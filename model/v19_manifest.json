@@ -1,0 +1,21 @@
+{
+  "schema": "34-fresnaye-hosted-model-manifest-v1",
+  "model": "34_Fresnaye_Level02_25pct_v19_D09ExplicitOpening.obj",
+  "canonical_obj_sha256": "0c8df8db5db23d16d52172b539f83ba092828366de037499748724ed2a1eef36",
+  "canonical_glb_sha256": "6afbe438fb40e19d042656fc6498917bbb64fee75adf073c354dde0b04a865ab",
+  "gzip_sha256": "70baae221f21e44d4dd0207e9a89f0f42c198dc85c6cd0d03b8e46f6352704c9",
+  "gzip_base64_chars": 95116,
+  "chunk_chars": 16000,
+  "chunks": [
+    "model/v19_obj_00.b64",
+    "model/v19_obj_01.b64",
+    "model/v19_obj_02.b64",
+    "model/v19_obj_03.b64",
+    "model/v19_obj_04.b64",
+    "model/v19_obj_05.b64"
+  ],
+  "chunk_lengths": [16000,16000,16000,16000,16000,15116],
+  "triangles": 8787,
+  "architectural_geometry_changed": false,
+  "viewer": "Walkthrough_v22_Hosted"
+}
