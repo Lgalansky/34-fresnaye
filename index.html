@@ -1,155 +1,46 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#151515">
-<title>34 Fresnaye — Level 02 Walkthrough v25 Hosted Manifest</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>34 Fresnaye — Level 02 Walkthrough v23 Static Host Split</title>
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#121212;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:white}
-#c{width:100%;height:100%;display:block;touch-action:none}
-.hud{position:fixed;inset:0;pointer-events:none}
-.top{position:absolute;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
-.card{background:rgba(15,15,15,.80);backdrop-filter:blur(9px);padding:10px 12px;border-radius:12px;max-width:575px;font-size:12px;line-height:1.35}
-.card b{font-size:15px} .statusline{margin-top:3px} .coords{font-variant-numeric:tabular-nums;opacity:.9}
-.warning{opacity:.76;margin-top:4px}
-.actions{pointer-events:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:53vw}
-.btn{border:0;border-radius:10px;padding:9px 10px;background:rgba(20,20,20,.84);color:#fff;font-weight:650;font-size:12px}
-.btn.primary,.btn.on{background:#fff;color:#111}
-.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto}
-.enter{border:0;border-radius:14px;padding:14px 20px;font-size:17px;font-weight:750;background:#fff;color:#111;box-shadow:0 6px 30px rgba(0,0,0,.25)}
-.cross{position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);opacity:.62}
-.cross:before,.cross:after{content:"";position:absolute;background:white} .cross:before{width:2px;height:12px;left:5px} .cross:after{height:2px;width:12px;top:5px}
-.touch{display:none;position:absolute;inset:0}
-.stick{pointer-events:auto;touch-action:none;position:absolute;left:18px;bottom:max(22px,env(safe-area-inset-bottom));width:126px;height:126px;border-radius:50%;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.10)}
-.knob{position:absolute;width:42px;height:42px;border-radius:50%;left:42px;top:42px;background:rgba(255,255,255,.64)}
-.look{pointer-events:auto;touch-action:none;position:absolute;right:0;top:68px;width:58%;bottom:0}
-.legend{position:absolute;left:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:8px 10px;border-radius:10px;background:rgba(15,15,15,.68);font-size:11px;line-height:1.35;max-width:425px}
-.diag{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,88vw);max-height:72vh;overflow:auto;background:rgba(12,12,12,.94);padding:18px;border-radius:14px;pointer-events:auto;white-space:pre-wrap;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;box-shadow:0 12px 48px rgba(0,0,0,.45)}
-.diag.show{display:block} .diag button{float:right}
-@media(pointer:coarse){.touch{display:block}.legend{left:auto;right:10px;bottom:max(10px,env(safe-area-inset-bottom));max-width:205px}.center{display:none}.cross{opacity:.30}.card{max-width:64vw;font-size:10px}.card b{font-size:12px}.actions{max-width:43vw}.btn{font-size:10px;padding:8px 8px}}
-</style>
-</head>
-<body>
-<canvas id="c"></canvas>
-<div class="hud">
-  <div class="top">
-    <div class="card">
-      <b>34 Fresnaye · Level 02 · canonical v19 · Walkthrough v25</b>
-      <div id="status" class="statusline">Loading hosted canonical geometry…</div>
-      <div id="coords" class="coords">Position —</div>
-      <div class="warning">Viewer navigation only. Architectural geometry is unchanged. Level 02 25% QA remains pending on D21 instance 1, W11 wall depth, iD05 and iD08; D09 is resolved in canonical v19.</div>
-    </div>
-    <div class="actions">
-      <button class="btn" data-start="living">Living</button>
-      <button class="btn" data-start="kitchen">Kitchen</button>
-      <button class="btn" data-start="bedroom">Main bedroom</button>
-      <button class="btn" data-start="entrance">Entrance</button>
-      <button class="btn" data-start="second">Second dwelling</button>
-      <button class="btn" data-start="service">Service stair</button>
-      <button class="btn" id="next">Next room</button>
-      <button class="btn on" id="collision">Collision ON</button>
-      <button class="btn" id="fullscreen">Full screen</button>
-      <button class="btn" id="diagnostics">Diagnostics</button>
-      <button class="btn" id="reset">Reset</button>
-    </div>
-  </div>
-  <div class="center"><button class="enter" id="enter">Enter walkthrough</button></div>
-  <div class="cross"></div>
-  <div class="touch"><div class="stick" id="stick"><div class="knob" id="knob"></div></div><div class="look" id="look"></div></div>
-  <div class="legend">Desktop: Enter · WASD/arrows · mouse look · Shift faster · N next · R reset · C collision<br>Mobile: left joystick · drag right side to look<br>Reset returns to selected room. URL hash stores the selected start room.</div>
-  <div class="diag" id="diag"><button class="btn" id="diagClose">Close</button><div id="diagText">Diagnostics loading…</div></div>
-</div>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#121212;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:white}#c{width:100%;height:100%;display:block;touch-action:none}.hud{position:fixed;inset:0;pointer-events:none}.top{position:absolute;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}.card{background:rgba(15,15,15,.78);backdrop-filter:blur(9px);padding:10px 12px;border-radius:12px;max-width:560px;font-size:12px;line-height:1.35}.card b{font-size:15px}.statusline{margin-top:3px}.actions{pointer-events:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:50vw}.btn{border:0;border-radius:10px;padding:9px 10px;background:rgba(20,20,20,.82);color:#fff;font-weight:650;font-size:12px}.btn.primary,.btn.on{background:#fff;color:#111}.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto}.enter{border:0;border-radius:14px;padding:14px 20px;font-size:17px;font-weight:750;background:#fff;color:#111;box-shadow:0 6px 30px rgba(0,0,0,.25)}.cross{position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);opacity:.65}.cross:before,.cross:after{content:"";position:absolute;background:white}.cross:before{width:2px;height:12px;left:5px}.cross:after{height:2px;width:12px;top:5px}.touch{display:none;position:absolute;inset:0}.stick{pointer-events:auto;touch-action:none;position:absolute;left:18px;bottom:max(22px,env(safe-area-inset-bottom));width:126px;height:126px;border-radius:50%;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.10)}.knob{position:absolute;width:42px;height:42px;border-radius:50%;left:42px;top:42px;background:rgba(255,255,255,.64)}.look{pointer-events:auto;touch-action:none;position:absolute;right:0;top:68px;width:58%;bottom:0}.legend{position:absolute;left:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:8px 10px;border-radius:10px;background:rgba(15,15,15,.66);font-size:11px;line-height:1.35;max-width:370px}.coords{font-variant-numeric:tabular-nums;opacity:.9}.warning{opacity:.78}@media(pointer:coarse){.touch{display:block}.legend{left:auto;right:10px;bottom:max(10px,env(safe-area-inset-bottom));max-width:190px}.center{display:none}.cross{opacity:.30}.card{max-width:64vw;font-size:10px}.card b{font-size:12px}.actions{max-width:42vw}.btn{font-size:10px;padding:8px 8px}}
+</style></head><body><canvas id="c"></canvas><div class="hud"><div class="top"><div class="card"><b>34 Fresnaye · Level 02 · canonical v19 · Walkthrough v23</b><div id="status" class="statusline">Loading canonical v19 geometry…</div><div id="coords" class="coords">Position —</div><div class="warning">Collision/floor-following is a viewer navigation aid generated from the canonical mesh; it does not alter architectural geometry. Level 02 25% QA remains pending on D21 instance 1, W11 wall depth, iD05 and iD08. D09 is resolved in canonical v19.</div></div><div class="actions"><button class="btn" data-start="living">Living</button><button class="btn" data-start="kitchen">Kitchen</button><button class="btn" data-start="bedroom">Main bedroom</button><button class="btn" data-start="entrance">Entrance</button><button class="btn" data-start="second">Second dwelling</button><button class="btn" data-start="service">Service stair</button><button class="btn" id="next">Next room</button><button class="btn on" id="collision">Collision ON</button><button class="btn" id="fullscreen">Full screen</button><button class="btn" id="reset">Reset</button></div></div><div class="center"><button class="enter" id="enter">Enter walkthrough</button></div><div class="cross"></div><div class="touch"><div class="stick" id="stick"><div class="knob" id="knob"></div></div><div class="look" id="look"></div></div><div class="legend">Desktop: click Enter · WASD / arrows · mouse look · Shift = faster<br>Mobile: left joystick · drag right side to look<br>Navigation: 0.22 m body radius · floor-following · step/stair support · Next room cycles verified start points · Reset returns to selected room</div></div>
+<script src="34_Fresnaye_Model_v19_GZ_part01.js"></script><script src="34_Fresnaye_Model_v19_GZ_part02.js"></script><script src="34_Fresnaye_Model_v19_GZ_part03.js"></script><script src="34_Fresnaye_Model_v19_GZ_part04a.js"></script><script src="34_Fresnaye_Model_v19_GZ_part04b.js"></script><script src="34_Fresnaye_Model_v19_GZ_part04c.js"></script><script src="34_Fresnaye_Model_v19_GZ_part05a.js"></script><script src="34_Fresnaye_Model_v19_GZ_part05b.js"></script><script src="34_Fresnaye_Model_v19_GZ_part05c.js"></script>
 <script>
-'use strict';
-const VIEWER_VERSION='Walkthrough_v25_HostedManifest';
 const MODEL_NAME='34_Fresnaye_Level02_25pct_v19_D09ExplicitOpening.obj';
 const MODEL_SHA256='0c8df8db5db23d16d52172b539f83ba092828366de037499748724ed2a1eef36';
-const MODEL_GZIP_SHA256='70baae221f21e44d4dd0207e9a89f0f42c198dc85c6cd0d03b8e46f6352704c9';
-const MODEL_GZIP_BASE64_CHARS=95116;
-const MODEL_GLBSHA256='6afbe438fb40e19d042656fc6498917bbb64fee75adf073c354dde0b04a865ab';
-let OBJ_GZ_B64='';
-const HOSTED_MANIFEST='model/v19_manifest.json';
-async function loadHostedPayload(){const r=await fetch(HOSTED_MANIFEST,{cache:'no-store'});if(!r.ok)throw new Error('Model manifest HTTP '+r.status);const m=await r.json();if(m.canonical_obj_sha256!==MODEL_SHA256||m.gzip_sha256!==MODEL_GZIP_SHA256||m.gzip_base64_chars!==MODEL_GZIP_BASE64_CHARS||m.triangles!==8787)throw new Error('Hosted model manifest integrity mismatch');if(!Array.isArray(m.chunks)||!m.chunks.length)throw new Error('Hosted model manifest has no chunks');let parts=[];for(const path of m.chunks){const q=await fetch(path,{cache:'force-cache'});if(!q.ok)throw new Error('Model chunk HTTP '+q.status+': '+path);parts.push((await q.text()).trim())}const b64=parts.join('');if(b64.length!==MODEL_GZIP_BASE64_CHARS)throw new Error('Hosted model payload length mismatch');return b64}
+const OBJ_GZ_B64=window.__FRES_OBJ_GZ||'';
+const MODEL_ASSET_PARTS=9;
 const NAV={eyeHeight:1.65,radius:.22,bodyLow:.16,bodyHigh:1.48,maxStepUp:.24,maxDrop:.22,walkSpeed:2.15,runSpeed:4.1,floorNormalMin:.58,wallNormalMax:.72};
-const canvas=document.getElementById('c'),status=document.getElementById('status'),coords=document.getElementById('coords');
-let gl=canvas.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});
-const WEBGL2=!!gl;
-if(!gl) gl=canvas.getContext('webgl',{antialias:true,alpha:false,powerPreference:'high-performance'})||canvas.getContext('experimental-webgl',{antialias:true,alpha:false});
-if(!gl){status.textContent='WebGL is not available in this browser.';window.__FRESNAYE_QA={viewer:VIEWER_VERSION,status:'ERROR',message:'WebGL unavailable'};throw new Error('WebGL unavailable')}
+const canvas=document.getElementById('c');let gl=canvas.getContext('webgl2',{antialias:true,alpha:false});const WEBGL2=!!gl;if(!gl)gl=canvas.getContext('webgl',{antialias:true,alpha:false})||canvas.getContext('experimental-webgl',{antialias:true,alpha:false});
+const status=document.getElementById('status'),coords=document.getElementById('coords');if(!gl){status.textContent='WebGL is not available in this browser.';throw new Error('WebGL unavailable')}
 const vs=WEBGL2?`#version 300 es
 precision highp float;layout(location=0) in vec3 p;layout(location=1) in vec3 n;uniform mat4 vp;out vec3 N;out vec3 P;void main(){P=p;N=n;gl_Position=vp*vec4(p,1.);}`:`precision highp float;attribute vec3 p;attribute vec3 n;uniform mat4 vp;varying vec3 N;varying vec3 P;void main(){P=p;N=n;gl_Position=vp*vec4(p,1.);}`;
 const fs=WEBGL2?`#version 300 es
-precision highp float;in vec3 N;in vec3 P;out vec4 o;void main(){vec3 nn=normalize(N);vec3 sun=normalize(vec3(.32,-.42,.85));float hemi=.64+.36*max(0.,nn.z);float diffuse=.56+.44*abs(dot(nn,sun));float vertical=.96+.04*max(0.,nn.z);vec3 base=vec3(.79,.785,.765);o=vec4(base*hemi*diffuse*vertical,1.);}`:`precision highp float;varying vec3 N;varying vec3 P;void main(){vec3 nn=normalize(N);vec3 sun=normalize(vec3(.32,-.42,.85));float hemi=.64+.36*max(0.,nn.z);float diffuse=.56+.44*abs(dot(nn,sun));float vertical=.96+.04*max(0.,nn.z);vec3 base=vec3(.79,.785,.765);gl_FragColor=vec4(base*hemi*diffuse*vertical,1.);}`;
-function sh(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
-let prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));if(!WEBGL2){gl.bindAttribLocation(prog,0,'p');gl.bindAttribLocation(prog,1,'n')}gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(prog));gl.useProgram(prog);let uVP=gl.getUniformLocation(prog,'vp');
-function b64bytes(s){let b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
-async function sha256Bytes(u){let d=await crypto.subtle.digest('SHA-256',u);return [...new Uint8Array(d)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-async function sha256Text(t){return sha256Bytes(new TextEncoder().encode(t))}
-async function decodeGzipBytes(u){if(typeof DecompressionStream==='undefined')throw new Error('Browser gzip decompression unavailable; use current Safari/Chrome/Edge.');let ds=new DecompressionStream('gzip');return await new Response(new Blob([u]).stream().pipeThrough(ds)).text()}
-function parseOBJ(t){let V=[],out=[],tris=[];for(const line of t.split(/\r?\n/)){if(line.startsWith('v ')){let a=line.trim().split(/\s+/);V.push([+a[1],+a[2],+a[3]])}else if(line.startsWith('f ')){let a=line.trim().split(/\s+/).slice(1).map(x=>parseInt(x.split('/')[0],10)-1);for(let k=1;k<a.length-1;k++){let q=[V[a[0]],V[a[k]],V[a[k+1]]],ux=q[1][0]-q[0][0],uy=q[1][1]-q[0][1],uz=q[1][2]-q[0][2],vx=q[2][0]-q[0][0],vy=q[2][1]-q[0][1],vz=q[2][2]-q[0][2],nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,L=Math.hypot(nx,ny,nz)||1;nx/=L;ny/=L;nz/=L;for(const p of q)out.push(p[0],p[1],p[2],nx,ny,nz);tris.push({q,n:[nx,ny,nz],minx:Math.min(q[0][0],q[1][0],q[2][0]),maxx:Math.max(q[0][0],q[1][0],q[2][0]),miny:Math.min(q[0][1],q[1][1],q[2][1]),maxy:Math.max(q[0][1],q[1][1],q[2][1]),minz:Math.min(q[0][2],q[1][2],q[2][2]),maxz:Math.max(q[0][2],q[1][2],q[2][2])})}}}return{data:new Float32Array(out),tris,vertexCount:V.length}}
+precision highp float;in vec3 N;in vec3 P;out vec4 o;void main(){vec3 nn=normalize(N);vec3 l=normalize(vec3(.32,-.42,.85));float hemi=.61+.39*max(0.,nn.z);float d=.58+.42*abs(dot(nn,l));float warm=step(.05,P.z)*.018;vec3 base=vec3(.77+warm,.765,.74);o=vec4(base*d*hemi,1.);}`:`precision highp float;varying vec3 N;varying vec3 P;void main(){vec3 nn=normalize(N);vec3 l=normalize(vec3(.32,-.42,.85));float hemi=.61+.39*max(0.,nn.z);float d=.58+.42*abs(dot(nn,l));float warm=step(.05,P.z)*.018;vec3 base=vec3(.77+warm,.765,.74);gl_FragColor=vec4(base*d*hemi,1.);}`;
+function sh(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}let prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));if(!WEBGL2){gl.bindAttribLocation(prog,0,'p');gl.bindAttribLocation(prog,1,'n');}gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(prog));gl.useProgram(prog);let uVP=gl.getUniformLocation(prog,'vp');
+async function decodeGzip64(s){let b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);if(typeof DecompressionStream==='undefined')throw new Error('This browser needs a newer Safari/Chrome version for the walkthrough.');let ds=new DecompressionStream('gzip');return await new Response(new Blob([u]).stream().pipeThrough(ds)).text()}
+async function sha256Text(t){let d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(d)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function parseOBJ(t){let V=[],out=[],tris=[];for(const line of t.split(/\r?\n/)){if(line.startsWith('v ')){let a=line.trim().split(/\s+/);V.push([+a[1],+a[2],+a[3]])}else if(line.startsWith('f ')){let a=line.trim().split(/\s+/).slice(1).map(x=>parseInt(x.split('/')[0],10)-1);for(let k=1;k<a.length-1;k++){let q=[V[a[0]],V[a[k]],V[a[k+1]]],ux=q[1][0]-q[0][0],uy=q[1][1]-q[0][1],uz=q[1][2]-q[0][2],vx=q[2][0]-q[0][0],vy=q[2][1]-q[0][1],vz=q[2][2]-q[0][2],nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,L=Math.hypot(nx,ny,nz)||1;nx/=L;ny/=L;nz/=L;for(const p of q)out.push(p[0],p[1],p[2],nx,ny,nz);tris.push({q,n:[nx,ny,nz],minx:Math.min(q[0][0],q[1][0],q[2][0]),maxx:Math.max(q[0][0],q[1][0],q[2][0]),miny:Math.min(q[0][1],q[1][1],q[2][1]),maxy:Math.max(q[0][1],q[1][1],q[2][1]),minz:Math.min(q[0][2],q[1][2],q[2][2]),maxz:Math.max(q[0][2],q[1][2],q[2][2])})}}}return{data:new Float32Array(out),tris}}
 function perspective(fovy,asp,n,f){let t=1/Math.tan(fovy/2),nf=1/(n-f);return new Float32Array([t/asp,0,0,0,0,t,0,0,0,0,(f+n)*nf,-1,0,0,2*f*n*nf,0])}
-function norm(a){let l=Math.hypot(...a)||1;return a.map(x=>x/l)} function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]} function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
+function norm(a){let l=Math.hypot(...a)||1;return a.map(x=>x/l)}function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
 function lookAt(e,c,u){let f=norm([c[0]-e[0],c[1]-e[1],c[2]-e[2]]),s=norm(cross(f,u)),v=cross(s,f);return new Float32Array([s[0],v[0],-f[0],0,s[1],v[1],-f[1],0,s[2],v[2],-f[2],0,-dot(s,e),-dot(v,e),dot(f,e),1])}
 function mul(a,b){let o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+r]*b[c*4+k];o[c*4+r]=s}return o}
 function pointInTri2(x,y,a,b,c){let v0x=c[0]-a[0],v0y=c[1]-a[1],v1x=b[0]-a[0],v1y=b[1]-a[1],v2x=x-a[0],v2y=y-a[1],d00=v0x*v0x+v0y*v0y,d01=v0x*v1x+v0y*v1y,d02=v0x*v2x+v0y*v2y,d11=v1x*v1x+v1y*v1y,d12=v1x*v2x+v1y*v2y,den=d00*d11-d01*d01;if(Math.abs(den)<1e-12)return false;let u=(d11*d02-d01*d12)/den,v=(d00*d12-d01*d02)/den;return u>=-1e-5&&v>=-1e-5&&u+v<=1.00001}
 function planeZ(t,x,y){let a=t.q[0],n=t.n;if(Math.abs(n[2])<1e-7)return null;return a[2]-(n[0]*(x-a[0])+n[1]*(y-a[1]))/n[2]}
 function distSeg2(px,py,a,b){let vx=b[0]-a[0],vy=b[1]-a[1],wx=px-a[0],wy=py-a[1],L=vx*vx+vy*vy;if(L<1e-10)return Math.hypot(wx,wy);let t=Math.max(0,Math.min(1,(wx*vx+wy*vy)/L)),dx=px-(a[0]+t*vx),dy=py-(a[1]+t*vy);return Math.hypot(dx,dy)}
-async function init(){
-  status.textContent='Loading hosted canonical model…';
-  OBJ_GZ_B64=await loadHostedPayload();
-  if(OBJ_GZ_B64.length!==MODEL_GZIP_BASE64_CHARS)throw new Error('Hosted model payload length mismatch');
-  const gzBytes=b64bytes(OBJ_GZ_B64);
-  status.textContent='Validating compressed canonical model…';
-  const gzipSha=await sha256Bytes(gzBytes);
-  if(gzipSha!==MODEL_GZIP_SHA256)throw new Error('Compressed model integrity check failed');
-  status.textContent='Decompressing canonical model…';
-  const objText=await decodeGzipBytes(gzBytes);
-  const runtimeSha=await sha256Text(objText);
-  if(runtimeSha!==MODEL_SHA256)throw new Error('Canonical OBJ integrity check failed');
-  status.textContent='Building navigation mesh…';
-  const parsed=parseOBJ(objText),data=parsed.data,tris=parsed.tris;
-  const floors=tris.filter(t=>Math.abs(t.n[2])>=NAV.floorNormalMin),walls=tris.filter(t=>Math.abs(t.n[2])<=NAV.wallNormalMax&&(t.maxz-t.minz)>.12);
-  let vao=null;if(WEBGL2){vao=gl.createVertexArray();gl.bindVertexArray(vao)}
-  const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,24,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,24,12);
-  const count=data.length/6,triCount=Math.round(count/3);
-  if(triCount!==8787||parsed.vertexCount!==5689)throw new Error(`Canonical topology mismatch (${parsed.vertexCount} vertices / ${triCount} triangles)`);
-  status.textContent=`Ready · canonical hash verified · ${triCount.toLocaleString()} triangles · ${WEBGL2?'WebGL2':'WebGL1'} · hosted manifest`;
-  function floorZAt(x,y,footZ){let best=null;for(const t of floors){if(x<t.minx-1e-4||x>t.maxx+1e-4||y<t.miny-1e-4||y>t.maxy+1e-4)continue;if(!pointInTri2(x,y,t.q[0],t.q[1],t.q[2]))continue;let z=planeZ(t,x,y);if(z===null)continue;if(z<=footZ+NAV.maxStepUp+1e-4&&z>=footZ-NAV.maxDrop-1e-4&&(best===null||z>best))best=z}return best}
-  function wallBlocked(x,y,footZ){let z0=footZ+NAV.bodyLow,z1=footZ+NAV.bodyHigh,r=NAV.radius;for(const t of walls){if(t.maxz<z0||t.minz>z1||x<t.minx-r||x>t.maxx+r||y<t.miny-r||y>t.maxy+r)continue;let q=t.q,pts=[[q[0][0],q[0][1]],[q[1][0],q[1][1]],[q[2][0],q[2][1]]];if(distSeg2(x,y,pts[0],pts[1])<r||distSeg2(x,y,pts[1],pts[2])<r||distSeg2(x,y,pts[2],pts[0])<r)return true}return false}
-  const starts={living:{p:[3.6,13,1.65],yaw:1.05},kitchen:{p:[8,8.2,1.65],yaw:.52},bedroom:{p:[3.5,26.7,1.65],yaw:1.31},entrance:{p:[7.9,17.1,1.65],yaw:.79},second:{p:[-15.4,5.2,2.26],yaw:2.70},service:{p:[-5.0767,2.1133,.89],yaw:3.05}};
-  const startOrder=Object.keys(starts);
-  let requested=(location.hash||'').replace(/^#/,'').toLowerCase();if(!starts[requested])requested='entrance';
-  let start=requested,pos=[...starts[start].p],yaw=starts[start].yaw,pitch=0,eyeHeight=NAV.eyeHeight,footZ=pos[2]-eyeHeight,collisionOn=true;
-  function updateCoords(){coords.textContent=`${start} · x ${pos[0].toFixed(2)} m · y ${pos[1].toFixed(2)} m · floor ${footZ.toFixed(2)} m · eye ${pos[2].toFixed(2)} m · ${collisionOn?'collision':'free-fly XY'}`}
-  function setStart(k){if(!starts[k])return;start=k;pos=[...starts[k].p];eyeHeight=NAV.eyeHeight;footZ=pos[2]-eyeHeight;yaw=starts[k].yaw;pitch=0;history.replaceState(null,'','#'+k);document.querySelectorAll('[data-start]').forEach(b=>b.classList.toggle('on',b.dataset.start===k));updateCoords()}
-  document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>setStart(b.dataset.start));
-  document.getElementById('reset').onclick=()=>setStart(start);
-  document.getElementById('next').onclick=()=>{let i=Math.max(0,startOrder.indexOf(start));setStart(startOrder[(i+1)%startOrder.length])};
-  const cbtn=document.getElementById('collision');cbtn.onclick=()=>{collisionOn=!collisionOn;cbtn.textContent=collisionOn?'Collision ON':'Collision OFF';cbtn.classList.toggle('on',collisionOn);updateCoords()};
-  document.getElementById('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.().catch?.(()=>{});
-  const enter=document.getElementById('enter');enter.onclick=()=>canvas.requestPointerLock?.();
-  document.addEventListener('pointerlockchange',()=>{enter.style.display=document.pointerLockElement===canvas?'none':''});
-  document.addEventListener('mousemove',e=>{if(document.pointerLockElement===canvas){yaw-=e.movementX*.0025;pitch=Math.max(-1.35,Math.min(1.35,pitch-e.movementY*.0025))}});
-  let keys=new Set();addEventListener('keydown',e=>{keys.add(e.code);if(e.code==='KeyR')setStart(start);if(e.code==='KeyN')document.getElementById('next').click();if(e.code==='KeyC')cbtn.click();if(e.code==='KeyF')document.getElementById('fullscreen').click()});addEventListener('keyup',e=>keys.delete(e.code));addEventListener('blur',()=>keys.clear());
-  let mx=0,my=0,stickId=null,lookId=null,lx=0,ly=0;const stick=document.getElementById('stick'),knob=document.getElementById('knob'),look=document.getElementById('look');
-  function stickMove(e){let r=stick.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=43,L=Math.hypot(x,y)||1,k=Math.min(1,m/L);x*=k;y*=k;knob.style.transform=`translate(${x}px,${y}px)`;mx=x/m;my=y/m}
-  stick.onpointerdown=e=>{stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e)};stick.onpointermove=e=>{if(e.pointerId===stickId)stickMove(e)};function se(e){if(e.pointerId===stickId){stickId=null;mx=my=0;knob.style.transform='translate(0,0)'}}stick.onpointerup=se;stick.onpointercancel=se;
-  look.onpointerdown=e=>{lookId=e.pointerId;look.setPointerCapture(e.pointerId);lx=e.clientX;ly=e.clientY};look.onpointermove=e=>{if(e.pointerId===lookId){yaw-=(e.clientX-lx)*.005;pitch=Math.max(-1.35,Math.min(1.35,pitch-(e.clientY-ly)*.005));lx=e.clientX;ly=e.clientY}};look.onpointerup=e=>{if(e.pointerId===lookId)lookId=null};look.onpointercancel=look.onpointerup;
-  function tryAxis(nx,ny){if(!collisionOn){pos[0]=nx;pos[1]=ny;return}if(wallBlocked(nx,ny,footZ))return;let nf=floorZAt(nx,ny,footZ);if(nf===null)return;pos[0]=nx;pos[1]=ny;footZ=nf;pos[2]=footZ+eyeHeight}
-  function resize(){let d=Math.min(devicePixelRatio||1,2),w=Math.max(1,Math.floor(innerWidth*d)),h=Math.max(1,Math.floor(innerHeight*d));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h)}}
-  let last=performance.now(),coordClock=0;
-  function frame(now){if(document.hidden){last=now;requestAnimationFrame(frame);return}resize();let dt=Math.min((now-last)/1000,.05);last=now;let f=0,r=0;if(keys.has('KeyW')||keys.has('ArrowUp'))f++;if(keys.has('KeyS')||keys.has('ArrowDown'))f--;if(keys.has('KeyD')||keys.has('ArrowRight'))r++;if(keys.has('KeyA')||keys.has('ArrowLeft'))r--;f+=-my;r+=mx;let L=Math.hypot(f,r);if(L>1){f/=L;r/=L}let sp=(keys.has('ShiftLeft')||keys.has('ShiftRight'))?NAV.runSpeed:NAV.walkSpeed,fx=Math.cos(yaw),fy=Math.sin(yaw),rx=-fy,ry=fx,dx=(fx*f+rx*r)*sp*dt,dy=(fy*f+ry*r)*sp*dt;if(collisionOn){let ox=pos[0],oy=pos[1];tryAxis(ox+dx,oy);tryAxis(pos[0],oy+dy)}else{pos[0]+=dx;pos[1]+=dy}pos[2]=footZ+eyeHeight;coordClock+=dt;if(coordClock>.15){coordClock=0;updateCoords()}let cp=Math.cos(pitch),forward=[Math.cos(yaw)*cp,Math.sin(yaw)*cp,Math.sin(pitch)],target=[pos[0]+forward[0],pos[1]+forward[1],pos[2]+forward[2]],P=perspective(70*Math.PI/180,canvas.width/canvas.height,.04,180),V=lookAt(pos,target,[0,0,1]);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.clearColor(.94,.94,.92,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(uVP,false,mul(P,V));if(WEBGL2)gl.bindVertexArray(vao);gl.drawArrays(gl.TRIANGLES,0,count);requestAnimationFrame(frame)}
-  setStart(requested);
-  const diag=document.getElementById('diag'),diagText=document.getElementById('diagText');
-  const qa={viewer:VIEWER_VERSION,status:'READY',architecturalGeometryChanged:false,modelName:MODEL_NAME,modelSha256:MODEL_SHA256,runtimeSha256:runtimeSha,gzipSha256:gzipSha,glbSha256:MODEL_GLBSHA256,assetSource:HOSTED_MANIFEST,embeddedBase64Chars:OBJ_GZ_B64.length,webglVersion:WEBGL2?'WebGL2':'WebGL1',vertices:parsed.vertexCount,triangles:triCount,floorTriangles:floors.length,wallTriangles:walls.length,nav:{...NAV},starts:JSON.parse(JSON.stringify(starts)),controls:{desktop:['WASD','arrows','mouse pointer lock','Shift run','N next','R reset','C collision','F fullscreen'],mobile:['left joystick','right drag look'],reset:true,nextRoom:true,roomHashDeepLinks:true},floorAt:(x,y,z)=>floorZAt(x,y,z),blockedAt:(x,y,z)=>wallBlocked(x,y,z)};
-  window.__FRESNAYE_QA=qa;
-  function diagSerializable(){let q={...qa};delete q.floorAt;delete q.blockedAt;return q}
-  document.getElementById('diagnostics').onclick=()=>{diagText.textContent=JSON.stringify(diagSerializable(),null,2);diag.classList.add('show')};
-  document.getElementById('diagClose').onclick=()=>diag.classList.remove('show');
-  requestAnimationFrame(frame);
+async function init(){if(!OBJ_GZ_B64||OBJ_GZ_B64.length<90000)throw new Error('Canonical model asset chunks did not load');let objText=await decodeGzip64(OBJ_GZ_B64),runtimeSha=await sha256Text(objText);if(runtimeSha!==MODEL_SHA256)throw new Error('Embedded model integrity check failed');let parsed=parseOBJ(objText),data=parsed.data,tris=parsed.tris;let floors=tris.filter(t=>Math.abs(t.n[2])>=NAV.floorNormalMin),walls=tris.filter(t=>Math.abs(t.n[2])<=NAV.wallNormalMax && (t.maxz-t.minz)>.12);let vao=null;if(WEBGL2){vao=gl.createVertexArray();gl.bindVertexArray(vao);}let buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,24,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,24,12);let count=data.length/6;status.textContent=`Loaded · hash verified · ${Math.round(count/3).toLocaleString()} triangles · ${WEBGL2?'WebGL2':'WebGL1 compatibility'} · collision-ready`;
+function floorZAt(x,y,footZ){let best=null;for(const t of floors){if(x<t.minx-1e-4||x>t.maxx+1e-4||y<t.miny-1e-4||y>t.maxy+1e-4)continue;if(!pointInTri2(x,y,t.q[0],t.q[1],t.q[2]))continue;let z=planeZ(t,x,y);if(z===null)continue;if(z<=footZ+NAV.maxStepUp+1e-4&&z>=footZ-NAV.maxDrop-1e-4&&(best===null||z>best))best=z}return best}
+function wallBlocked(x,y,footZ){let z0=footZ+NAV.bodyLow,z1=footZ+NAV.bodyHigh,r=NAV.radius;for(const t of walls){if(t.maxz<z0||t.minz>z1||x<t.minx-r||x>t.maxx+r||y<t.miny-r||y>t.maxy+r)continue;let q=t.q,pts=[[q[0][0],q[0][1]],[q[1][0],q[1][1]],[q[2][0],q[2][1]]];if(distSeg2(x,y,pts[0],pts[1])<r||distSeg2(x,y,pts[1],pts[2])<r||distSeg2(x,y,pts[2],pts[0])<r)return true}return false}
+const starts={living:{p:[3.6,13,1.65],yaw:1.05},kitchen:{p:[8,8.2,1.65],yaw:.52},bedroom:{p:[3.5,26.7,1.65],yaw:1.31},entrance:{p:[7.9,17.1,1.65],yaw:.79},second:{p:[-15.4,5.2,2.26],yaw:2.70},service:{p:[-5.0767,2.1133,.89],yaw:3.05}};let start='entrance',pos=[...starts[start].p],yaw=starts[start].yaw,pitch=0,eyeHeight=NAV.eyeHeight,footZ=pos[2]-eyeHeight,collisionOn=true;
+function setStart(k){start=k;pos=[...starts[k].p];eyeHeight=NAV.eyeHeight;footZ=pos[2]-eyeHeight;yaw=starts[k].yaw;pitch=0;updateCoords()}document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>setStart(b.dataset.start));document.getElementById('reset').onclick=()=>setStart(start);const startOrder=Object.keys(starts);document.getElementById('next').onclick=()=>{let i=Math.max(0,startOrder.indexOf(start));setStart(startOrder[(i+1)%startOrder.length])};
+const cbtn=document.getElementById('collision');cbtn.onclick=()=>{collisionOn=!collisionOn;cbtn.textContent=collisionOn?'Collision ON':'Collision OFF';cbtn.classList.toggle('on',collisionOn)};document.getElementById('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
+const enter=document.getElementById('enter');enter.onclick=()=>{canvas.requestPointerLock?.()};document.addEventListener('pointerlockchange',()=>{enter.style.display=document.pointerLockElement===canvas?'none':''});document.addEventListener('mousemove',e=>{if(document.pointerLockElement===canvas){yaw-=e.movementX*.0025;pitch=Math.max(-1.35,Math.min(1.35,pitch-e.movementY*.0025))}});
+let keys=new Set();addEventListener('keydown',e=>keys.add(e.code));addEventListener('keyup',e=>keys.delete(e.code));
+let mx=0,my=0,stickId=null,lookId=null,lx=0,ly=0;const stick=document.getElementById('stick'),knob=document.getElementById('knob'),look=document.getElementById('look');function stickMove(e){let r=stick.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=43,L=Math.hypot(x,y)||1,k=Math.min(1,m/L);x*=k;y*=k;knob.style.transform=`translate(${x}px,${y}px)`;mx=x/m;my=y/m}stick.onpointerdown=e=>{stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e)};stick.onpointermove=e=>{if(e.pointerId===stickId)stickMove(e)};function se(e){if(e.pointerId===stickId){stickId=null;mx=my=0;knob.style.transform='translate(0,0)'}}stick.onpointerup=se;stick.onpointercancel=se;look.onpointerdown=e=>{lookId=e.pointerId;look.setPointerCapture(e.pointerId);lx=e.clientX;ly=e.clientY};look.onpointermove=e=>{if(e.pointerId===lookId){yaw-=(e.clientX-lx)*.005;pitch=Math.max(-1.35,Math.min(1.35,pitch-(e.clientY-ly)*.005));lx=e.clientX;ly=e.clientY}};look.onpointerup=e=>{if(e.pointerId===lookId)lookId=null};look.onpointercancel=look.onpointerup;
+function updateCoords(){coords.textContent=`x ${pos[0].toFixed(2)} m · y ${pos[1].toFixed(2)} m · floor ${footZ.toFixed(2)} m · eye ${pos[2].toFixed(2)} m · ${collisionOn?'collision':'free-fly XY'}`}
+function tryAxis(nx,ny){if(!collisionOn){pos[0]=nx;pos[1]=ny;return}if(wallBlocked(nx,ny,footZ))return;let nf=floorZAt(nx,ny,footZ);if(nf===null)return;pos[0]=nx;pos[1]=ny;footZ=nf;pos[2]=footZ+eyeHeight}
+function resize(){let d=Math.min(devicePixelRatio||1,2),w=Math.floor(innerWidth*d),h=Math.floor(innerHeight*d);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h)}}let last=performance.now(),coordClock=0;function frame(now){resize();let dt=Math.min((now-last)/1000,.05);last=now;let f=0,r=0;if(keys.has('KeyW')||keys.has('ArrowUp'))f++;if(keys.has('KeyS')||keys.has('ArrowDown'))f--;if(keys.has('KeyD')||keys.has('ArrowRight'))r++;if(keys.has('KeyA')||keys.has('ArrowLeft'))r--;f+=-my;r+=mx;let L=Math.hypot(f,r);if(L>1){f/=L;r/=L}let sp=(keys.has('ShiftLeft')||keys.has('ShiftRight'))?NAV.runSpeed:NAV.walkSpeed,fx=Math.cos(yaw),fy=Math.sin(yaw),rx=-fy,ry=fx,dx=(fx*f+rx*r)*sp*dt,dy=(fy*f+ry*r)*sp*dt;if(collisionOn){let ox=pos[0],oy=pos[1];tryAxis(ox+dx,oy);tryAxis(pos[0],oy+dy)}else{pos[0]+=dx;pos[1]+=dy}pos[2]=footZ+eyeHeight;coordClock+=dt;if(coordClock>.15){coordClock=0;updateCoords()}let cp=Math.cos(pitch),forward=[Math.cos(yaw)*cp,Math.sin(yaw)*cp,Math.sin(pitch)],target=[pos[0]+forward[0],pos[1]+forward[1],pos[2]+forward[2]],P=perspective(70*Math.PI/180,canvas.width/canvas.height,.04,180),V=lookAt(pos,target,[0,0,1]);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.clearColor(.94,.94,.92,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(uVP,false,mul(P,V));if(WEBGL2)gl.bindVertexArray(vao);gl.drawArrays(gl.TRIANGLES,0,count);requestAnimationFrame(frame)}
+setStart('entrance');window.__FRESNAYE_QA={viewer:'Walkthrough_v23_StaticHostSplit',assetParts:MODEL_ASSET_PARTS,modelName:MODEL_NAME,modelSha256:MODEL_SHA256,runtimeSha256:runtimeSha,webglVersion:WEBGL2?'WebGL2':'WebGL1',triangles:Math.round(count/3),floorTriangles:floors.length,wallTriangles:walls.length,nav:{...NAV},starts:JSON.parse(JSON.stringify(starts)),floorAt:(x,y,z)=>floorZAt(x,y,z),blockedAt:(x,y,z)=>wallBlocked(x,y,z),status:'READY'};requestAnimationFrame(frame);
 }
-init().catch(e=>{console.error(e);status.textContent='Walkthrough failed to load: '+e.message;window.__FRESNAYE_QA={viewer:VIEWER_VERSION,status:'ERROR',message:e.message,modelName:MODEL_NAME,modelSha256:MODEL_SHA256}});
-</script>
-</body>
-</html>
+init().catch(e=>{console.error(e);status.textContent='Walkthrough failed to load: '+e.message;window.__FRESNAYE_QA={status:'ERROR',message:e.message}});
+</script></body></html>
