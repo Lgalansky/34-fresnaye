@@ -1,0 +1,50 @@
+name: Walkthrough deployment QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'walkthrough_v25.html'
+      - 'walkthrough_v25.js'
+      - 'model/**'
+      - '.github/workflows/walkthrough-qa.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript syntax
+        run: node --check walkthrough_v25.js
+      - name: Model manifest and payload integrity
+        run: |
+          python - <<'PY'
+          import json, base64, gzip, hashlib, pathlib
+          root=pathlib.Path('.')
+          m=json.loads((root/'model/v19_manifest.json').read_text())
+          b64=''.join((root/p).read_text().strip() for p in m['chunks'])
+          assert len(b64)==m['gzip_base64_chars'], (len(b64),m['gzip_base64_chars'])
+          gz=base64.b64decode(b64)
+          assert hashlib.sha256(gz).hexdigest()==m['gzip_sha256']
+          obj=gzip.decompress(gz)
+          assert hashlib.sha256(obj).hexdigest()==m['canonical_obj_sha256']
+          text=obj.decode('utf-8')
+          v=sum(1 for x in text.splitlines() if x.startswith('v '))
+          tri=sum(max(0,len(x.split())-3) for x in text.splitlines() if x.startswith('f '))
+          assert v==5689, v
+          assert tri==8787, tri
+          assert m['canonical_obj_sha256']=='0c8df8db5db23d16d52172b539f83ba092828366de037499748724ed2a1eef36'
+          assert m['canonical_glb_sha256']=='6afbe438fb40e19d042656fc6498917bbb64fee75adf073c354dde0b04a865ab'
+          print('MODEL_OK',v,tri,m['canonical_obj_sha256'])
+          PY
+      - name: Viewer contract checks
+        run: |
+          python - <<'PY'
+          import pathlib
+          h=pathlib.Path('walkthrough_v25.html').read_text()
+          j=pathlib.Path('walkthrough_v25.js').read_text()
+          for s in ['data-start="living"','data-start="kitchen"','data-start="bedroom"','data-start="entrance"','data-start="second"','data-start="service"','id="next"','id="reset"','id="collision"','id="diagnostics"','id="stick"','id="look"']:
+              assert s in h, s
+          for s in ['KeyW','ArrowUp','requestPointerLock','ShiftLeft','stick.onpointerdown','look.onpointerdown','history.replaceState','wallBlocked','floorZAt','webgl2','experimental-webgl','MODEL_SHA256','MODEL_GZIP_SHA256']:
+              assert s in j, s
+          print('VIEWER_CONTRACT_OK')
+          PY
