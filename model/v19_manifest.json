@@ -5,17 +5,30 @@
   "canonical_glb_sha256": "6afbe438fb40e19d042656fc6498917bbb64fee75adf073c354dde0b04a865ab",
   "gzip_sha256": "70baae221f21e44d4dd0207e9a89f0f42c198dc85c6cd0d03b8e46f6352704c9",
   "gzip_base64_chars": 95116,
-  "chunk_chars": 16000,
   "chunks": [
     "model/v19_obj_00.b64",
     "model/v19_obj_01.b64",
     "model/v19_obj_02.b64",
     "model/v19_obj_03.b64",
-    "model/v19_obj_04.b64",
-    "model/v19_obj_05.b64"
+    "model/v19_obj_04a.b64",
+    "model/v19_obj_04b.b64",
+    "model/v19_obj_05a.b64",
+    "model/v19_obj_05b.b64"
   ],
-  "chunk_lengths": [16000,16000,16000,16000,16000,15116],
+  "chunk_lengths": [16000,16000,16000,16000,8000,8000,8000,7116],
+  "chunk_git_blob_shas": [
+    "67905906f2952ea7c2a2e96bdfb0e6134d99f65c",
+    "40ec9b50840c7acbaeb50b1b12c7a15faeb755be",
+    "b384c269aaca0c3273d7cc7dc37944d7515c56e4",
+    "d731a1acb130cdfef7dbff0bcf8a0429a44bc3e7",
+    "3ead339a29bae908cb9f5c246f7755aacac7ec9f",
+    "6f31436e1f699ef136e5c868d53f4de1e5241a2f",
+    "0ad3b19447efbc6e825e9d11170c12cb9e73e1d2",
+    "ee153f3ddeb68f05ee640fd294d1271fe708d9ac"
+  ],
+  "vertices": 5689,
   "triangles": 8787,
   "architectural_geometry_changed": false,
-  "viewer": "Walkthrough_v22_Hosted"
+  "viewer": "Walkthrough_v25_HostedManifest",
+  "repair_note": "2026-09-07 hosted payload reconciled to byte-exact canonical v19; superseded corrupt v19_obj_04.b64 and v19_obj_05.b64 are no longer referenced."
 }
