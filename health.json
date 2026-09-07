@@ -1,5 +1,5 @@
 {
-  "status": "V73_SOURCE29_DEPLOYED__PUBLIC_ROOT_BROWSER_RETEST_PENDING",
+  "status": "PUBLIC_ORIGIN_BROWSER_QA_PASS__HUMAN_CONTINUOUS_WALK_OPEN",
   "viewer": "v73 Production Source29 Observability",
   "productionProfile": "legacy-live-controls-observability-v73",
   "canonicalModel": "v23",
@@ -25,8 +25,14 @@
     "status": "SOURCE_SEMANTICS_CLOSED_NO_COMPONENT_GEOMETRY_AUTHORIZATION",
     "brickworkRoughWidthMm": 2697,
     "brickworkUSOpeningMm": 2125,
-    "D20": [2700, 2125],
-    "S07": [2700, 2125],
+    "D20": [
+      2700,
+      2125
+    ],
+    "S07": [
+      2700,
+      2125
+    ],
     "preserveDifferenceMm": 3
   },
   "level02_50pctBlockers": [
@@ -45,6 +51,8 @@
   ],
   "candidatePublicBrowserQA": "PASS",
   "candidatePublicBrowserQAArtifact": "live-browser-qa-v73-candidate.json",
-  "publicOriginInteractiveAcceptance": "ROOT_RETEST_PENDING",
-  "humanContinuousWalk": "OUTSTANDING"
+  "publicOriginInteractiveAcceptance": "AUTOMATED_DESKTOP_MOBILE_WEBGL_CONTROLS_PASS",
+  "humanContinuousWalk": "OUTSTANDING",
+  "liveBrowserQA": "live-browser-qa-v73-root.json",
+  "liveBrowserQATimestamp": "2026-09-07T22:48:00.975Z"
 }
