@@ -1,0 +1,95 @@
+name: Promote v69 Source27 production sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/promote-v69-source27-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync production metadata to Source Architect v27 / discrepancy v47
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          canonical='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          if canonical not in s or 'v19_to_v23_patch_gz.js' not in s:
+              raise SystemExit('Refusing v69 promotion: canonical v23 contract missing')
+
+          s=s.replace('Walkthrough v65 Durable Host Link Gate','Walkthrough v69 Production Source27 Sync')
+          s=s.replace('Walkthrough v65 LIVE','Walkthrough v69 LIVE')
+          s=s.replace('Source Gate · SA25 / DL45','Source Gate · SA27 / DL47')
+          s=s.replace('SA25-DL45-v23-PROMOTED','SA27-DL47-v23-PROMOTED')
+
+          old='SA25/DL45 adds only later-level L03 D04 schedule-omission evidence; no Level 02 geometry authorization.'
+          new='SA27/DL47 directly re-audits all four Level 02 50% blockers against FRE_WD_302/303/304/305/401/402; W09 width, G04 structural height, W05 50 mm head/interface and zone-specific ceiling/bulkhead dimensions remain explicitly open. No Level 02 geometry authorization.'
+          s=s.replace(old,new)
+
+          # One current live-meta assignment only.
+          s=re.sub(r"window\.__FRESNAYE_LIVE_META=\{[^\n]+\};\n?",'',s)
+          live_meta=("window.__FRESNAYE_LIVE_META={viewer:'Walkthrough_v69_Production_Source27_Sync',"
+                     "sourceContract:'SA27-DL47-v23-PROMOTED',canonicalModel:'v23',"
+                     "modelSha256:MODEL_SHA256,geometryChanged:false,hashVerified:false,durableLink:null};\n")
+          marker='async function init(){'
+          if marker not in s: raise SystemExit('Viewer init marker missing')
+          s=s.replace(marker,live_meta+marker,1)
+
+          hv="window.__FRESNAYE_LIVE_META.hashVerified=(runtimeSha===MODEL_SHA256);"
+          s=re.sub(r'(?:'+re.escape(hv)+r'){2,}',hv,s)
+          s=re.sub(r"window\.__FRESNAYE_QA=\{viewer:'Walkthrough_v[^']+'", "window.__FRESNAYE_QA={viewer:'Walkthrough_v69_Production_Source27_Sync'", s, count=1)
+
+          required=['Walkthrough v69 LIVE','SA27 / DL47','Walkthrough_v69_Production_Source27_Sync','SA27-DL47-v23-PROMOTED',canonical,'function durableHostedURL()']
+          missing=[x for x in required if x not in s]
+          if missing: raise SystemExit('Missing v69 markers: '+repr(missing))
+          stale=['Walkthrough_v52_LiveHostedSourceSync','SA16-DL36-CR8','SA24-DL44-v23-PROMOTED','SA25-DL45-v23-PROMOTED']
+          present=[x for x in stale if x in s]
+          if present: raise SystemExit('Stale production metadata remains: '+repr(present))
+          if s.count('window.__FRESNAYE_LIVE_META={') != 1 or s.count(hv) != 1:
+              raise SystemExit('Live metadata/hash assignment cardinality failure')
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Static JavaScript and canonical asset gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          inline=[]
+          for attrs,body in re.findall(r'<script([^>]*)>(.*?)</script>',s,flags=re.S|re.I):
+              if 'src=' not in attrs.lower(): inline.append(body)
+          Path('/tmp/v69-inline.js').write_text('\n'.join(inline),encoding='utf-8')
+          PY
+          node --check /tmp/v69-inline.js
+          for f in 34_Fresnaye_Model_v19_GZ_part01.js 34_Fresnaye_Model_v19_GZ_part02.js 34_Fresnaye_Model_v19_GZ_part03.js 34_Fresnaye_Model_v19_GZ_part04a.js 34_Fresnaye_Model_v19_GZ_part04b.js 34_Fresnaye_Model_v19_GZ_part04c.js 34_Fresnaye_Model_v19_GZ_part05a.js 34_Fresnaye_Model_v19_GZ_part05b.js 34_Fresnaye_Model_v19_GZ_part05c.js v19_to_v23_patch_gz.js; do test -f "$f"; done
+
+      - name: Commit v69 production index
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'v69 production root already synchronized'
+          else
+            git commit -m 'Promote v69 Source27 production metadata'
+            git push origin HEAD:gh-pages
+          fi
