@@ -1,0 +1,109 @@
+name: Promote v64 durable walkthrough host
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/promote-v64-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Patch deployed canonical v23 viewer to v64
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          canonical='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          if canonical not in s:
+              raise SystemExit('Refusing promotion: deployed index is not canonical v23')
+          if 'v19_to_v23_patch_gz.js' not in s:
+              raise SystemExit('Refusing promotion: canonical v23 patch asset is missing')
+
+          s=s.replace('34 Fresnaye — Level 02 Walkthrough v60 Canonical v23 Live Patch','34 Fresnaye — Level 02 Walkthrough v64 Durable Host Link Gate')
+          s=s.replace('canonical v23 · Walkthrough v60 LIVE','canonical v23 · Walkthrough v64 LIVE')
+          s=s.replace('Source Gate · SA22 / DL42','Source Gate · SA24 / DL44')
+
+          # Remove stale/duplicated live-meta assignments from earlier production patches.
+          s=re.sub(r"window\.__FRESNAYE_LIVE_META=\{[^\n]+\};\n?",'',s)
+          live_meta=("window.__FRESNAYE_LIVE_META={viewer:'Walkthrough_v64_DurableHost_LinkGate',"
+                     "sourceContract:'SA24-DL44-v23-PROMOTED',canonicalModel:'v23',"
+                     "modelSha256:MODEL_SHA256,geometryChanged:false,hashVerified:false,durableLink:null};\n")
+          marker='async function init(){'
+          if marker not in s:
+              raise SystemExit('Viewer init marker missing')
+          s=s.replace(marker,live_meta+marker,1)
+
+          if 'id="copyreview"' not in s:
+              reset='<button class="btn" id="reset">Reset</button>'
+              if reset not in s:
+                  raise SystemExit('Reset control marker missing')
+              s=s.replace(reset,'<button class="btn" id="copyreview">Copy review link</button>'+reset,1)
+
+          if 'function durableHostedURL()' not in s:
+              hook="document.getElementById('reset').onclick=()=>setStart(start);"
+              if hook not in s:
+                  raise SystemExit('Reset handler marker missing')
+              durable="""document.getElementById('reset').onclick=()=>setStart(start);const durableBtn=document.getElementById('copyreview');function durableHostedURL(){const ok=(location.protocol==='https:'||location.protocol==='http:')&&!/^(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)$/i.test(location.hostname);return ok?location.origin+location.pathname:null}durableBtn.onclick=async()=>{const u=durableHostedURL();if(!u){durableBtn.textContent='Host link unavailable';status.textContent='No durable review URL on this origin.';setTimeout(()=>durableBtn.textContent='Copy review link',1800);return}let ok=false;try{if(navigator.clipboard&&isSecureContext){await navigator.clipboard.writeText(u);ok=true}}catch(_){}durableBtn.textContent=ok?'Review link copied':'Use address bar';window.__FRESNAYE_LIVE_META.durableLink=u;setTimeout(()=>durableBtn.textContent='Copy review link',1600)};window.__FRESNAYE_LIVE_META.durableLink=durableHostedURL();"""
+              s=s.replace(hook,durable,1)
+
+          required=['Walkthrough v64 LIVE','SA24 / DL44','Walkthrough_v64_DurableHost_LinkGate',canonical,'function durableHostedURL()','v19_to_v23_patch_gz.js']
+          missing=[x for x in required if x not in s]
+          if missing:
+              raise SystemExit('Missing post-patch markers: '+repr(missing))
+          if 'Walkthrough_v52_LiveHostedSourceSync' in s:
+              raise SystemExit('Stale v52 live metadata remains')
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Static viewer syntax and contract gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          inline=[]
+          for attrs,body in re.findall(r'<script([^>]*)>(.*?)</script>',s,flags=re.S|re.I):
+              if 'src=' not in attrs.lower(): inline.append(body)
+          Path('/tmp/v64-inline.js').write_text('\n'.join(inline),encoding='utf-8')
+          PY
+          node --check /tmp/v64-inline.js
+          test -f 34_Fresnaye_Model_v19_GZ_part01.js
+          test -f 34_Fresnaye_Model_v19_GZ_part02.js
+          test -f 34_Fresnaye_Model_v19_GZ_part03.js
+          test -f 34_Fresnaye_Model_v19_GZ_part04a.js
+          test -f 34_Fresnaye_Model_v19_GZ_part04b.js
+          test -f 34_Fresnaye_Model_v19_GZ_part04c.js
+          test -f 34_Fresnaye_Model_v19_GZ_part05a.js
+          test -f 34_Fresnaye_Model_v19_GZ_part05b.js
+          test -f 34_Fresnaye_Model_v19_GZ_part05c.js
+          test -f v19_to_v23_patch_gz.js
+
+      - name: Commit exact v64 production index
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No changes required'
+          else
+            git commit -m 'Promote v64 durable canonical v23 walkthrough'
+            git push origin HEAD:gh-pages
+          fi
