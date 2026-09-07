@@ -25,21 +25,25 @@ Do not create new canonical geometry by inference.
 
 ## Walkthrough engineering
 
-The latest engineering candidate is **Walkthrough v67 Rich Simulator SourceSync**. It preserves the canonical v23 model and the richer first-person simulator infrastructure: desktop WASD/arrows + mouse, mobile joystick/touch-look, reset/room starts, collision/floor following, route guide, guided connected-room review, continuous acceptance proof, navigation map, continuity/gap/floor-island diagnostics, performance/adaptive quality, input/orientation recovery, session QA, exact-view recovery and device readiness.
+The latest engineering candidate is **Walkthrough v68 Rich Simulator BlockerSync**. It preserves the canonical v23 model and the richer first-person simulator infrastructure: desktop WASD/arrows + mouse, mobile joystick/touch-look, reset/room starts, collision/floor following, route guide, guided connected-room review, continuous acceptance proof, navigation map, continuity/gap/floor-island diagnostics, performance/adaptive quality, input/orientation recovery, session QA, exact-view recovery and device readiness.
 
-Fresh v67 QA passes:
+v68 corrects a source-state reporting inconsistency inherited by v67: the readiness list had all four Level 02 50% blockers, but the device/session source-state object reported a blocker count of zero. v68 now explicitly reports **4/4 blockers** and self-tests blocker-count consistency. This is QA/metadata hardening only; no architectural geometry changed.
+
+Fresh v68 QA passes:
 
 - JavaScript syntax and exact canonical v23 model reconstruction/hash/topology.
 - Portable desktop CPU runtime; actual W-key frame-loop movement **0.716595 m**.
 - Host desktop CPU runtime.
 - Mobile CPU/touch runtime at 390×844; joystick movement **0.76986 m**, touch-look yaw delta **0.175 rad**, mobile Controls and Reset verified, input returned idle.
-- Embedded self-test including hash/topology, desktop/mobile control math, collision, walking guide, review/acceptance tooling and live-device QA bridge.
+- Embedded self-test including hash/topology, desktop/mobile control math, collision, walking guide, review/acceptance tooling, live-device QA bridge and source-blocker consistency.
 
 The WebGL attempt fell back to CPU because of the current execution environment; this is not classified as a WebGL viewer pass or failure.
 
 ## Production hosting
 
-The GitHub Pages production root remains **Walkthrough v65 Durable Host Link Gate**, not v67. The Pages deployment is healthy by GitHub deployment evidence and a production `qa.html` exists, but Walkthrough Engineering has not freshly opened the public Pages origin from the current execution environment. Therefore v67 is **not promoted** and public-origin interactive acceptance is still outstanding.
+The GitHub Pages production root remains **Walkthrough v65 Durable Host Link Gate**, not v68. The production `gh-pages/index.html` was re-read after the current GitHub changes and still identifies v65 with its existing blob. The legacy model-payload and mobile-control repair workflows have been changed to **manual-only**, so routine `main` pushes no longer needlessly mutate or redeploy the production branch. The live-viewer validation workflow remains read-only.
+
+The Pages deployment is healthy by GitHub evidence and a production `qa.html` exists, but Walkthrough Engineering has not freshly opened the public Pages origin from the current execution environment. Therefore v68 is **not promoted** and public-origin interactive acceptance is still outstanding.
 
 Known durable origin: `https://lgalansky.github.io/34-fresnaye/` — do not present it as newly verified from a run that could not open it.
 
