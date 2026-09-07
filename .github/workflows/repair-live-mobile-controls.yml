@@ -1,0 +1,51 @@
+name: Repair live mobile controls
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair-mobile-controls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out GitHub Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Keep action controls above mobile touch-look layer
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='/* v52 mobile stacking repair */'
+          if marker not in s:
+              css='''\n/* v52 mobile stacking repair */\n.top{z-index:5}.touch{z-index:2}\n'''
+              if '</style>' not in s:
+                  raise RuntimeError('Cannot locate style close tag')
+              s=s.replace('</style>',css+'</style>',1)
+              p.write_text(s,encoding='utf-8')
+              print('Applied mobile stacking repair')
+          else:
+              print('Mobile stacking repair already present')
+          PY
+
+      - name: Commit mobile repair
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "No mobile repair change to commit."
+            exit 0
+          fi
+          git config user.name "34 Fresnaye Walkthrough Engineer"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Keep live mobile controls above touch look layer"
+          git push origin gh-pages
