@@ -21,6 +21,12 @@ jobs:
           ref: gh-pages
           fetch-depth: 0
 
+      - name: Configure commit identity
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
       - name: Verify staged v73 static contract
         shell: bash
         run: |
