@@ -9,8 +9,7 @@ Latest QA-approved simulator infrastructure: **Walkthrough v50 — Dual Loader R
 - Fresh runtime regression: PASS on desktop WebGL2, forced WebGL1, and mobile CPU Canvas2D.
 - v50 adds a hash-verified raw-OBJ compatibility loader for browsers without `DecompressionStream`; forced no-decompress mobile runtime QA passes.
 - v50 fixes the mobile controls drawer stacking context so its scrim no longer intercepts drawer controls.
-- Source contract remains Source Architect handoff **v15 / discrepancy log v35 / clarification register v7**; no geometry was changed by the Walkthrough Engineer.
-- Viewer-bound Level 02 25% source gate remains W11 face-to-face wall thickness and iD05 rough-opening width until a newer Source Architect handoff supersedes v15.
+- Source contract remains Source Architect handoff **v15 / discrepancy log v35 / clarification register v7** until Source Architect ingests the newer user-supplied Archilab clarification received 2026-09-07. That clarification appears to conflict with v15 on D21 and provides new W11 evidence, so no Walkthrough Engineer geometry inference or canonical change is permitted.
 
 ## Continuity / acceptance
 
@@ -18,6 +17,8 @@ Entrance → Living → Kitchen → Main Bedroom → Entrance remains the verifi
 
 ## Hosting
 
-A `gh-pages` branch now exists as deployment staging infrastructure. GitHub Pages is still disabled (`has_pages=false`, `homepage=null`) and the branch root still contains the older v23 payload, so no verified public HTTPS walkthrough URL is claimed. The complete v50 static-host package is persisted in `/34 fresnaye` and Google Drive and is ready for unpacked deployment once a compatible file-upload/deployment path and Pages enablement are available.
+GitHub Pages is now enabled from the `gh-pages` branch and the Pages build/deployment completed successfully. The deployment environment URL is `https://lgalansky.github.io/34-fresnaye/`.
+
+However, the exact deployed Pages artifact was downloaded and inspected after deployment: its root `index.html` is still **Walkthrough v23**, SHA-256 `ad237473927a48ed72b7685f36460258d8cbb4a6839acc08dfdf8fb03c7ffce2`. Therefore the public URL is **not a current v50 review/acceptance link**. The current v50 static-host package is persisted in `/34 fresnaye` and Google Drive and must be unpacked to the Pages branch root, followed by live desktop/mobile runtime verification, before a v50 public link is claimed.
 
 Site-dependent dimensions require real-world verification. This repository is not construction certification.
