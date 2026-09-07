@@ -38,6 +38,7 @@ jobs:
           s=s.replace('34 Fresnaye — Level 02 Walkthrough v60 Canonical v23 Live Patch','34 Fresnaye — Level 02 Walkthrough v64 Durable Host Link Gate')
           s=s.replace('canonical v23 · Walkthrough v60 LIVE','canonical v23 · Walkthrough v64 LIVE')
           s=s.replace('Source Gate · SA22 / DL42','Source Gate · SA24 / DL44')
+          s=s.replace("window.__FRESNAYE_QA={viewer:'Walkthrough_v60_CanonicalV23LivePatch'","window.__FRESNAYE_QA={viewer:'Walkthrough_v64_DurableHost_LinkGate'")
 
           # Remove stale/duplicated live-meta assignments from earlier production patches.
           s=re.sub(r"window\.__FRESNAYE_LIVE_META=\{[^\n]+\};\n?",'',s)
@@ -48,6 +49,10 @@ jobs:
           if marker not in s:
               raise SystemExit('Viewer init marker missing')
           s=s.replace(marker,live_meta+marker,1)
+
+          # Collapse repeated historical hash-verified assignments to one exact assignment.
+          hv="window.__FRESNAYE_LIVE_META.hashVerified=(runtimeSha===MODEL_SHA256);"
+          s=re.sub(r'(?:'+re.escape(hv)+r'){2,}',hv,s)
 
           if 'id="copyreview"' not in s:
               reset='<button class="btn" id="reset">Reset</button>'
@@ -66,8 +71,10 @@ jobs:
           missing=[x for x in required if x not in s]
           if missing:
               raise SystemExit('Missing post-patch markers: '+repr(missing))
-          if 'Walkthrough_v52_LiveHostedSourceSync' in s:
-              raise SystemExit('Stale v52 live metadata remains')
+          if 'Walkthrough_v52_LiveHostedSourceSync' in s or "viewer:'Walkthrough_v60_CanonicalV23LivePatch'" in s:
+              raise SystemExit('Stale live/QA viewer metadata remains')
+          if s.count(hv) != 1:
+              raise SystemExit('Expected exactly one runtime hash-verified assignment')
           p.write_text(s,encoding='utf-8')
           PY
 
@@ -104,6 +111,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No changes required'
           else
-            git commit -m 'Promote v64 durable canonical v23 walkthrough'
+            git commit -m 'Harden v64 durable canonical v23 walkthrough'
             git push origin HEAD:gh-pages
           fi
