@@ -1,0 +1,22 @@
+{
+  "project": "34 Fresnaye",
+  "date": "2026-09-07",
+  "productionViewer": "v65 Durable Host Link Gate",
+  "productionIndexBlobSha": "ace1de75f0a37e9f5434b4f98b1ee32c336b5d8c",
+  "candidateViewer": "v69 Rich Simulator SourceSync / Chunked Durable Deploy",
+  "candidatePromoted": false,
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "vertices": 5769,
+  "triangles": 8907,
+  "sourceContract": "SA27-DL47-v23-PROMOTED",
+  "level02_25pct": "PASSED",
+  "level02_50pct": "BLOCKED_NOT_STARTED",
+  "geometryChanged": false,
+  "candidateStaticQA": "PASS",
+  "candidateDesktopMobileCpuRuntimeQA": "PASS",
+  "candidateWebGL": "ENVIRONMENT_FELL_BACK_TO_CPU",
+  "chunkedTransport": "BYTE_EXACT_SHA_GATED_STATIC_PASS_NETWORK_PATH_NOT_PROMOTED",
+  "humanContinuousAcceptance": "OUTSTANDING"
+}
