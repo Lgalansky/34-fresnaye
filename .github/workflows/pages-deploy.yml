@@ -68,16 +68,10 @@ jobs:
           (site/'.nojekyll').write_text('')
           PY
 
-      - name: Bootstrap Pages site if needed
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow >/tmp/pages-create.json 2>/tmp/pages-create.err || true
-          cat /tmp/pages-create.json || true
-          cat /tmp/pages-create.err || true
-
-      - name: Configure Pages
+      - name: Configure or enable Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
