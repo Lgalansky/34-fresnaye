@@ -1,0 +1,33 @@
+{
+  "status": "DEPLOYED_BYTES_STATIC_QA_PASS_INTERACTIVE_PUBLIC_ORIGIN_ACCEPTANCE_OPEN",
+  "viewer": "v71 Production Source28 Observability",
+  "productionProfile": "legacy-live-controls-observability-v71",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "vertices": 5769,
+  "triangles": 8907,
+  "sourceContract": "SA28-DL48-v23-PROMOTED",
+  "sourceArchitect": "v28",
+  "discrepancyLog": "v48",
+  "revisionWatch": "v12",
+  "geometryChanged": false,
+  "indexSha256": "597f75d3c2e157792d97c1efb1804f9af04882ca1e23b28caf4334d2324b0ca8",
+  "durableOrigin": "https://lgalansky.github.io/34-fresnaye/",
+  "versionedViewer": "https://lgalansky.github.io/34-fresnaye/walkthrough-v71.html",
+  "controls": {
+    "desktop": "WASD/arrows + pointer-lock mouse",
+    "mobile": "left joystick + right touch-look",
+    "resetStarts": true,
+    "collisionFloorFollowing": true
+  },
+  "richSimulatorFeatureParity": false,
+  "richFeatureParityOpenItems": [
+    "CPU Canvas2D fallback",
+    "navigation map/route planning",
+    "guided review/acceptance proof",
+    "device/session QA",
+    "adaptive performance guard"
+  ],
+  "publicOriginInteractiveAcceptance": "OUTSTANDING"
+}
