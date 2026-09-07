@@ -1,4 +1,4 @@
-name: Upgrade live walkthrough
+name: Validate live walkthrough generation
 
 on:
   push:
@@ -6,83 +6,30 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  upgrade-live-viewer:
+  validate-live-viewer:
     runs-on: ubuntu-latest
     steps:
       - name: Check out GitHub Pages branch
         uses: actions/checkout@v4
         with:
           ref: gh-pages
-          fetch-depth: 0
+          fetch-depth: 1
 
-      - name: Upgrade hosted walkthrough to current source gate
+      - name: Validate without rewriting production
         shell: bash
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           from pathlib import Path
-          import re
-
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
-
-          # Idempotent: never repeatedly rewrite an already-upgraded root.
-          if 'Walkthrough v52 LIVE' in s:
-              print('Live root already upgraded to v52; no content rewrite required.')
-              raise SystemExit(0)
-
-          old_title = '34 Fresnaye — Level 02 Walkthrough v23 Static Host Split'
-          s = s.replace(old_title, '34 Fresnaye — Level 02 Walkthrough v52 Live Hosted Source Sync')
-          s = s.replace('34 Fresnaye · Level 02 · canonical v19 · Walkthrough v23', '34 Fresnaye · Level 02 · canonical v19 · Walkthrough v52 LIVE')
-
-          old_warning = 'Collision/floor-following is a viewer navigation aid generated from the canonical mesh; it does not alter architectural geometry. Level 02 25% QA remains pending on D21 instance 1, W11 wall depth, iD05 and iD08. D09 is resolved in canonical v19.'
-          new_warning = 'Collision/floor-following is a viewer navigation aid generated from canonical v19; it does not alter architectural geometry. Archilab source evidence for Level 02 25% is now closed under SA16 / DL36 / CR8, but canonical v19 remains frozen pending a separately authorized Geometry Builder update and independent model QA.'
-          s = s.replace(old_warning, new_warning)
-
-          source_gate = '''<details class="sourcegate"><summary>Source Gate · SA16</summary><div><b>Written Archilab evidence closed</b><br>D09: 1790 / U-S 2400<br>D21: 975 × 2400 at Entrance Lobby / Family Kitchen<br>Former duplicate bay: corrected to D22 · rough 2980 / U-S 2210; assembly 6240 overall / 3080 inner / 2210 high<br>W11: 400 mm finished / overall wall thickness · opening 1800 / U-S 2090<br>iD05: rough 1200 / U-S 2400 · pocket 100<br>iD08: rough 855 / U-S 2400 · pocket 90<br><span>Source evidence gate: PASSED · geometry authorization: NOT YET ISSUED</span></div></details>'''
-          needle = '<div id="coords" class="coords">Position —</div><div class="warning">'
-          if needle in s:
-              s = s.replace(needle, '<div id="coords" class="coords">Position —</div>' + source_gate + '<div class="warning">', 1)
-
-          extra_css = '''\n.sourcegate{pointer-events:auto;margin-top:6px;font-size:11px}.sourcegate summary{cursor:pointer;font-weight:750;opacity:.92}.sourcegate div{margin-top:6px;padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.08);line-height:1.42}.sourcegate span{display:block;margin-top:5px;color:#bfe9c8;font-weight:700}@media(pointer:coarse){.sourcegate{max-width:62vw;font-size:9px}.sourcegate div{max-height:32vh;overflow:auto}}\n'''
-          s = s.replace('</style>', extra_css + '</style>', 1)
-
-          first_chunk = '<script src="34_Fresnaye_Model_v19_GZ_part01.js"></script>'
-          fallback_tag = '<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js" crossorigin="anonymous"></script>'
-          if fallback_tag not in s:
-              s = s.replace(first_chunk, fallback_tag + first_chunk, 1)
-
-          # Preserve the exact verified gzip payload from the existing split chunks,
-          # but add an independent decompression fallback for mobile browsers lacking DecompressionStream.
-          decode_pattern = r"async function decodeGzip64\(s\)\{.*?\}\nasync function sha256Text"
-          decode_replacement = '''async function decodeGzip64(s){let b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);if(typeof DecompressionStream!==\'undefined\'){let ds=new DecompressionStream(\'gzip\');return await new Response(new Blob([u]).stream().pipeThrough(ds)).text()}if(window.fflate&&typeof window.fflate.gunzipSync===\'function\'){let raw=window.fflate.gunzipSync(u);return new TextDecoder().decode(raw)}throw new Error(\'This browser lacks native gzip decompression and the compatibility decompressor could not load.\')}\nasync function sha256Text'''
-          s, n = re.subn(decode_pattern, decode_replacement, s, count=1, flags=re.S)
-          if n != 1:
-              raise RuntimeError('Could not patch hosted decompression function safely')
-
-          live_meta = "window.__FRESNAYE_LIVE_META={viewer:'Walkthrough_v52_LiveHostedSourceSync',sourceContract:'SA16-DL36-CR8',canonicalModel:'v19',modelSha256:MODEL_SHA256,geometryChanged:false,hashVerified:false};\n"
-          s = s.replace('async function init(){', live_meta + 'async function init(){', 1)
-          hash_needle = "if(runtimeSha!==MODEL_SHA256)throw new Error('Embedded model integrity check failed');let parsed="
-          hash_repl = "window.__FRESNAYE_LIVE_META.hashVerified=(runtimeSha===MODEL_SHA256);if(runtimeSha!==MODEL_SHA256)throw new Error('Embedded model integrity check failed');let parsed="
-          if hash_needle not in s:
-              raise RuntimeError('Could not bind live model hash verification state')
-          s = s.replace(hash_needle, hash_repl, 1)
-
-          p.write_text(s, encoding='utf-8')
-          print('Upgraded live root bytes:', p.stat().st_size)
+          s=Path('index.html').read_text(encoding='utf-8')
+          canonical='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          if canonical not in s:
+              raise SystemExit('Production root is not bound to canonical Level 02 v23')
+          if 'v19_to_v23_patch_gz.js' not in s:
+              raise SystemExit('Production root is missing canonical v19-to-v23 patch loader')
+          if 'Source Gate · SA' not in s:
+              raise SystemExit('Production root has no source-gate display')
+          print('Live branch validation only; legacy v52 mutation workflow is retired.')
           PY
-
-      - name: Commit upgraded live root
-        shell: bash
-        run: |
-          if git diff --quiet -- index.html; then
-            echo "No live-root change to commit."
-            exit 0
-          fi
-          git config user.name "34 Fresnaye Walkthrough Engineer"
-          git config user.email "actions@users.noreply.github.com"
-          git add index.html
-          git commit -m "Upgrade live walkthrough to v52 source-synced viewer"
-          git push origin gh-pages
