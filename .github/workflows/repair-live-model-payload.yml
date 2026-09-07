@@ -1,0 +1,88 @@
+name: Repair live canonical model payload
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair-model-payload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out GitHub Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Repair three corrupted base64 characters and verify canonical SHA
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, base64, gzip, hashlib
+
+          canonical = '0c8df8db5db23d16d52172b539f83ba092828366de037499748724ed2a1eef36'
+          names = [
+              '34_Fresnaye_Model_v19_GZ_part01.js',
+              '34_Fresnaye_Model_v19_GZ_part02.js',
+              '34_Fresnaye_Model_v19_GZ_part03.js',
+              '34_Fresnaye_Model_v19_GZ_part04a.js',
+              '34_Fresnaye_Model_v19_GZ_part04b.js',
+              '34_Fresnaye_Model_v19_GZ_part04c.js',
+              '34_Fresnaye_Model_v19_GZ_part05a.js',
+              '34_Fresnaye_Model_v19_GZ_part05b.js',
+              '34_Fresnaye_Model_v19_GZ_part05c.js',
+          ]
+
+          def payload(path):
+              text = Path(path).read_text(encoding='utf-8')
+              m = re.search(r"\+'([^']*)';", text)
+              if not m:
+                  raise RuntimeError(f'Cannot locate payload in {path}')
+              return text, m, m.group(1)
+
+          patches = {
+              '34_Fresnaye_Model_v19_GZ_part01.js': {5900: 'E', 5902: 'f'},
+              '34_Fresnaye_Model_v19_GZ_part02.js': {9118: 'E'},
+          }
+
+          for name, changes in patches.items():
+              text, m, data = payload(name)
+              chars = list(data)
+              for offset, expected in changes.items():
+                  before = chars[offset]
+                  if before != expected:
+                      print(f'{name}: repairing offset {offset}: {before!r} -> {expected!r}')
+                      chars[offset] = expected
+                  else:
+                      print(f'{name}: offset {offset} already correct ({expected!r})')
+              repaired = ''.join(chars)
+              text = text[:m.start(1)] + repaired + text[m.end(1):]
+              Path(name).write_text(text, encoding='utf-8')
+
+          assembled = ''.join(payload(name)[2] for name in names)
+          if len(assembled) != 95116:
+              raise RuntimeError(f'Unexpected assembled base64 length: {len(assembled)}')
+          obj = gzip.decompress(base64.b64decode(assembled))
+          sha = hashlib.sha256(obj).hexdigest()
+          if sha != canonical:
+              raise RuntimeError(f'Canonical model SHA mismatch after repair: {sha}')
+          print('Canonical model payload verified:', sha, 'OBJ bytes:', len(obj))
+          PY
+
+      - name: Commit repaired payload
+        shell: bash
+        run: |
+          if git diff --quiet -- 34_Fresnaye_Model_v19_GZ_part01.js 34_Fresnaye_Model_v19_GZ_part02.js; then
+            echo "Payload is already canonical; nothing to commit."
+            exit 0
+          fi
+          git config user.name "34 Fresnaye Walkthrough Engineer"
+          git config user.email "actions@users.noreply.github.com"
+          git add 34_Fresnaye_Model_v19_GZ_part01.js 34_Fresnaye_Model_v19_GZ_part02.js
+          git commit -m "Repair live canonical v19 model payload"
+          git push origin gh-pages
