@@ -1,0 +1,78 @@
+name: Promote v65 Source Architect 25 sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/promote-v65-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Source-sync production viewer without geometry changes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          canonical='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          if canonical not in s or 'v19_to_v23_patch_gz.js' not in s:
+              raise SystemExit('Refusing v65 promotion: canonical v23 contract missing')
+
+          s=s.replace('Walkthrough v64 Durable Host Link Gate','Walkthrough v65 Durable Host Link Gate')
+          s=s.replace('Walkthrough v64 LIVE','Walkthrough v65 LIVE')
+          s=s.replace('Source Gate · SA24 / DL44','Source Gate · SA25 / DL45')
+          s=s.replace("viewer:'Walkthrough_v64_DurableHost_LinkGate'","viewer:'Walkthrough_v65_DurableHost_LinkGate'")
+          s=s.replace('SA24-DL44-v23-PROMOTED','SA25-DL45-v23-PROMOTED')
+
+          # Make the source-only advancement explicit; no geometry authorization is implied.
+          old='<span>25% PASSED · 50% BLOCKED on W09 width, G04 front height, W05 50 mm head/interface, and zone-specific ceiling/bulkhead dimensions.</span>'
+          new='<span>25% PASSED · 50% BLOCKED on W09 width, G04 front height, W05 50 mm head/interface, and zone-specific ceiling/bulkhead dimensions. SA25/DL45 adds only later-level L03 D04 schedule-omission evidence; no Level 02 geometry authorization.</span>'
+          s=s.replace(old,new)
+
+          required=['Walkthrough v65 LIVE','SA25 / DL45','Walkthrough_v65_DurableHost_LinkGate','SA25-DL45-v23-PROMOTED',canonical,'function durableHostedURL()']
+          missing=[x for x in required if x not in s]
+          if missing:
+              raise SystemExit('Missing v65 markers: '+repr(missing))
+          if "viewer:'Walkthrough_v64_DurableHost_LinkGate'" in s or 'SA24-DL44-v23-PROMOTED' in s:
+              raise SystemExit('Stale v64/SA24 runtime metadata remains')
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Static JavaScript and asset gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          inline=[]
+          for attrs,body in re.findall(r'<script([^>]*)>(.*?)</script>',s,flags=re.S|re.I):
+              if 'src=' not in attrs.lower(): inline.append(body)
+          Path('/tmp/v65-inline.js').write_text('\n'.join(inline),encoding='utf-8')
+          PY
+          node --check /tmp/v65-inline.js
+          for f in 34_Fresnaye_Model_v19_GZ_part01.js 34_Fresnaye_Model_v19_GZ_part02.js 34_Fresnaye_Model_v19_GZ_part03.js 34_Fresnaye_Model_v19_GZ_part04a.js 34_Fresnaye_Model_v19_GZ_part04b.js 34_Fresnaye_Model_v19_GZ_part04c.js 34_Fresnaye_Model_v19_GZ_part05a.js 34_Fresnaye_Model_v19_GZ_part05b.js 34_Fresnaye_Model_v19_GZ_part05c.js v19_to_v23_patch_gz.js; do test -f "$f"; done
+
+      - name: Commit v65 production index
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Promote v65 SA25 DL45 walkthrough source sync'
+          git push origin HEAD:gh-pages
