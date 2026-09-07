@@ -1,8 +1,6 @@
 name: Repair live mobile controls
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
