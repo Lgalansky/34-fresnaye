@@ -1,0 +1,96 @@
+name: Fresnaye Walkthrough Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'walkthrough_v25.html'
+      - 'walkthrough_v25.js'
+      - 'model/**'
+      - '.github/workflows/pages-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Verify canonical model payload
+        run: |
+          python - <<'PY'
+          import json, base64, gzip, hashlib, pathlib
+          root = pathlib.Path('.')
+          m = json.loads((root/'model/v19_manifest.json').read_text())
+          b64 = ''.join((root/p).read_text().strip() for p in m['chunks'])
+          assert len(b64) == m['gzip_base64_chars'], (len(b64), m['gzip_base64_chars'])
+          gz = base64.b64decode(b64)
+          assert hashlib.sha256(gz).hexdigest() == m['gzip_sha256']
+          obj = gzip.decompress(gz)
+          assert hashlib.sha256(obj).hexdigest() == m['canonical_obj_sha256']
+          text = obj.decode('utf-8')
+          vertices = sum(1 for line in text.splitlines() if line.startswith('v '))
+          triangles = sum(max(0, len(line.split())-3) for line in text.splitlines() if line.startswith('f '))
+          assert vertices == 5689, vertices
+          assert triangles == 8787, triangles
+          assert m['canonical_obj_sha256'] == '0c8df8db5db23d16d52172b539f83ba092828366de037499748724ed2a1eef36'
+          assert m['canonical_glb_sha256'] == '6afbe438fb40e19d042656fc6498917bbb64fee75adf073c354dde0b04a865ab'
+          print('CANONICAL_MODEL_OK', vertices, triangles)
+          PY
+
+      - name: Prepare static site
+        run: |
+          rm -rf _site
+          mkdir -p _site/model
+          cp walkthrough_v25.html _site/index.html
+          cp walkthrough_v25.js _site/walkthrough_v25.js
+          cp model/v19_manifest.json _site/model/v19_manifest.json
+          python - <<'PY'
+          import json, pathlib, shutil
+          root = pathlib.Path('.')
+          site = root/'_site'
+          m = json.loads((root/'model/v19_manifest.json').read_text())
+          for rel in m['chunks']:
+              src = root/rel
+              dst = site/rel
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(src, dst)
+          (site/'.nojekyll').write_text('')
+          PY
+
+      - name: Bootstrap Pages site if needed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow >/tmp/pages-create.json 2>/tmp/pages-create.err || true
+          cat /tmp/pages-create.json || true
+          cat /tmp/pages-create.err || true
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
