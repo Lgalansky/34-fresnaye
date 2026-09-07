@@ -2,44 +2,52 @@
 
 Current permanent hosted reviewer: **Walkthrough v52 — Live Hosted Source Sync** at `https://lgalansky.github.io/34-fresnaye/`, still bound to promoted Level 02 **canonical v19**.
 
-Latest candidate QA viewer: **Walkthrough v54 — v22 Candidate Independent QA** (2026-09-07). It is deliberately **not live** and **not canonical**.
+Latest canonical-model host candidate: **Walkthrough v55 — CanonicalLock SourceSync** (2026-09-07). It has fresh desktop WebGL2, forced WebGL1 and mobile CPU runtime regression passes but is deliberately **not live yet**.
+
+Latest Geometry Builder candidate: **v23 — iD08 Exact Hatch Footprint Subvolumes Candidate**. It is **NOT CANONICAL** and awaits independent QA.
 
 ## Canonical / live boundary
 
 - Canonical Level 02: **v19** — 5,689 vertices / 8,787 triangles.
 - Canonical OBJ SHA-256: `0c8df8db5db23d16d52172b539f83ba092828366de037499748724ed2a1eef36`.
 - Canonical GLB SHA-256: `6afbe438fb40e19d042656fc6498917bbb64fee75adf073c354dde0b04a865ab`.
-- Permanent Pages reviewer remains **v52**. Do not rebind the live URL to a candidate model before canonical promotion QA.
+- Permanent Pages reviewer remains **v52**. Do not rebind the live URL to a candidate geometry model before canonical promotion QA.
 
-## Latest Geometry Builder candidate — v22
+## Source contract — SA20 / discrepancy log v40
 
-Candidate file: `34_Fresnaye_Level02_25pct_v22_iD05_SourceOwnedOpeningRebuildCandidate`.
+Level 02 25% **source evidence is PASSED**. Source Architect v20 authorizes iD08 as separate exact source-owned HATCH footprint sub-volumes while preserving source gaps. A single monolithic L-junction wall polygon, convex hull, boolean gap fill, taper/bridge or scheduled 955 mm leaf substitution remains prohibited.
 
-- OBJ SHA-256: `4d788681c3c92b8d4daf678ba5b5822d47cf558b96b3ec7e56d80b6262dc8cd8`.
-- GLB SHA-256: `39a715fafb6970d4ae03da7eaf6e5e40a6e4e54386dc3675544fb7393bb751ac`.
-- Topology: **5,721 vertices / 8,835 triangles**, zero degenerate faces.
-- v21 parent vertices/faces are preserved exactly as the candidate prefix; v22 adds 24 vertices / 36 triangles for the source-owned iD05 local wall/jamb/header reconstruction.
-- Independent iD05 QA: **PASS_LOCAL_iD05_CANDIDATE_QA_WITH_CAVEAT**. Registered jamb span is 1200.144 mm versus written 1200 mm, the local wall band is 400.049 mm versus written 400 mm, the U/S head is 2400 mm, and no triangle centroid intrudes into the below-head opening corridor.
-- Caveat: eight inherited parent triangle centroids remain encapsulated inside the new source-owned local solids. They do not intrude into the opening corridor, but final candidate cleanup/review should address the internal-shell duplication before promotion.
+Governing iD08 values remain rough opening **855 mm**, U/S **2400 mm**, pocket **90 mm**, adjacent return **750 mm**. Written nominal dimensions govern; registered native vectors locate the source geometry.
 
-## Remaining Level 02 25% model blocker
+## Latest Geometry Builder candidate — v23
 
-The **source-evidence gate is PASSED**, but model acceptance remains **NOT PASSED**. iD08 is dimensionally source-closed at **855 / U-S2400 / pocket90**, with a written 750 return chain and registered native vector endpoints. However, the Archilab source represents the L-junction with staggered segmented wall/cavity/finish vectors and does not supply a safe single closed solid boundary. Do **not** invent a bridge, taper, 0.198 m fill strip, or substitute the scheduled 955 mm leaf. A source-owned coherent L-junction boundary or explicit conversion instruction is still required for final integration.
+Candidate: `34_Fresnaye_Level02_25pct_v23_iD08_ExactHatchFootprintSubvolumesCandidate`.
 
-## Walkthrough v54 candidate QA
+- OBJ SHA-256: `c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5`.
+- GLB SHA-256: `7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49`.
+- Topology: **5,769 vertices / 8,907 triangles**, zero degenerate faces.
+- Parent v22 is preserved as the candidate prefix; v23 adds 48 vertices / 72 triangles across six exact source-footprint sub-volumes.
+- Builder diff QA passes: source perimeters match, no positive-area overlap between new source regions, registered opening-corridor vertex intrusions = 0, bounds unchanged.
+- Candidate caveat: inherited parent internal-shell surfaces remain encapsulated in portions of the new patch. Independent QA must decide cleanup/justification before promotion.
 
-The self-contained v54 QA viewer is bound to the exact v22 candidate hashes/topology and is marked **CANDIDATE QA ONLY**. Browser regression passed:
+## Walkthrough v55 host candidate
 
-- desktop WebGL2: model/hash/topology loaded; keyboard movement and pointer-lock mouse-look exercised;
-- forced WebGL1: model/hash/topology loaded; keyboard/mouse controls exercised;
-- mobile WebGL2: physical touch joystick moved 1.126 m and touch-look changed 0.309 rad; compact mobile menu tap worked;
-- CPU Canvas2D fallback: exact v22 hash/topology loaded and rendered;
-- route regression: Entrance→Living, Living→Kitchen, Kitchen→Main Bedroom and Main Bedroom→Entrance all remain collision-safe; Entrance→Second Dwelling and Entrance→Service Stair remain disconnected.
+Walkthrough v55 remains bound to **canonical v19**, not v23. It is source-synchronized to SA20 / DL40 and contains a canonical deployment guard: runtime deployment is valid only when the loaded OBJ hash equals canonical v19; v23 is explicitly quarantined as NOT CANONICAL.
 
-The full viewer contains both gzip and raw-base64 model payloads. Static integrity checks confirm both independently decode to the exact v22 OBJ SHA above; inline JavaScript syntax passes.
+Fresh runtime QA passes:
 
-## Level 02 50% source exceptions
+- desktop WebGL2: canonical hash/topology verified, embedded self-test passed, keyboard movement exercised (0.5375 m), collision-safe routes within the verified main component passed;
+- forced WebGL1: same canonical/hash/self-test and movement checks passed;
+- mobile CPU Canvas2D: canonical hash/topology verified, touch joystick moved 1.166325 m, touch-look changed 0.140 rad, compact menu and Reset tap exercised, input returned idle.
 
-Do not start final 50% geometry until 25% promotion. Current source exceptions remain: W09 overall width, G04 front structural opening height, the W05 50 mm brickwork/schedule head-interface interpretation, and zone-specific ceiling/bulkhead dimensions pending Archilab's revised issue.
+Static packaging also passes: viewer JavaScript syntax, exact 95,116-character gzip reconstruction to the 537,394-byte canonical OBJ, ZIP integrity, static-host package and single-file portable package.
 
-Static renders remain review aids only. Site-dependent dimensions require real-world verification. This repository is not construction certification.
+## Acceptance / continuity boundary
+
+Entrance → Living → Kitchen → Main Bedroom remains the verified connected component under canonical v19. Second Dwelling and Service Stair remain isolated. Human continuous-walk acceptance remains outstanding. Static renders remain review aids only.
+
+Level 02 25% **model acceptance remains NOT PASSED** until independent v23 QA and explicit canonical promotion. Final 50% geometry must not start before that promotion.
+
+Current 50% source exceptions remain: W09 overall/rough width, G04 front structural opening height, W05 50 mm brickwork/schedule head-interface interpretation, and remaining zone-specific ceiling/bulkhead dimensions pending Archilab revision.
+
+Site-dependent dimensions require real-world verification. This repository is simulator/model QA, not construction certification.
