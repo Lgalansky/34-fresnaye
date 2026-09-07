@@ -1,0 +1,80 @@
+name: Promote staged v74 Source31 after public browser QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/promote-v74-source31-public-qa-v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify-promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Validate staged candidate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('walkthrough-v74.html').read_text()
+          req=['fresnaye-viewer" content="v74"','SA31-DL51-v23-PROMOTED','Walkthrough v74 Production Source31 Consistency Sync','Source Architect v31 / discrepancy log v51 / revision watch v15','c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5','v19_to_v23_patch_gz.js']
+          assert not [x for x in req if x not in s]
+          blocks=[m.group(2) for m in re.finditer(r'<script([^>]*)>(.*?)</script>',s,re.S|re.I) if 'src=' not in m.group(1).lower() and m.group(2).strip()]
+          Path('/tmp/v74.js').write_text('\n;\n'.join(blocks))
+          PY
+          node --check /tmp/v74.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Browser QA harness
+        run: |
+          cat > /tmp/liveqa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),crypto=require('crypto'),fs=require('fs');
+          const U=process.env.TEST_URL,C='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const ok=(v,m)=>{if(!v)throw Error(m)},xy=t=>{let m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords');return[+m[1],+m[2]]},d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),h=b=>crypto.createHash('sha256').update(b).digest('hex');
+          async function state(p){await p.goto(U+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});return p.evaluate(()=>({q:__FRESNAYE_QA,l:__FRESNAYE_LIVE_META,m:{v:document.querySelector('meta[name=fresnaye-viewer]')?.content,c:document.querySelector('meta[name=fresnaye-canonical-model]')?.content,s:document.querySelector('meta[name=fresnaye-model-sha256]')?.content,src:document.querySelector('meta[name=fresnaye-source-contract]')?.content,g:document.querySelector('meta[name=fresnaye-geometry-mutated]')?.content},source:document.querySelector('.sourcegate')?.textContent||''}));}
+          (async()=>{let b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']}),o={artifact:'34_Fresnaye_Walkthrough_v74_PublicBrowserQA',url:U,canonicalObjSha256:C,sourceContract:'SA31-DL51-v23-PROMOTED',timestamp:new Date().toISOString(),desktop:{},mobile:{},pass:false};try{
+            let dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),s=await state(p);ok(s.m.v==='v74'&&s.m.c==='v23'&&s.m.s===C&&s.m.src==='SA31-DL51-v23-PROMOTED'&&s.m.g==='false','desktop identity');ok(s.q.runtimeSha256===C&&s.q.triangles===8907&&/^WebGL[12]$/.test(s.q.webglVersion)&&s.l?.hashVerified===true,'desktop model/renderer');ok(/Source Architect v31/.test(s.source)&&/discrepancy log v51/.test(s.source),'source display');let a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(750);await p.keyboard.up('w');await p.waitForTimeout(200);let z=xy(await p.locator('#coords').textContent());ok(d(a,z)>.2,'keyboard movement');await p.locator('#reset').click();await p.waitForTimeout(130);ok(d(xy(await p.locator('#coords').textContent()),[7.9,17.1])<.08,'reset');await p.locator('[data-start=living]').click();await p.waitForTimeout(100);ok(d(xy(await p.locator('#coords').textContent()),[3.6,13])<.08,'room start');await p.locator('#enter').click();await p.waitForTimeout(250);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');let h1=h(await p.locator('#c').screenshot());await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:140,movementY:-12,bubbles:true})));await p.waitForTimeout(180);ok(h1!==h(await p.locator('#c').screenshot()),'mouse look');o.desktop={pass:true,renderer:s.q.webglVersion,keyboardMovementM:+d(a,z).toFixed(3),hashVerified:true,reset:true,roomStarts:true,pointerLock:true,mouseLook:true};await dc.close();
+            let mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),ms=await state(m);ok(ms.m.v==='v74'&&ms.m.s===C&&ms.m.src==='SA31-DL51-v23-PROMOTED'&&ms.q.runtimeSha256===C&&ms.q.triangles===8907&&/^WebGL[12]$/.test(ms.q.webglVersion),'mobile identity/model');let touch=await m.evaluate(()=>({c:matchMedia('(pointer:coarse)').matches,d:getComputedStyle(document.querySelector('.touch')).display}));ok(touch.c&&touch.d!=='none','touch ui');let sb=await m.locator('#stick').boundingBox(),cl=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2,ma=xy(await m.locator('#coords').textContent());await cl.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]});await cl.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-48,id:1,radiusX:4,radiusY:4}]});await m.waitForTimeout(750);await cl.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(160);let mb=xy(await m.locator('#coords').textContent());ok(d(ma,mb)>.18,'joystick');await m.evaluate(()=>document.getElementById('reset').click());await m.waitForTimeout(120);ok(d(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.08,'mobile reset');let lb=await m.locator('#look').boundingBox(),before=h(await m.locator('#c').screenshot()),lx=lb.x+lb.width*.55,ly=lb.y+lb.height*.5;await cl.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]});await cl.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]});await cl.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(180);ok(before!==h(await m.locator('#c').screenshot()),'touch look');o.mobile={pass:true,renderer:ms.q.webglVersion,joystickMovementM:+d(ma,mb).toFixed(3),touchLook:true,hashVerified:true,reset:true,touchUi:true};await mc.close();o.pass=true;
+          }finally{await b.close()}fs.writeFileSync(process.env.OUT,JSON.stringify(o,null,2)+'\n');console.log(JSON.stringify(o,null,2));})().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+      - name: Verify versioned public candidate
+        run: TEST_URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v74.html' OUT='live-browser-qa-v74-candidate.json' node /tmp/liveqa.cjs
+      - name: Promote candidate
+        run: |
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp walkthrough-v74.html index.html
+          git add index.html live-browser-qa-v74-candidate.json
+          git commit -m 'Promote public-browser-passed v74 Source31 viewer'
+          git push origin HEAD:gh-pages
+      - name: Wait for production root
+        run: |
+          ok=0; for i in $(seq 1 60); do body=$(curl -fsSL --max-time 30 "https://lgalansky.github.io/34-fresnaye/?b=$GITHUB_RUN_ID-$i" 2>/dev/null||true); if printf '%s' "$body"|grep -q 'Walkthrough v74 Production Source31 Consistency Sync'; then ok=1; break; fi; sleep 5; done; test "$ok" = 1
+      - name: Verify actual public root
+        run: TEST_URL='https://lgalansky.github.io/34-fresnaye/' OUT='live-browser-qa-v74-root.json' node /tmp/liveqa.cjs
+      - name: Publish production health
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          r=json.loads(Path('live-browser-qa-v74-root.json').read_text()); assert r['pass']
+          s=Path('index.html').read_text()
+          h={'status':'PUBLIC_ORIGIN_V74_SOURCE31_BROWSER_QA_PASS__HUMAN_CONTINUOUS_WALK_OPEN','viewer':'v74 Production Source31 Consistency Sync','canonicalModel':'v23','canonicalObjSha256':'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5','canonicalGlbSha256':'7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49','vertices':5769,'triangles':8907,'sourceContract':'SA31-DL51-v23-PROMOTED','sourceArchitect':'v31','discrepancyLog':'v51','revisionWatch':'v15','geometryChanged':False,'indexSha256':hashlib.sha256(s.encode()).hexdigest(),'durableOrigin':'https://lgalansky.github.io/34-fresnaye/','versionedViewer':'https://lgalansky.github.io/34-fresnaye/walkthrough-v74.html','publicOriginAutomatedDesktopMobileWebGLControls':'PASS','liveBrowserQA':'live-browser-qa-v74-root.json','liveBrowserQATimestamp':r['timestamp'],'richSimulatorFeatureParity':False,'richFeatureParityOpenItems':['CPU Canvas2D fallback','navigation map/route planning','guided review/acceptance proof','device/session QA','adaptive performance guard'],'level02_50pctBlockers':['W09 overall/rough width','G04 front structural opening height','W05 50mm brickwork/schedule head-interface interpretation','remaining zone-specific ceiling heights / perimeter-bulkhead drops'],'humanContinuousWalk':'OUTSTANDING'}
+          Path('health.json').write_text(json.dumps(h,indent=2)+'\n')
+          Path('LIVE_REVIEW.md').write_text('# 34 Fresnaye — verified live review\n\nPermanent walkthrough: https://lgalansky.github.io/34-fresnaye/\n\nProduction: v74 Source31 consistency sync / canonical v23. Automated public-origin desktop/mobile WebGL controls PASS. Human continuous room-to-room acceptance remains open.\n')
+          PY
+          git add health.json live-browser-qa-v74-root.json LIVE_REVIEW.md
+          git commit -m 'Record v74 Source31 public root browser QA pass'
+          git push origin HEAD:gh-pages
