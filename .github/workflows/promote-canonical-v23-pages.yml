@@ -1,0 +1,89 @@
+name: Promote canonical v23 to Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'canonical-v23.html'
+      - 'v19_to_v23_patch_gz.js'
+      - '34_Fresnaye_Model_v19_GZ_part*.js'
+      - '.github/workflows/promote-canonical-v23-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+
+      - name: Check out Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+          fetch-depth: 0
+
+      - name: Verify canonical v23 viewer contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          src = Path('source/canonical-v23.html').read_text(encoding='utf-8')
+          expected = 'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          checks = {
+              'canonical v23 title': 'canonical v23' in src.lower(),
+              'model SHA bound': expected in src,
+              'Level 02 25% passed': '25% PASSED' in src,
+              '50% blocker gate visible': '50% BLOCKED' in src,
+              'v23 patch loaded': 'v19_to_v23_patch_gz.js' in src,
+              'desktop controls': 'WASD' in src,
+              'mobile controls': 'left joystick' in src,
+              'reset control': 'id="reset"' in src,
+          }
+          failed = [k for k,v in checks.items() if not v]
+          if failed:
+              raise SystemExit('Viewer contract failed: ' + ', '.join(failed))
+          for i in range(1,4):
+              pass
+          patch = Path('source/v19_to_v23_patch_gz.js')
+          if not patch.exists() or patch.stat().st_size < 1000:
+              raise SystemExit('Missing or invalid v23 patch payload')
+          for name in [
+              '34_Fresnaye_Model_v19_GZ_part01.js','34_Fresnaye_Model_v19_GZ_part02.js','34_Fresnaye_Model_v19_GZ_part03.js',
+              '34_Fresnaye_Model_v19_GZ_part04a.js','34_Fresnaye_Model_v19_GZ_part04b.js','34_Fresnaye_Model_v19_GZ_part04c.js',
+              '34_Fresnaye_Model_v19_GZ_part05a.js','34_Fresnaye_Model_v19_GZ_part05b.js','34_Fresnaye_Model_v19_GZ_part05c.js']:
+              p=Path('source')/name
+              if not p.exists() or p.stat().st_size < 1000:
+                  raise SystemExit(f'Missing hosted base-model chunk: {name}')
+          print('Canonical v23 viewer contract verified.')
+          PY
+
+      - name: Promote canonical viewer and required payloads
+        shell: bash
+        run: |
+          cp source/canonical-v23.html site/index.html
+          cp source/v19_to_v23_patch_gz.js site/v19_to_v23_patch_gz.js
+          for f in source/34_Fresnaye_Model_v19_GZ_part*.js; do cp "$f" site/; done
+          touch site/.nojekyll
+
+      - name: Commit Pages promotion
+        shell: bash
+        run: |
+          cd site
+          if git diff --quiet -- index.html v19_to_v23_patch_gz.js '34_Fresnaye_Model_v19_GZ_part*.js' .nojekyll; then
+            echo 'Pages branch already matches canonical v23 source.'
+            exit 0
+          fi
+          git config user.name '34 Fresnaye Walkthrough Engineer'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html v19_to_v23_patch_gz.js 34_Fresnaye_Model_v19_GZ_part*.js .nojekyll
+          git commit -m 'Promote canonical v23 walkthrough to GitHub Pages'
+          git push origin gh-pages
