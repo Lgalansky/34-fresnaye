@@ -1,26 +1,40 @@
 {
-  "status": "DEPLOYED_BYTES_STATIC_QA_PASS_INTERACTIVE_PUBLIC_ORIGIN_ACCEPTANCE_OPEN",
-  "viewer": "v71 Production Source28 Observability",
-  "productionProfile": "legacy-live-controls-observability-v71",
+  "status": "V73_SOURCE29_DEPLOYED__PUBLIC_ROOT_BROWSER_RETEST_PENDING",
+  "viewer": "v73 Production Source29 Observability",
+  "productionProfile": "legacy-live-controls-observability-v73",
   "canonicalModel": "v23",
   "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
   "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
   "vertices": 5769,
   "triangles": 8907,
-  "sourceContract": "SA28-DL48-v23-PROMOTED",
-  "sourceArchitect": "v28",
-  "discrepancyLog": "v48",
-  "revisionWatch": "v12",
+  "sourceContract": "SA29-DL49-v23-PROMOTED",
+  "sourceArchitect": "v29",
+  "discrepancyLog": "v49",
+  "revisionWatch": "v13",
   "geometryChanged": false,
-  "indexSha256": "597f75d3c2e157792d97c1efb1804f9af04882ca1e23b28caf4334d2324b0ca8",
+  "indexSha256": "cb23d783c853637b7602e3e385acc3de3da59355ae01377f7be7236c21aa0c97",
   "durableOrigin": "https://lgalansky.github.io/34-fresnaye/",
-  "versionedViewer": "https://lgalansky.github.io/34-fresnaye/walkthrough-v71.html",
+  "versionedViewer": "https://lgalansky.github.io/34-fresnaye/walkthrough-v73.html",
   "controls": {
     "desktop": "WASD/arrows + pointer-lock mouse",
     "mobile": "left joystick + right touch-look",
     "resetStarts": true,
     "collisionFloorFollowing": true
   },
+  "d20s07": {
+    "status": "SOURCE_SEMANTICS_CLOSED_NO_COMPONENT_GEOMETRY_AUTHORIZATION",
+    "brickworkRoughWidthMm": 2697,
+    "brickworkUSOpeningMm": 2125,
+    "D20": [2700, 2125],
+    "S07": [2700, 2125],
+    "preserveDifferenceMm": 3
+  },
+  "level02_50pctBlockers": [
+    "W09 overall/rough width",
+    "G04 front structural opening height",
+    "W05 50mm brickwork/schedule head-interface interpretation",
+    "remaining zone-specific ceiling heights / perimeter-bulkhead drops"
+  ],
   "richSimulatorFeatureParity": false,
   "richFeatureParityOpenItems": [
     "CPU Canvas2D fallback",
@@ -29,5 +43,8 @@
     "device/session QA",
     "adaptive performance guard"
   ],
-  "publicOriginInteractiveAcceptance": "OUTSTANDING"
+  "candidatePublicBrowserQA": "PASS",
+  "candidatePublicBrowserQAArtifact": "live-browser-qa-v73-candidate.json",
+  "publicOriginInteractiveAcceptance": "ROOT_RETEST_PENDING",
+  "humanContinuousWalk": "OUTSTANDING"
 }

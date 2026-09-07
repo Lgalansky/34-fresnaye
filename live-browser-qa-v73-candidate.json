@@ -1,0 +1,27 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v73_PublicBrowserQA_v2",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-v73.html",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "timestamp": "2026-09-07T22:44:57.205Z",
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.898,
+    "pointerLock": true,
+    "pointerLockMouseEventViewChange": true,
+    "hashVerified": true,
+    "reset": true,
+    "roomStarts": true
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 1.223,
+    "touchLookPixelsChanged": true,
+    "hashVerified": true,
+    "reset": true,
+    "touchUi": true
+  },
+  "pass": true,
+  "note": "Public versioned candidate browser QA passed before production promotion. Pointer-lock acquisition was real; headless physical relative mouse movement did not expose movementX, so the mouse-look listener was verified under active pointer lock with a dispatched movement event and resulting rendered-view change."
+}
