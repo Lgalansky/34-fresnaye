@@ -1,0 +1,35 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v73_StagedStaticQA_v1",
+  "status": "PASS_STAGED_NOT_PRODUCTION",
+  "viewer": "v73 Production Source29 Observability candidate",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "sourceContract": "SA29-DL49-v23-PROMOTED",
+  "sourceArchitect": "v29",
+  "discrepancyLog": "v49",
+  "revisionWatch": "v13",
+  "geometryChanged": false,
+  "vertices": 5769,
+  "triangles": 8907,
+  "indexCandidateSha256": "cb23d783c853637b7602e3e385acc3de3da59355ae01377f7be7236c21aa0c97",
+  "d20s07": {
+    "brickworkRoughWidthMm": 2697,
+    "brickworkUSOpeningMm": 2125,
+    "D20": [
+      2700,
+      2125
+    ],
+    "S07": [
+      2700,
+      2125
+    ],
+    "preserveDifferenceMm": 3
+  },
+  "blockers": [
+    "W09 overall/rough width",
+    "G04 front structural opening height",
+    "W05 50mm brickwork/schedule head-interface interpretation",
+    "remaining zone-specific ceiling heights / perimeter-bulkhead drops"
+  ],
+  "productionRichFeatureParity": false
+}
