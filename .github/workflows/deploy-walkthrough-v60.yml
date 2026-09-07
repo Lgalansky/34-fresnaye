@@ -1,0 +1,111 @@
+name: Fresnaye Walkthrough v60 Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/v60/**'
+      - '.github/workflows/deploy-walkthrough-v60.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  verify-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Reconstruct static-host package
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat deploy/v60/site.zip.b64.part* > /tmp/site.zip.b64
+          base64 -d /tmp/site.zip.b64 > /tmp/site.zip
+          echo "3c93bd04cc44c2c4af2e065e7f8e0018ab69b654a30b33571667f0f5788b2971  /tmp/site.zip" | sha256sum -c -
+          unzip -t /tmp/site.zip
+          rm -rf _site
+          mkdir _site
+          unzip -q /tmp/site.zip -d _site
+          test -f _site/index.html
+          test -f _site/sw.js
+          test -f _site/manifest.webmanifest
+          for i in 01 02 03 04 05; do test -f "_site/34_Fresnaye_App_v60_GZ_part${i}.js"; done
+          for i in 01 02 03 04 05 06 07 08 09 10; do test -f "_site/34_Fresnaye_Model_v23_GZ_part${i}.js"; done
+          touch _site/.nojekyll
+
+      - name: Verify application and canonical model integrity
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64, gzip, hashlib, pathlib, re, subprocess, json
+          site=pathlib.Path('_site')
+          def extract(parts, var):
+              out=''
+              for p in parts:
+                  t=p.read_text()
+                  m=re.search(r"\+'([^']*)';",t)
+                  assert m, p
+                  out += m.group(1)
+              return out
+          app_b64=extract([site/f'34_Fresnaye_App_v60_GZ_part{i:02d}.js' for i in range(1,6)],'app')
+          assert len(app_b64)==47684, len(app_b64)
+          app=gzip.decompress(base64.b64decode(app_b64))
+          app_sha=hashlib.sha256(app).hexdigest()
+          assert app_sha=='46dce64c5d81f46706c5fad0c48f11bed041401a178301efd8b7db4b23ffd656', app_sha
+          inner=pathlib.Path('/tmp/v60_inner.html'); inner.write_bytes(app)
+          model_b64=extract([site/f'34_Fresnaye_Model_v23_GZ_part{i:02d}.js' for i in range(1,11)],'model')
+          assert len(model_b64)==97520, len(model_b64)
+          obj=gzip.decompress(base64.b64decode(model_b64))
+          obj_sha=hashlib.sha256(obj).hexdigest()
+          assert obj_sha=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5', obj_sha
+          text=obj.decode('utf-8')
+          vertices=sum(1 for line in text.splitlines() if line.startswith('v '))
+          triangles=sum(max(0,len(line.split())-3) for line in text.splitlines() if line.startswith('f '))
+          assert vertices==5769, vertices
+          assert triangles==8907, triangles
+          assert 'Walkthrough_v60_v23CanonicalChunkBridge' in app.decode('utf-8')
+          assert 'viewerGeometryMutation:false' in app.decode('utf-8')
+          print(json.dumps({'app_sha256':app_sha,'canonical_obj_sha256':obj_sha,'vertices':vertices,'triangles':triangles},indent=2))
+          PY
+
+      - name: Verify JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check _site/sw.js
+          python - <<'PY'
+          import pathlib,re,subprocess
+          for src in [pathlib.Path('_site/index.html'), pathlib.Path('/tmp/v60_inner.html')]:
+              text=src.read_text()
+              for n,js in enumerate(re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',text,flags=re.S|re.I)):
+                  if not js.strip(): continue
+                  p=pathlib.Path(f'/tmp/{src.stem}_{n}.js'); p.write_text(js)
+                  subprocess.run(['node','--check',str(p)],check=True)
+          print('JS_SYNTAX_OK')
+          PY
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
