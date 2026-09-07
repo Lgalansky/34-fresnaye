@@ -1,0 +1,130 @@
+name: Build and promote walkthrough v62
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-promote-v62-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+          fetch-depth: 0
+
+      - name: Check out Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+          fetch-depth: 0
+
+      - name: Build v62 from canonical v23 viewer without geometry changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, hashlib
+          src_path=Path('source/canonical-v23.html')
+          patch_path=Path('source/v19_to_v23_patch_gz.js')
+          src=src_path.read_text(encoding='utf-8')
+          patch=patch_path.read_text(encoding='utf-8').strip()
+          expected='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          required=['Walkthrough v60','canonical v23',expected,'v19_to_v23_patch_gz.js','WASD','left joystick','id="reset"','25% PASSED','50% BLOCKED']
+          missing=[x for x in required if x not in src]
+          if missing:
+              raise SystemExit('Base viewer contract mismatch: '+repr(missing))
+          if not patch.startswith('window.__FRES_PATCH_V23_GZ=') or len(patch)<1000:
+              raise SystemExit('Invalid canonical v23 patch asset')
+          out=src
+          out=out.replace('Walkthrough v60 Canonical v23 Live Patch','Walkthrough v62 Canonical v23 Durable Host')
+          out=out.replace('Walkthrough v60 LIVE','Walkthrough v62 LIVE')
+          out=out.replace('Source Gate · SA22 / DL42','Source Gate · SA23 / DL43')
+          out=out.replace("viewer:'Walkthrough_v60_CanonicalV23LivePatch',sourceContract:'SA22-DL42-v23-PROMOTED'","viewer:'Walkthrough_v62_DurableHost_SourceSync',sourceContract:'SA23-DL43-v23-PROMOTED'")
+          out=out.replace("viewer:'Walkthrough_v60_CanonicalV23LivePatch',assetParts:","viewer:'Walkthrough_v62_DurableHost_SourceSync',assetParts:")
+          out=out.replace('<script src="v19_to_v23_patch_gz.js"></script>', '<script>\n'+patch+'\n</script>')
+          out=out.replace('<button class="btn" id="fullscreen">Full screen</button><button class="btn" id="reset">Reset</button>', '<button class="btn" id="fullscreen">Full screen</button><button class="btn" id="copylink">Copy review link</button><button class="btn" id="reset">Reset</button>')
+          fs="document.getElementById('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();"
+          if fs not in out:
+              raise SystemExit('Fullscreen handler anchor missing')
+          out=out.replace(fs,fs+"const copyBtn=document.getElementById('copylink');copyBtn.onclick=async()=>{const u=location.origin+location.pathname;try{await navigator.clipboard.writeText(u);copyBtn.textContent='Link copied';setTimeout(()=>copyBtn.textContent='Copy review link',1400)}catch(e){copyBtn.textContent='Use address bar';setTimeout(()=>copyBtn.textContent='Copy review link',1800)}};")
+          key_anchor="let keys=new Set();addEventListener('keydown',e=>keys.add(e.code));addEventListener('keyup',e=>keys.delete(e.code));"
+          resilience="function clearInputState(){keys.clear();mx=my=0;stickId=lookId=null;if(knob)knob.style.transform='translate(0,0)'};addEventListener('blur',clearInputState);addEventListener('pagehide',clearInputState);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInputState()});addEventListener('orientationchange',()=>{clearInputState();resize()});"
+          if resilience not in out:
+              if key_anchor not in out:
+                  raise SystemExit('Keyboard handler anchor missing')
+              out=out.replace(key_anchor,key_anchor+resilience)
+          out=out.replace("inputResilience:['blur','pagehide','visibilitychange','orientationchange'],status:'READY'", "inputResilience:['blur','pagehide','visibilitychange','orientationchange'],durableReviewUrl:(location.origin+location.pathname),status:'READY'")
+          checks={
+            'v62 marker':'Walkthrough v62 LIVE' in out,
+            'latest source contract':'SA23 / DL43' in out and 'SA23-DL43-v23-PROMOTED' in out,
+            'canonical hash':expected in out,
+            'patch inlined':'v19_to_v23_patch_gz.js' not in out and 'window.__FRES_PATCH_V23_GZ=' in out,
+            'desktop controls':'keydown' in out and 'pointerlockchange' in out and 'mousemove' in out,
+            'mobile controls':'stick.onpointerdown' in out and 'look.onpointerdown' in out,
+            'input resilience':all(x in out for x in ['blur','pagehide','visibilitychange','orientationchange']),
+            'copy durable link':'id="copylink"' in out and 'location.origin+location.pathname' in out,
+            'collision':'wallBlocked' in out and 'floorZAt' in out,
+          }
+          failed=[k for k,v in checks.items() if not v]
+          if failed:
+              raise SystemExit('v62 build contract failed: '+', '.join(failed))
+          Path('source/canonical-v23-v62.html').write_text(out,encoding='utf-8')
+          print('v62 bytes',len(out.encode()),'sha256',hashlib.sha256(out.encode()).hexdigest())
+          PY
+
+      - name: JavaScript syntax gate
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('source/canonical-v23-v62.html').read_text(encoding='utf-8')
+          scripts=[]
+          for m in re.finditer(r'<script(?:\s[^>]*)?>(.*?)</script>',s,re.S|re.I):
+              tag=s[m.start():s.find('>',m.start())+1]
+              if 'src=' not in tag:
+                  scripts.append(m.group(1))
+          Path('/tmp/v62-inline.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/v62-inline.js
+
+      - name: Persist versioned v62 viewer on main
+        shell: bash
+        run: |
+          cd source
+          if git diff --quiet -- canonical-v23-v62.html && git ls-files --error-unmatch canonical-v23-v62.html >/dev/null 2>&1; then
+            echo 'Versioned v62 viewer already current on main.'
+          else
+            git config user.name '34 Fresnaye Walkthrough Engineer'
+            git config user.email 'actions@users.noreply.github.com'
+            git add canonical-v23-v62.html
+            git commit -m 'Add walkthrough v62 durable-host viewer'
+            git push origin main
+          fi
+
+      - name: Promote v62 atomically to Pages
+        shell: bash
+        run: |
+          cp source/canonical-v23-v62.html site/index.html
+          for f in source/34_Fresnaye_Model_v19_GZ_part*.js; do cp "$f" site/; done
+          touch site/.nojekyll
+          cd site
+          git config user.name '34 Fresnaye Walkthrough Engineer'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html 34_Fresnaye_Model_v19_GZ_part*.js .nojekyll
+          if git diff --cached --quiet; then
+            echo 'Pages already matches v62.'
+          else
+            git commit -m 'Promote walkthrough v62 durable host to Pages'
+            git push origin gh-pages
+          fi
