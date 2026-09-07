@@ -1,0 +1,101 @@
+name: Promote walkthrough v71 source display guard
+
+on:
+  push:
+    paths:
+      - '.github/workflows/promote-v71-display-guard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Patch v70 production to v71 without geometry changes
+        shell: python
+        run: |
+          from pathlib import Path
+          import re, hashlib, json, subprocess
+          p=Path('index.html')
+          s=p.read_text()
+          assert 'Walkthrough_v70' in s or 'v70 Production' in s
+          assert 'SA28-DL48-v23-PROMOTED' in s
+          assert 'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' in s
+          assert 'Source Architect handoff v27 · discrepancy log v47' in s
+          assert 'Level 02 50% readiness · Source Architect v27' in s
+
+          s=s.replace('v70','v71')
+          old='<div class="gateMeta">Authoritative source audit: Source Architect handoff v27 · discrepancy log v47 · Archilab marked clarification received 2026-09-07. Written dimensions and corrected IDs govern. Canonical v23 passed independent 25% model QA. Site verification remains required; this viewer is not construction certification.</div>'
+          new='<div class="gateMeta" id="gateMeta">Authoritative source state: Source Architect handoff v28 · discrepancy log v48 · revision watch v12 · latest known Archilab message 2026-09-07T10:00:06Z. Written dimensions and corrected IDs govern. Canonical v23 passed independent 25% model QA. Site verification remains required; this viewer is not construction certification.</div>'
+          assert old in s
+          s=s.replace(old,new,1)
+          old2='<div class="gatePrep"><b>Level 02 50% readiness · Source Architect v27</b><br>Material source gaps remain: W09 overall/rough width, G04 front structural opening height, W05 50 mm brickwork/frame head-interface interpretation, and remaining zone-specific ceiling/perimeter-bulkhead dimensions. Source Architect v27 directly re-audited the four Level 02 50% source exceptions against FRE_WD_302/303/304/305/401/402; all four remain open and no newer Archilab revision has been received. Do not infer pending dimensions.</div>'
+          new2='<div class="gatePrep" id="gatePrep50"><b>Level 02 50% readiness · Source Architect v28</b><br>Material source gaps remain: W09 overall/rough width, G04 front structural opening height, W05 50 mm brickwork/frame head-interface interpretation, and remaining zone-specific ceiling/perimeter-bulkhead dimensions. Source Architect v28 carries forward the direct FRE_WD_302/303/304/305/401/402 re-audit: all four remain open, revision watch v12 found no newer Archilab revision, and no Level 02 50% geometry is authorized. Do not infer pending dimensions.</div>'
+          assert old2 in s
+          s=s.replace(old2,new2,1)
+          viewport='<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">'
+          metas='\n<meta name="fresnaye-viewer" content="v71"><meta name="fresnaye-canonical-model" content="v23"><meta name="fresnaye-model-sha256" content="c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5"><meta name="fresnaye-source-contract" content="SA28-DL48-v23-PROMOTED"><meta name="fresnaye-geometry-mutated" content="false">'
+          assert viewport in s
+          s=s.replace(viewport,viewport+metas,1)
+          needle="result.tests.sourceBlockerConsistency=SOURCE_GATE.geometryBlockersCount===4&&SOURCE_GATE.geometryBlockers.length===4&&SOURCE_GATE.level02_50pctReadiness.openItems.length===4;"
+          add="result.tests.sourceBlockerConsistency=SOURCE_GATE.geometryBlockersCount===4&&SOURCE_GATE.geometryBlockers.length===4&&SOURCE_GATE.level02_50pctReadiness.openItems.length===4;const gateMetaText=document.getElementById('gateMeta')?.textContent||'',gatePrep50Text=document.getElementById('gatePrep50')?.textContent||'';result.tests.sourceDisplayCurrent=gateMetaText.includes('handoff v28')&&gateMetaText.includes('discrepancy log v48')&&gateMetaText.includes('revision watch v12')&&!gateMetaText.includes('v27')&&!gateMetaText.includes('v47')&&gatePrep50Text.includes('Source Architect v28')&&gatePrep50Text.includes('no Level 02 50% geometry is authorized')&&!gatePrep50Text.includes('Source Architect v27');"
+          assert needle in s
+          s=s.replace(needle,add,1)
+          s=s.replace('Production Source28 Sync','Production Source28 Display Guard')
+          p.write_text(s)
+
+          visible=re.sub(r'<script(?:\s[^>]*)?>.*?</script>','',s,flags=re.S|re.I)
+          assert 'Source Architect handoff v28' in visible
+          assert 'discrepancy log v48' in visible
+          assert 'revision watch v12' in visible
+          assert 'Source Architect v27' not in visible
+          assert 'handoff v27' not in visible
+          assert 'discrepancy log v47' not in visible
+          assert '<meta name="fresnaye-viewer" content="v71">' in s
+          assert '<meta name="fresnaye-geometry-mutated" content="false">' in s
+          assert 'sourceDisplayCurrent' in s
+
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',s,re.S|re.I)
+          for i,js in enumerate(scripts):
+              q=Path(f'/tmp/v71_{i}.js'); q.write_text(js)
+              subprocess.run(['node','--check',str(q)],check=True)
+
+          sha=hashlib.sha256(p.read_bytes()).hexdigest()
+          Path('walkthrough-v71.html').write_bytes(p.read_bytes())
+          health={
+            'status':'DEPLOYED_BYTES_STATIC_QA_PASS_INTERACTIVE_PUBLIC_ORIGIN_ACCEPTANCE_OPEN',
+            'viewer':'v71 Production Source28 Display Guard',
+            'canonicalModel':'v23',
+            'canonicalObjSha256':'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',
+            'canonicalGlbSha256':'7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49',
+            'vertices':5769,
+            'triangles':8907,
+            'sourceContract':'SA28-DL48-v23-PROMOTED',
+            'sourceArchitect':'v28',
+            'discrepancyLog':'v48',
+            'revisionWatch':'v12',
+            'geometryChanged':False,
+            'indexSha256':sha,
+            'durableOrigin':'https://lgalansky.github.io/34-fresnaye/',
+            'versionedViewer':'https://lgalansky.github.io/34-fresnaye/walkthrough-v71.html',
+            'publicOriginInteractiveAcceptance':'OUTSTANDING'
+          }
+          Path('health.json').write_text(json.dumps(health,indent=2)+'\n')
+          print(json.dumps(health,indent=2))
+
+      - name: Commit v71 production bytes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html walkthrough-v71.html health.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Promote v71 Source28 display guard"
+          git push origin gh-pages
