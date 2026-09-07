@@ -1,34 +1,23 @@
 # 34 Fresnaye — latest walkthrough state
 
-**Level 02 25% model acceptance is now PASSED.** Independent QA promoted Geometry Builder v23 to canonical after the Source Architect v20 exact iD08 footprint contract was consumed and Source Architect v21 confirmed that contract remains current.
+**Level 02 25% source + model acceptance is PASSED.** Canonical Level 02 remains **v23** at 5,769 vertices / 8,907 triangles. OBJ SHA-256: `c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5`. GLB SHA-256: `7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49`.
 
-## Canonical Level 02
+Source Architect **v21 / discrepancy log v41** is current. Walkthrough Engineering has made no architectural geometry changes.
 
-- Canonical model: **v23** — 5,769 vertices / 8,907 triangles.
-- Canonical OBJ SHA-256: `c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5`.
-- Canonical GLB SHA-256: `7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49`.
-- Independent QA: `34_Fresnaye_Level02_25pct_v23_IndependentQA_v1.json`.
-- Promotion record: `34_Fresnaye_Level02_25pct_v23_PromotionRecord_v1.json`.
+## Walkthrough v57 — Canonical Live Sync
 
-The iD08 reconstruction uses only six exact FRE_WD_206 source HATCH footprints as separate sub-volumes, preserves source gaps, leaves the registered 855 mm rough-opening corridor clear, and introduces no degenerate faces or index-nonmanifold edges. Inherited internal-shell encapsulation is retained as a non-material topology-hygiene caveat; no deletion, bridge, hull or gap fill may be introduced by assumption.
+v57 is the latest QA-passed canonical-v23 walkthrough candidate. It truth-synchronizes source/acceptance metadata to SA21/DL41 and the promoted v23 state, fixes stale pre-promotion acceptance wording, and records `viewerGeometryMutation=false` while keeping final acceptance scoped to the verified connected component.
 
-## Current source state
+Fresh runtime QA passes desktop WebGL2, forced WebGL1, mobile CPU Canvas2D, desktop keyboard/mouse movement, mobile joystick/touch-look, Reset, source-gate visibility, collision-safe routes to Living/Kitchen/Main Bedroom, and the self-contained portable raw compatibility path. The live-host candidate uses 10 external gzip model assets totaling 97,520 base64 characters; they reconstruct the exact canonical v23 OBJ. Static JavaScript/ZIP/model-integrity QA also passes.
 
-Source Architect **v21 / discrepancy log v41** is current. Level 02 25% source evidence remains passed. The governing iD08 values remain rough opening **855 mm**, U/S **2400 mm**, pocket **90 mm**, adjacent return **750 mm**; written dimensions govern and native vectors are positional evidence only.
+## Permanent hosting boundary
 
-## Walkthrough / live boundary
+The public GitHub Pages root remains the previously verified **Walkthrough v52 / canonical v19** at https://lgalansky.github.io/34-fresnaye/. A fresh `gh-pages` branch read confirms the root `index.html` is still blob `14b498ca9a4b9b771fcd0afa580b5d358fffd36c` and still identifies v52/canonical-v19. Do not represent the public URL as canonical v23 yet.
 
-A self-contained **v55-v23 canonical walkthrough** has been built and statically verifies the exact promoted OBJ payload/hash/topology while preserving desktop keyboard/mouse, mobile joystick/touch, reset, map, guide, continuity and source-gate controls.
+v57 is staged, runtime-QA-passed and static-host packaged. The working v52 root is intentionally preserved until the exact generated v57 deployment bytes can be transferred through the connected write path and the multipart/bootstrap deployment path can be verified before and after promotion; the current execution environment blocks production-equivalent browser navigation for that bootstrap verification.
 
-Fresh automated browser regression of the v23 viewer could not run in the current build execution environment because local browser navigation is blocked by administrator policy. The immediately preceding v55 canonical-v19 viewer engine has fresh desktop WebGL2, forced WebGL1 and mobile CPU runtime passes. Therefore the **permanent hosted reviewer remains the previously verified v52 live build** at `https://lgalansky.github.io/34-fresnaye/` until the v23 viewer is safely deployed and runtime-tested on the live URL. Do not represent v52 as containing canonical v23 geometry.
+## Acceptance / next milestone
 
-## Next milestone
+The verified main navigation component remains Entrance → Living → Kitchen → Main Bedroom → Entrance. Second Dwelling and Service Stair remain outside the verified connected component. A human continuous acceptance walk is still outstanding.
 
-Level 02 50% is **NOT STARTED**. Material source blockers remain:
-
-- W09 overall/rough width;
-- G04 front structural opening height;
-- W05 50 mm brickwork/schedule head-interface interpretation;
-- remaining zone-specific ceiling heights / perimeter-bulkhead drops.
-
-No 50% geometry may be created by inference. Site-dependent dimensions require real-world verification. This repository is simulator/model QA, not construction certification.
+Level 02 50% is **NOT STARTED**. Material source blockers remain W09 overall/rough width, G04 front structural opening height, W05 50 mm brickwork/schedule head-interface interpretation, and remaining zone-specific ceiling heights / perimeter-bulkhead drops. No 50% geometry may be created by inference. Site-dependent dimensions require real-world verification; this repository is simulator/model QA, not construction certification.
