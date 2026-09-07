@@ -1,0 +1,21 @@
+{
+  "artifact": "v74-staged-static-qa",
+  "status": "PASS_STAGED_NOT_PRODUCTION",
+  "viewer": "v74 Production Source31 Consistency Sync",
+  "canonical": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "sourceContract": "SA31-DL51-v23-PROMOTED",
+  "sourceArchitect": "v31",
+  "discrepancyLog": "v51",
+  "revisionWatch": "v15",
+  "vertices": 5769,
+  "triangles": 8907,
+  "geometryChanged": false,
+  "level02_50pctBlockers": [
+    "W09 overall/rough width",
+    "G04 front structural opening height",
+    "W05 50mm brickwork/schedule head-interface interpretation",
+    "remaining zone-specific ceiling heights / perimeter-bulkhead drops"
+  ],
+  "indexSha256": "a7c7c201769b0a1f7a6b020bed28d1ae6e64718d9cdcd5f2882d88e191d6d1fb"
+}
