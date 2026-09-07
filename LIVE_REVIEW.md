@@ -1,5 +1,5 @@
-# 34 Fresnaye live review
+# 34 Fresnaye — verified live review
 
 Permanent walkthrough: https://lgalansky.github.io/34-fresnaye/
 
-Automated public-origin browser QA: PASS on desktop keyboard + pointer-lock mouse event handling and mobile joystick + touch-look. Canonical v23 hash/topology verified. Human continuous acceptance walk remains outstanding.
+Production: v74 Source31 consistency sync / canonical v23. Automated public-origin desktop/mobile WebGL controls PASS. Human continuous room-to-room acceptance remains open.

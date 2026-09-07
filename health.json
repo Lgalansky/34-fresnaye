@@ -1,46 +1,22 @@
 {
-  "status": "PUBLIC_ORIGIN_BROWSER_QA_PASS__HUMAN_CONTINUOUS_WALK_OPEN",
-  "viewer": "v73 Production Source29 Observability",
-  "productionProfile": "legacy-live-controls-observability-v73",
+  "status": "PUBLIC_ORIGIN_V74_SOURCE31_BROWSER_QA_PASS__HUMAN_CONTINUOUS_WALK_OPEN",
+  "viewer": "v74 Production Source31 Consistency Sync",
   "canonicalModel": "v23",
   "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
   "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
   "vertices": 5769,
   "triangles": 8907,
-  "sourceContract": "SA29-DL49-v23-PROMOTED",
-  "sourceArchitect": "v29",
-  "discrepancyLog": "v49",
-  "revisionWatch": "v13",
+  "sourceContract": "SA31-DL51-v23-PROMOTED",
+  "sourceArchitect": "v31",
+  "discrepancyLog": "v51",
+  "revisionWatch": "v15",
   "geometryChanged": false,
-  "indexSha256": "cb23d783c853637b7602e3e385acc3de3da59355ae01377f7be7236c21aa0c97",
+  "indexSha256": "a7c7c201769b0a1f7a6b020bed28d1ae6e64718d9cdcd5f2882d88e191d6d1fb",
   "durableOrigin": "https://lgalansky.github.io/34-fresnaye/",
-  "versionedViewer": "https://lgalansky.github.io/34-fresnaye/walkthrough-v73.html",
-  "controls": {
-    "desktop": "WASD/arrows + pointer-lock mouse",
-    "mobile": "left joystick + right touch-look",
-    "resetStarts": true,
-    "collisionFloorFollowing": true
-  },
-  "d20s07": {
-    "status": "SOURCE_SEMANTICS_CLOSED_NO_COMPONENT_GEOMETRY_AUTHORIZATION",
-    "brickworkRoughWidthMm": 2697,
-    "brickworkUSOpeningMm": 2125,
-    "D20": [
-      2700,
-      2125
-    ],
-    "S07": [
-      2700,
-      2125
-    ],
-    "preserveDifferenceMm": 3
-  },
-  "level02_50pctBlockers": [
-    "W09 overall/rough width",
-    "G04 front structural opening height",
-    "W05 50mm brickwork/schedule head-interface interpretation",
-    "remaining zone-specific ceiling heights / perimeter-bulkhead drops"
-  ],
+  "versionedViewer": "https://lgalansky.github.io/34-fresnaye/walkthrough-v74.html",
+  "publicOriginAutomatedDesktopMobileWebGLControls": "PASS",
+  "liveBrowserQA": "live-browser-qa-v74-root.json",
+  "liveBrowserQATimestamp": "2026-09-07T23:47:13.720Z",
   "richSimulatorFeatureParity": false,
   "richFeatureParityOpenItems": [
     "CPU Canvas2D fallback",
@@ -49,10 +25,11 @@
     "device/session QA",
     "adaptive performance guard"
   ],
-  "candidatePublicBrowserQA": "PASS",
-  "candidatePublicBrowserQAArtifact": "live-browser-qa-v73-candidate.json",
-  "publicOriginInteractiveAcceptance": "AUTOMATED_DESKTOP_MOBILE_WEBGL_CONTROLS_PASS",
-  "humanContinuousWalk": "OUTSTANDING",
-  "liveBrowserQA": "live-browser-qa-v73-root.json",
-  "liveBrowserQATimestamp": "2026-09-07T22:48:00.975Z"
+  "level02_50pctBlockers": [
+    "W09 overall/rough width",
+    "G04 front structural opening height",
+    "W05 50mm brickwork/schedule head-interface interpretation",
+    "remaining zone-specific ceiling heights / perimeter-bulkhead drops"
+  ],
+  "humanContinuousWalk": "OUTSTANDING"
 }

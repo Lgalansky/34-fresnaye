@@ -1,0 +1,27 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v74_PublicBrowserQA",
+  "url": "https://lgalansky.github.io/34-fresnaye/",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "sourceContract": "SA31-DL51-v23-PROMOTED",
+  "timestamp": "2026-09-07T23:47:13.720Z",
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 1.039,
+    "hashVerified": true,
+    "reset": true,
+    "roomStarts": true,
+    "pointerLock": true,
+    "mouseLook": true
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 1.534,
+    "touchLook": true,
+    "hashVerified": true,
+    "reset": true,
+    "touchUi": true
+  },
+  "pass": true
+}
