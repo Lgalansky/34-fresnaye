@@ -1,4 +1,4 @@
-# Re-run after retiring the stale v52 live-root mutator.
+# Canonical v65 source-sync promotion; legacy v52 live-root mutator is retired.
 name: Promote v65 Source Architect 25 sync
 
 on:
@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Source-sync production viewer without geometry changes
+      - name: Source-sync and clean production viewer without geometry changes
         shell: bash
         run: |
           python3 - <<'PY'
@@ -37,19 +37,35 @@ jobs:
           s=s.replace('Walkthrough v64 Durable Host Link Gate','Walkthrough v65 Durable Host Link Gate')
           s=s.replace('Walkthrough v64 LIVE','Walkthrough v65 LIVE')
           s=s.replace('Source Gate · SA24 / DL44','Source Gate · SA25 / DL45')
-          s=s.replace("viewer:'Walkthrough_v64_DurableHost_LinkGate'","viewer:'Walkthrough_v65_DurableHost_LinkGate'")
           s=s.replace('SA24-DL44-v23-PROMOTED','SA25-DL45-v23-PROMOTED')
 
           old='<span>25% PASSED · 50% BLOCKED on W09 width, G04 front height, W05 50 mm head/interface, and zone-specific ceiling/bulkhead dimensions.</span>'
           new='<span>25% PASSED · 50% BLOCKED on W09 width, G04 front height, W05 50 mm head/interface, and zone-specific ceiling/bulkhead dimensions. SA25/DL45 adds only later-level L03 D04 schedule-omission evidence; no Level 02 geometry authorization.</span>'
           s=s.replace(old,new)
 
+          # Remove all historical live-meta assignments, then insert exactly one current assignment.
+          s=re.sub(r"window\.__FRESNAYE_LIVE_META=\{[^\n]+\};\n?",'',s)
+          live_meta=("window.__FRESNAYE_LIVE_META={viewer:'Walkthrough_v65_DurableHost_LinkGate',"
+                     "sourceContract:'SA25-DL45-v23-PROMOTED',canonicalModel:'v23',"
+                     "modelSha256:MODEL_SHA256,geometryChanged:false,hashVerified:false,durableLink:null};\n")
+          marker='async function init(){'
+          if marker not in s: raise SystemExit('Viewer init marker missing')
+          s=s.replace(marker,live_meta+marker,1)
+
+          # Collapse historical repeated runtime hash-state writes.
+          hv="window.__FRESNAYE_LIVE_META.hashVerified=(runtimeSha===MODEL_SHA256);"
+          s=re.sub(r'(?:'+re.escape(hv)+r'){2,}',hv,s)
+
+          # Ensure the QA object reports the actual production viewer.
+          s=re.sub(r"window\.__FRESNAYE_QA=\{viewer:'Walkthrough_v[^']+'", "window.__FRESNAYE_QA={viewer:'Walkthrough_v65_DurableHost_LinkGate'", s, count=1)
+
           required=['Walkthrough v65 LIVE','SA25 / DL45','Walkthrough_v65_DurableHost_LinkGate','SA25-DL45-v23-PROMOTED',canonical,'function durableHostedURL()']
           missing=[x for x in required if x not in s]
-          if missing:
-              raise SystemExit('Missing v65 markers: '+repr(missing))
-          if "viewer:'Walkthrough_v64_DurableHost_LinkGate'" in s or 'SA24-DL44-v23-PROMOTED' in s:
-              raise SystemExit('Stale v64/SA24 runtime metadata remains')
+          if missing: raise SystemExit('Missing v65 markers: '+repr(missing))
+          if 'Walkthrough_v52_LiveHostedSourceSync' in s or 'SA16-DL36-CR8' in s or 'SA24-DL44-v23-PROMOTED' in s:
+              raise SystemExit('Stale production metadata remains')
+          if s.count('window.__FRESNAYE_LIVE_META={') != 1 or s.count(hv) != 1:
+              raise SystemExit('Live metadata/hash assignment cardinality failure')
           p.write_text(s,encoding='utf-8')
           PY
 
@@ -74,5 +90,9 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'Promote v65 SA25 DL45 walkthrough source sync'
-          git push origin HEAD:gh-pages
+          if git diff --cached --quiet; then
+            echo 'v65 production root already clean'
+          else
+            git commit -m 'Clean v65 SA25 DL45 production metadata'
+            git push origin HEAD:gh-pages
+          fi
