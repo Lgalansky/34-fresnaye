@@ -1,0 +1,67 @@
+name: QA v82 public rich candidate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qa-v82-public-candidate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify v82 public candidate desktop and mobile
+        env:
+          TEST_URL: https://lgalansky.github.io/34-fresnaye/walkthrough-v82.html
+        shell: bash
+        run: |
+          cat > liveqa.cjs <<'JS'
+          const { chromium, devices } = require('playwright');
+          const URL=process.env.TEST_URL;
+          const CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const CON='SA38-DL59-v23-PROMOTED';
+          const DIG='9964dadbaece446301728858ed25da2a3e7fdd81297ebf929c2c7186e15a39f5';
+          const ok=(v,m)=>{if(!v)throw new Error(m)};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(page){
+            let last='';
+            for(let i=0;i<15;i++){
+              try{
+                const r=await page.goto(URL+'?candidate='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+                last='HTTP '+(r?.status()||'none');
+                if(r?.ok()){
+                  await page.waitForFunction(()=>document.querySelector('meta[name="fresnaye-viewer"]')?.content==='v82'&&window.__FRESNAYE_QA?.status==='READY',null,{timeout:30000});
+                  return page.evaluate(()=>({qa:window.__FRESNAYE_QA,live:window.__FRESNAYE_LIVE_META,meta:{viewer:document.querySelector('meta[name="fresnaye-viewer"]')?.content,canonical:document.querySelector('meta[name="fresnaye-canonical-model"]')?.content,sha:document.querySelector('meta[name="fresnaye-model-sha256"]')?.content,source:document.querySelector('meta[name="fresnaye-source-contract"]')?.content,digest:document.querySelector('meta[name="fresnaye-source-digest"]')?.content,mutated:document.querySelector('meta[name="fresnaye-geometry-mutated"]')?.content}}));
+                }
+              }catch(e){last=e.message}
+              await page.waitForTimeout(5000);
+            }
+            throw new Error('candidate not ready: '+last);
+          }
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),s=await ready(p);
+              ok(s.meta.viewer==='v82','desktop viewer '+s.meta.viewer);ok(s.meta.canonical==='v23'&&s.meta.sha===CAN&&s.meta.mutated==='false','desktop canonical');ok(s.meta.source===CON&&s.meta.digest===DIG,'desktop source identity');ok(s.qa.runtimeSha256===CAN&&s.qa.vertices===5769&&s.qa.triangles===8907,'desktop hash/topology');ok(/^WebGL[12]$/.test(s.qa.renderer),'desktop WebGL '+s.qa.renderer);ok(s.live?.hashVerified===true&&s.live?.sourceIdentityDigest===DIG,'desktop live meta');
+              await p.evaluate(()=>window.__FRESNAYE_QA.runSelfTest());await p.waitForFunction(()=>window.__FRESNAYE_QA.selfTest?.pass===true,null,{timeout:90000});const st=await p.evaluate(()=>window.__FRESNAYE_QA.selfTest);ok(Object.keys(st.tests).length===50,'self test count '+Object.keys(st.tests).length);ok(Object.entries(st.tests).every(([,v])=>v===true),'self test failure');
+              const a=await p.evaluate(()=>window.__FRESNAYE_QA.cameraState());await p.keyboard.down('w');await p.waitForTimeout(750);await p.keyboard.up('w');await p.waitForTimeout(120);const b=await p.evaluate(()=>window.__FRESNAYE_QA.cameraState());ok(dist(a.pos,b.pos)>.20,'desktop movement');await p.click('#reset');const r=await p.evaluate(()=>window.__FRESNAYE_QA.cameraState());ok(dist(a.pos,r.pos)<.01,'desktop reset');const route=await p.evaluate(()=>window.__FRESNAYE_QA.planRoute('living',9000));ok(route.ok&&route.path.length===33&&Math.abs(route.length-8)<.01,'living route');
+              await p.click('#enter');await p.waitForTimeout(200);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.mouse.move(800,350);await p.mouse.move(930,330,{steps:2});await p.waitForTimeout(120);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.001,'mouse look');const dl=await p.evaluate(()=>window.__FRESNAYE_QA.runDeviceQA());ok(dl.corePass&&dl.durablePass&&!dl.productionPass&&dl.status==='PASS_DURABLE_CANDIDATE','candidate tier '+dl.status);console.log('DESKTOP_V82_PASS',JSON.stringify({renderer:s.qa.renderer,movement:+dist(a.pos,b.pos).toFixed(3),selfTests:Object.keys(st.tests).length,liveStatus:dl.status,source:s.meta.source}));await dc.close();
+              const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),ms=await ready(m);ok(ms.meta.viewer==='v82'&&ms.meta.canonical==='v23'&&ms.meta.sha===CAN,'mobile identity');ok(ms.meta.source===CON&&ms.meta.digest===DIG,'mobile source');ok(ms.qa.runtimeSha256===CAN&&ms.qa.triangles===8907,'mobile hash/topology');ok(/^WebGL[12]$/.test(ms.qa.renderer),'mobile WebGL '+ms.qa.renderer);const touch=await m.evaluate(()=>({coarse:matchMedia('(pointer:coarse)').matches,display:getComputedStyle(document.querySelector('.touch')).display,quick:getComputedStyle(document.querySelector('.mobileQuick')).display}));ok(touch.coarse&&touch.display!=='none'&&touch.quick!=='none','touch UI');const sb=await m.locator('#stick').boundingBox();ok(sb,'stick box');const client=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2,ma=await m.evaluate(()=>window.__FRESNAYE_QA.cameraState());await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]});await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-48,id:1,radiusX:4,radiusY:4}]});await m.waitForTimeout(750);await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(120);const mb=await m.evaluate(()=>window.__FRESNAYE_QA.cameraState());ok(dist(ma.pos,mb.pos)>.18,'joystick movement');await m.click('#mobileReset');const mr=await m.evaluate(()=>window.__FRESNAYE_QA.cameraState());ok(dist(ma.pos,mr.pos)<.01,'mobile reset');const lb=await m.locator('#look').boundingBox(),lx=lb.x+lb.width*.58,ly=lb.y+lb.height*.5,yy0=mr.yaw;await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]});await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]});await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(120);const yy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(yy1-yy0)>.01,'touch look');const ml=await m.evaluate(()=>window.__FRESNAYE_QA.runDeviceQA());ok(ml.corePass&&ml.durablePass&&!ml.productionPass&&ml.status==='PASS_DURABLE_CANDIDATE','mobile candidate tier');console.log('MOBILE_V82_PASS',JSON.stringify({renderer:ms.qa.renderer,movement:+dist(ma.pos,mb.pos).toFixed(3),look:+(yy1-yy0).toFixed(3),liveStatus:ml.status}));await mc.close();console.log('V82_PUBLIC_CANDIDATE_QA_PASS');
+            }finally{await browser.close()}
+          })().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node liveqa.cjs
