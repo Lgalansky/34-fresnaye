@@ -1,0 +1,34 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v1",
+  "updatedUtc": "2026-09-08T23:30:27Z",
+  "reviewCandidate": {
+    "viewerVersion": "v95",
+    "loader": "walkthrough-v95.html",
+    "readySentinel": "walkthrough-v95-ready.json",
+    "viewerSha256": "63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249",
+    "viewerBytes": 250254,
+    "canonicalModel": "v23",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "glbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+    "vertices": 5769,
+    "triangles": 8907,
+    "geometryChanged": false,
+    "automatedPublicCandidateReviewReady": true
+  },
+  "sourceState": {
+    "latestSourceArchitectObserved": "v59",
+    "sourceArchitectHandoffSha256": "830e9ad438c631c5e7113fe64f5807fa280534333ea3887df21688bed15e545c",
+    "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
+    "geometryAuthorization": false,
+    "level02EffectOfV59": "NONE",
+    "materialLevel02SourceBlockerCount": 1,
+    "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and transition segments lacking their own written radius/centre/tangent/horizontal witness. No scaling or inference."
+  },
+  "acceptance": {
+    "finalStatus": "OPEN",
+    "humanContinuousWalkRequired": true,
+    "requiredSequence": "Entrance -> Living -> Kitchen -> Main Bedroom",
+    "staticRendersDoNotCount": true,
+    "productionRootPromoted": false
+  }
+}
