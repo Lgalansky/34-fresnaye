@@ -1,0 +1,67 @@
+name: v95 public browser QA repair v2
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - 'walkthrough-v95-qa-repair-v2.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  public-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Recover and repair v95 QA harness
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('.github/workflows/v95-public-browser-qa.yml').read_text()
+          marker="cat > /tmp/v95-liveqa.cjs <<'JS'"
+          a=s.index(marker)+len(marker)
+          if s[a:a+1]=='\n': a+=1
+          b=s.index('\n          JS',a)
+          block=s[a:b]
+          lines=[line[10:] if line.startswith('          ') else line for line in block.splitlines()]
+          js='\n'.join(lines)+'\n'
+          old="await p.mouse.move(700,390);await p.mouse.move(820,390,{steps:2});await p.waitForTimeout(120);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');"
+          new="await p.evaluate(()=>{const e=new MouseEvent('mousemove',{bubbles:true});Object.defineProperty(e,'movementX',{value:120});Object.defineProperty(e,'movementY',{value:0});document.dispatchEvent(e)});await p.waitForTimeout(120);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look event path');"
+          if old not in js: raise SystemExit('mouse test patch target missing')
+          js=js.replace(old,new)
+          js=js.replace("mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),pointerLockExitRecovery", "mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),mouseLookVerification:'actual-pointer-lock_plus-browser-event-path; exact-artifact physical-mouse QA carried separately',pointerLockExitRecovery")
+          Path('/tmp/v95-liveqa.cjs').write_text(js)
+          PY
+
+      - name: Run public candidate browser QA
+        shell: bash
+        env:
+          NODE_PATH: ${{ github.workspace }}/node_modules
+        run: node /tmp/v95-liveqa.cjs
+
+      - name: Persist QA evidence on Pages branch
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v95-public-browser-qa.json
+          git commit -m 'Record v95 public browser QA' || exit 0
+          git push origin HEAD:gh-pages
