@@ -1,0 +1,102 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v95_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-08T21:46:08.072Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-v95.html",
+  "viewerSha256": "63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "sourceContract": "SA51-DL72-RW35-v23-CURRENT_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+  "sourceAdjudicationStatus": "CURRENT_SOURCE_ARCHITECT_V51_ADDITIVE__LEVEL02_BASELINE_V50__NO_GEOMETRY_AUTHORIZATION",
+  "geometryChanged": false,
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.714,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.3,
+    "mouseLookVerification": "actual-pointer-lock_plus-browser-event-path; exact-artifact physical-mouse QA carried separately",
+    "pointerLockExitRecovery": true,
+    "postExitDriftM": 0,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.573,
+    "touchLookYawRad": 0.35,
+    "lostPointerCaptureRecovery": true,
+    "postLossDriftM": 0,
+    "reset": true,
+    "pageErrors": []
+  },
+  "review": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "selfTests": 57,
+    "total": 57,
+    "hostTier": "durable-candidate",
+    "mainRoute": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v95_v23CanonicalRichProductionParity_SA51DL72_InputRecovery",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA51-DL72-RW35-v23-CURRENT_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    },
+    "pwa": {
+      "policy": "production-root-only",
+      "allowed": false,
+      "registered": false,
+      "scope": null,
+      "offlineReady": false,
+      "manifest": "./walkthrough-v95.manifest.webmanifest",
+      "serviceWorker": "./walkthrough-v95.sw.js",
+      "scopeSafe": true
+    }
+  },
+  "pass": true
+}
