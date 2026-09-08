@@ -31,7 +31,7 @@ jobs:
           TEST_URL: https://lgalansky.github.io/34-fresnaye/
         shell: bash
         run: |
-          cat > /tmp/liveqa.cjs <<'JS'
+          cat > liveqa.cjs <<'JS'
           const { chromium, devices } = require('playwright');
           const crypto=require('crypto');
           const URL=process.env.TEST_URL;
@@ -52,4 +52,4 @@ jobs:
             const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),ms=await ready(m);ok(ms.meta.viewer==='v74'&&ms.meta.canonical==='v23'&&ms.meta.sha===CAN,'mobile identity');ok(ms.qa.runtimeSha256===CAN&&ms.qa.triangles===8907,'mobile hash/topology');ok(/^WebGL[12]$/.test(ms.qa.webglVersion),'mobile WebGL');const touch=await m.evaluate(()=>({coarse:matchMedia('(pointer:coarse)').matches,display:getComputedStyle(document.querySelector('.touch')).display}));ok(touch.coarse&&touch.display!=='none','touch UI');const sb=await m.locator('#stick').boundingBox();ok(sb,'stick box');const client=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2,ma=xy(await m.locator('#coords').textContent());await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]});await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-48,id:1,radiusX:4,radiusY:4}]});await m.waitForTimeout(750);await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(150);const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.18,'joystick');await m.evaluate(()=>document.getElementById('reset').click());await m.waitForTimeout(120);ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.08,'mobile reset');const lb=await m.locator('#look').boundingBox(),before=hash(await m.locator('#c').screenshot()),lx=lb.x+lb.width*.58,ly=lb.y+lb.height*.50;await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]});await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]});await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(180);ok(before!==hash(await m.locator('#c').screenshot()),'touch look');console.log('MOBILE_PASS',JSON.stringify({renderer:ms.qa.webglVersion,movement:+dist(ma,mb).toFixed(3),source:ms.meta.source}));await mc.close();console.log('PUBLIC_ROOT_QA_PASS');
           }finally{await browser.close()}})().catch(e=>{console.error(e.stack||e);process.exit(1)});
           JS
-          node /tmp/liveqa.cjs
+          node liveqa.cjs
