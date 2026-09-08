@@ -49,3 +49,4 @@
   "productionPromotionAllowed": false,
   "promotionHoldReason": "Source Architect geometry_authorization=false; exact curved/unwitnessed bulkhead footprints remain source-locked; human continuous acceptance outstanding."
 }
+
