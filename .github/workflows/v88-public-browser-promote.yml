@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: fresnaye-v88-public-promote
+  cancel-in-progress: false
+
 jobs:
   qa-promote:
     runs-on: ubuntu-latest
@@ -19,13 +23,14 @@ jobs:
         with:
           ref: gh-pages
           fetch-depth: 0
-      - name: Wait for complete public candidate
+      - name: Wait for public candidate sentinel
         shell: bash
         run: |
-          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v88.html'; ok=0
+          set -euo pipefail
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v88-ready.json'; ok=0
           for i in $(seq 1 60); do
             body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
-            if printf '%s' "$body" | grep -q '2b42a29f98dee6927ae0e45c0ca8908b165abc32bd0d7f88f127456b33c046f6' && printf '%s' "$body" | grep -q 'walkthrough-v88.part04.b64'; then ok=1; break; fi
+            if printf '%s' "$body" | grep -q '2ecaa5caf47c77c9e29455e66ecc0c2be39a1998792f916054c880892f0db439' && printf '%s' "$body" | grep -q 'SA43-DL65-v23-PROMOTED'; then ok=1; break; fi
             sleep 5
           done
           test "$ok" = 1
@@ -37,22 +42,22 @@ jobs:
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Write browser QA harness
+      - name: Write public browser QA harness
         shell: bash
         run: |
           cat > /tmp/v88-liveqa.cjs <<'JS'
           const { chromium, devices } = require('playwright');
           const fs=require('fs');
           const CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
-          const SOURCE='SA42-DL64-v23-PROMOTED';
+          const VIEW='2ecaa5caf47c77c9e29455e66ecc0c2be39a1998792f916054c880892f0db439';
+          const SOURCE='SA43-DL65-v23-PROMOTED';
           const ok=(v,m)=>{if(!v)throw new Error(m)};
-          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw new Error('coords '+t);return[+m[1],+m[2]]};
           const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
-          async function ready(page,url,review=false){await page.goto(url+(url.includes('?')?'&':'?')+(review?'reviewqa=1&':'')+'bust='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await page.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});if(review)await page.waitForFunction(()=>window.__FRESNAYE_REVIEW_QA?.pass===true,null,{timeout:90000});}
-          async function run(url,mode,outfile){const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});const expectedTier=mode==='root'?'production':'durable-candidate',out={artifact:'34_Fresnaye_Walkthrough_v88_'+(mode==='root'?'Root':'Candidate')+'_PublicBrowserQA_v1',date:new Date().toISOString(),url,canonicalObjSha256:CAN,sourceContract:SOURCE,desktop:{},mobile:{},review:{},pwa:{},pass:false};try{
-            const rc=await browser.newContext({viewport:{width:1365,height:768}}),r=await rc.newPage();await ready(r,url,true);const rq=await r.evaluate(()=>window.__FRESNAYE_REVIEW_QA),st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest),pwa=await r.evaluate(()=>window.__FRESNAYE_QA.pwaState?.());ok(rq.pass&&rq.corePass&&rq.hostTier===expectedTier,'review readiness/tier');ok(st.pass&&st.modelHash===CAN,'self-test/hash');ok(st.tests.mainRouteConnectivity&&st.tests.pwaScopeSafety&&st.tests.sourceDisplayCurrent&&st.tests.source42RevisionGuard,'route/pwa/source/revision gates');ok(/^WebGL[12]$/.test(rq.renderer),'WebGL');if(mode==='candidate')ok(pwa?.registrationAllowed===false&&pwa?.registrationSkipped===true,'candidate must not register production SW');else{ok(pwa?.registrationAllowed===true,'root must allow SW');await r.waitForFunction(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !!reg&&reg.scope.endsWith('/34-fresnaye/')},{timeout:30000});}out.review={pass:true,renderer:rq.renderer,selfTests:Object.values(st.tests).filter(Boolean).length,total:Object.keys(st.tests).length,hostTier:rq.hostTier,mainRoute:rq.mainRoute};out.pwa=await r.evaluate(async()=>{const reg=await navigator.serviceWorker.getRegistration();return{state:window.__FRESNAYE_QA.pwaState?.(),registrationScope:reg?.scope||null,controller:!!navigator.serviceWorker.controller}});await rc.close();
-            const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let errs=[];p.on('pageerror',e=>errs.push(String(e)));await ready(p,url);const ident=await p.evaluate(()=>({viewer:document.querySelector('meta[name="fresnaye-viewer"]')?.content,rich:document.querySelector('meta[name="fresnaye-rich-parity"]')?.content,canonical:document.querySelector('meta[name="fresnaye-canonical-model"]')?.content,sha:document.querySelector('meta[name="fresnaye-model-sha256"]')?.content,source:document.querySelector('meta[name="fresnaye-source-contract"]')?.content,mutated:document.querySelector('meta[name="fresnaye-geometry-mutated"]')?.content,qa:window.__FRESNAYE_QA}));ok(ident.viewer==='v88'&&ident.rich==='production'&&ident.canonical==='v23'&&ident.sha===CAN&&ident.source===SOURCE&&ident.mutated==='false','desktop identity');ok(ident.qa.runtimeSha256===CAN&&ident.qa.triangles===8907,'desktop runtime hash/topology');const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(720);await p.keyboard.up('w');await p.waitForTimeout(140);const b=xy(await p.locator('#coords').textContent());ok(dist(a,b)>.2,'desktop keyboard movement');await p.locator('#reset').click();await p.waitForTimeout(120);ok(dist(xy(await p.locator('#coords').textContent()),[7.9,17.1])<.1,'desktop reset');await p.locator('[data-start="living"]').click();await p.waitForTimeout(100);ok(dist(xy(await p.locator('#coords').textContent()),[3.6,13])<.1,'living start');await p.locator('#enter').click();await p.waitForTimeout(200);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.mouse.move(700,390);await p.mouse.move(820,390,{steps:2});await p.waitForTimeout(120);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');ok(errs.length===0,'desktop page errors');out.desktop={pass:true,renderer:ident.qa.webglVersion,keyboardMovementM:+dist(a,b).toFixed(3),reset:true,livingStart:true,pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),pageErrors:errs};await dc.close();
-            const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let merr=[];m.on('pageerror',e=>merr.push(String(e)));await ready(m,url);const mi=await m.evaluate(()=>({qa:window.__FRESNAYE_QA,viewer:document.querySelector('meta[name="fresnaye-viewer"]')?.content,sha:document.querySelector('meta[name="fresnaye-model-sha256"]')?.content,source:document.querySelector('meta[name="fresnaye-source-contract"]')?.content}));ok(mi.viewer==='v88'&&mi.sha===CAN&&mi.source===SOURCE&&mi.qa.runtimeSha256===CAN,'mobile identity/hash');const sb=await m.locator('#stick').boundingBox();ok(sb,'mobile stick');const sess=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2,ma=xy(await m.locator('#coords').textContent());await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-45,id:1,radiusX:4,radiusY:4}]});await m.waitForTimeout(720);await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(140);const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.18,'mobile joystick');const lb=await m.locator('#look').boundingBox();ok(lb,'look zone');const cy0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw,lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5;await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(120);const cy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(cy1-cy0)>.05,'mobile look');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.1,'mobile reset');ok(merr.length===0,'mobile page errors');out.mobile={pass:true,renderer:mi.qa.webglVersion,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(cy1-cy0).toFixed(3),reset:true,touchUi:true,pageErrors:merr};await mc.close();out.pass=true;
+          async function ready(page,url,review=false){const sep=url.includes('?')?'&':'?';await page.goto(url+sep+(review?'reviewqa=1&':'')+'bust='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await page.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});if(review)await page.waitForFunction(()=>window.__FRESNAYE_REVIEW_QA?.pass===true,null,{timeout:90000});}
+          async function run(url,mode,outfile){const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});const tier=mode==='root'?'production':'durable-candidate',out={artifact:'34_Fresnaye_Walkthrough_v88_'+(mode==='root'?'Root':'Candidate')+'_PublicBrowserQA_v2',timestamp:new Date().toISOString(),url,canonicalObjSha256:CAN,viewerSha256:VIEW,sourceContract:SOURCE,pass:false};try{
+            const rc=await browser.newContext({viewport:{width:1365,height:768}}),r=await rc.newPage();await ready(r,url,true);const rq=await r.evaluate(()=>window.__FRESNAYE_REVIEW_QA),st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest),hi=await r.evaluate(()=>window.__FRESNAYE_QA.verifyHostedArtifactIntegrity());ok(rq.pass&&rq.corePass&&rq.hostPass&&rq.hostTier===tier,'review readiness/tier');ok(st.pass&&st.modelHash===CAN,'self-test/hash');ok(hi.pass&&hi.status==='PASS'&&hi.artifactSha256===VIEW&&hi.transport==='gzip-base64-parts','host transport integrity');ok(/^WebGL[12]$/.test(rq.renderer),'WebGL renderer required');const pwa=await r.evaluate(()=>window.__FRESNAYE_QA.pwaState());if(mode==='candidate')ok(pwa.registrationAllowed===false&&pwa.registrationSkipped===true,'candidate PWA scope safety');else{ok(pwa.registrationAllowed===true,'production PWA registration allowed');await r.waitForFunction(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !!reg&&reg.scope.endsWith('/34-fresnaye/')},{timeout:30000});}out.review={pass:true,renderer:rq.renderer,selfTests:Object.values(st.tests).filter(Boolean).length,total:Object.keys(st.tests).length,hostTier:rq.hostTier,hostIntegrity:hi};await rc.close();
+            const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let errs=[];p.on('pageerror',e=>errs.push(String(e)));await ready(p,url);const qa=await p.evaluate(()=>window.__FRESNAYE_QA);ok(qa.runtimeSha256===CAN&&qa.vertices===5769&&qa.triangles===8907,'desktop model identity/topology');await p.locator('#reset').click();let a=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;await p.keyboard.down('w');await p.waitForTimeout(720);await p.keyboard.up('w');await p.waitForTimeout(120);let b=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;ok(dist(a,b)>.2,'desktop keyboard movement');await p.locator('[data-start="living"]').click();await p.waitForTimeout(100);ok((await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).start==='living','living start');await p.locator('#reset').click();await p.locator('#enter').click();await p.waitForTimeout(180);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.mouse.move(650,380);await p.mouse.move(800,380,{steps:2});await p.waitForTimeout(100);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');ok(errs.length===0,'desktop page errors');out.desktop={pass:true,keyboardMovementM:+dist(a,b).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),pageErrors:errs};await dc.close();
+            const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let merr=[];m.on('pageerror',e=>merr.push(String(e)));await ready(m,url);ok(await m.evaluate(()=>matchMedia('(pointer:coarse)').matches),'coarse pointer');let ma=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;const sb=await m.locator('#stick').boundingBox(),sess=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-45,id:1,radiusX:4,radiusY:4}]});await m.waitForTimeout(720);await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(120);let mb=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;ok(dist(ma,mb)>.18,'mobile joystick');const lb=await m.locator('#look').boundingBox(),cy0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw,lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5;await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(100);const cy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(cy1-cy0)>.05,'mobile look');ok(await m.evaluate(()=>{let b=document.getElementById('mobileReset').getBoundingClientRect();return document.elementFromPoint(b.left+b.width/2,b.top+b.height/2)?.id==='mobileReset'}),'mobile reset hit target');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok((await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).start==='entrance','mobile reset');ok(merr.length===0,'mobile page errors');out.mobile={pass:true,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(cy1-cy0).toFixed(3),reset:true,pageErrors:merr};await mc.close();out.pass=true;
           }finally{await browser.close()}fs.writeFileSync(outfile,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));}
           const [,,url,mode,outfile]=process.argv;run(url,mode,outfile).catch(e=>{console.error(e.stack||e);process.exit(1)});
           JS
@@ -63,24 +68,26 @@ jobs:
       - name: Guarded production promotion
         shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           cp index.html /tmp/v88-index-before.html
           cp walkthrough-v88.html index.html
           cp /tmp/v88-candidate-qa.json v88-public-browser-qa.json
           cat > v88-production-health.json <<'JSON'
-          {"viewer":"v88","canonicalModel":"v23","canonicalObjSha256":"c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5","viewerSha256":"2b42a29f98dee6927ae0e45c0ca8908b165abc32bd0d7f88f127456b33c046f6","sourceContract":"SA42-DL64-v23-PROMOTED","geometryChanged":false,"candidatePublicBrowserQA":"PASS","rootPublicBrowserQA":"PENDING"}
+          {"viewer":"v88","canonicalModel":"v23","canonicalObjSha256":"c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5","viewerSha256":"2ecaa5caf47c77c9e29455e66ecc0c2be39a1998792f916054c880892f0db439","sourceContract":"SA43-DL65-v23-PROMOTED","geometryChanged":false,"candidatePublicBrowserQA":"PASS","rootPublicBrowserQA":"PENDING"}
           JSON
           git add index.html v88-public-browser-qa.json v88-production-health.json
-          git commit -m 'Promote browser-accepted v88 rich walkthrough'
+          git commit -m 'Promote browser-accepted v88 SA43 rich walkthrough'
           git push origin HEAD:gh-pages
       - name: Wait for production root v88
         shell: bash
         run: |
+          set -euo pipefail
           URL='https://lgalansky.github.io/34-fresnaye/'; ok=0
           for i in $(seq 1 60); do
             body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
-            if printf '%s' "$body" | grep -q '2b42a29f98dee6927ae0e45c0ca8908b165abc32bd0d7f88f127456b33c046f6' && printf '%s' "$body" | grep -q 'walkthrough-v88.part04.b64'; then ok=1; break; fi
+            if printf '%s' "$body" | grep -q '2ecaa5caf47c77c9e29455e66ecc0c2be39a1998792f916054c880892f0db439' && printf '%s' "$body" | grep -q 'walkthrough-v88.part04.b64'; then ok=1; break; fi
             sleep 5
           done
           test "$ok" = 1
