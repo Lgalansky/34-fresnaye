@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>34 Fresnaye — v86 loading</title><style>html,body{height:100%;margin:0;background:#111;color:#fff;font:15px system-ui}main{padding:24px;max-width:760px;margin:auto}.bad{color:#ff9b9b}</style><main><h1>34 Fresnaye v86</h1><div id="s">Loading verified rich canonical walkthrough…</div></main>
+<!-- Walkthrough_v86_v23CanonicalRichProductionParity_SA40DL62_ArchitectRequestGate -->
+<!-- SA40-DL62-v23-PROMOTED -->
+<script src="walkthrough-v86-patch82.js"></script>
+<script src="walkthrough-v86-patch01.js"></script>
+<script src="walkthrough-v86-patch02.js"></script>
+<script src="walkthrough-v86-patch03.js"></script>
+<script src="walkthrough-v86-patch04.js"></script>
+<script src="walkthrough-v86-patch05.js"></script>
+<script>
+(async()=>{const S=document.getElementById('s'),parts=["walkthrough-v81.part01.b64","walkthrough-v81.part02.b64","walkthrough-v81.part03.b64","walkthrough-v81.part04-05.b64","walkthrough-v81.part06-07.b64","walkthrough-v81.part08-09.b64","walkthrough-v81.part10.b64","walkthrough-v81.part11.b64","walkthrough-v81.part12.b64"],pre='b69bccf8783337911513ea5a3eff3d6744224a24c516d963c8365a797442a289',mid='a107c6cfb62e102c78e81c6b5f0071c7e52ecf4ebbe911287553dfcad13e33fa',post='69c8449b1161f261e8179f3e786244a2c0e80f9cc85e6ec024cda6a4958a478c';const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''),sha=async s=>hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));try{const txt=await Promise.all(parts.map(async p=>{let r=await fetch(p,{cache:'no-store'});if(!r.ok)throw Error(p+' '+r.status);return(await r.text()).trim()})),bin=Uint8Array.from(atob(txt.join('')),c=>c.charCodeAt(0)),raw=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).text();if(await sha(raw)!==pre)throw Error('v81 transport hash mismatch');let out=raw,p82=window.__FRESNAYE_V82_PATCH||[],p86=window.__FRESNAYE_V86_PATCH||[];for(let i=p82.length-1;i>=0;i--){const[a,b,r]=p82[i];out=out.slice(0,a)+r+out.slice(b)}if(await sha(out)!==mid)throw Error('v82 reconstruction hash mismatch');for(let i=p86.length-1;i>=0;i--){const[a,b,r]=p86[i];out=out.slice(0,a)+r+out.slice(b)}if(await sha(out)!==post)throw Error('v86 reconstruction hash mismatch');document.open();document.write(out);document.close()}catch(e){S.className='bad';S.textContent='v86 load failed: '+e.message;console.error(e)}})();
+</script>
