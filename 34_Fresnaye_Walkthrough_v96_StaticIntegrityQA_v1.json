@@ -1,0 +1,35 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StaticIntegrityQA_v1",
+  "timestampUtc": "2026-09-08T22:32:41Z",
+  "status": "PASS_STATIC_PENDING_RUNTIME",
+  "geometryChanged": false,
+  "viewerSha256": "0a4d5404288843cd376030158feeae682ea042f776bc1f98ee8eaf84afd7583f",
+  "viewerBytes": 253348,
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "vertices": 5769,
+  "triangles": 8907,
+  "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+  "sourceIdentityDigest": "54b6857632032a18c68c23a05e98801b8a770c60d92fae8704a5429cba7f78ea",
+  "transportParts": 12,
+  "transportExactReconstruction": true,
+  "acceptanceIntegrity": {
+    "minDistanceM": 40,
+    "minDurationSec": 12,
+    "backgroundInvalidation": true,
+    "transportBinding": true
+  },
+  "checks": {
+    "inlineJsExtracted": true,
+    "canonicalModelHashPresent": true,
+    "canonicalGlbHashPresent": true,
+    "geometryMutationFalse": true,
+    "sourceHandoffLatest": true,
+    "acceptanceSessionId": true,
+    "acceptanceVisibilityInvalidation": true,
+    "acceptanceDistanceFloor": true,
+    "acceptanceDurationFloor": true,
+    "transportBinding": true
+  }
+}

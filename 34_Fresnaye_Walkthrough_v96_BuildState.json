@@ -1,0 +1,38 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_BuildState",
+  "timestampUtc": "2026-09-08T22:32:41Z",
+  "status": "ACTIVE_VERSIONED_CANDIDATE_PENDING_PUBLIC_QA",
+  "geometryChanged": false,
+  "canonical": {
+    "version": "v23",
+    "objSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "glbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+    "vertices": 5769,
+    "triangles": 8907
+  },
+  "source": {
+    "latestArchitect": "v58",
+    "level02Baseline": "v50",
+    "discrepancyLog": "v72",
+    "revisionWatch": "v41",
+    "geometryAuthorization": false,
+    "currentMaterialLevel02Lock": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written horizontal witness. No radius/centre/tangent may be invented or obtained by scaling.",
+    "sourceIdentityDigest": "54b6857632032a18c68c23a05e98801b8a770c60d92fae8704a5429cba7f78ea"
+  },
+  "walkthrough": {
+    "candidate": "v96 Human Acceptance Integrity",
+    "viewerSha256": "0a4d5404288843cd376030158feeae682ea042f776bc1f98ee8eaf84afd7583f",
+    "viewerBytes": 253348,
+    "staticIntegrityQA": "PASS",
+    "runtimeQA": "PENDING",
+    "publicOriginQA": "PENDING",
+    "productionRoot": "UNCHANGED v74",
+    "humanContinuousAcceptance": "OUTSTANDING"
+  },
+  "infrastructureProgress": [
+    "Synced viewer provenance to latest Source Architect v58 / RW41 while preserving Level02 baseline v50 / DL72 and canonical v23 geometry.",
+    "Hardened human continuous acceptance proof with a unique session ID, 40m minimum continuous movement, 12s minimum elapsed time, and automatic invalidation on background/tab visibility loss, pagehide, window focus loss, reset/room jump or collision-off.",
+    "Bound hosted acceptance proof to loader-verified transport SHA/source contract when executed from the versioned public package.",
+    "Rebuilt deterministic gzip/base64 portable/static-host packaging with exact reconstruction verification."
+  ]
+}

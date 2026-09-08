@@ -1,0 +1,35 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_RunArtifactManifest_v1",
+  "timestampUtc": "2026-09-08T22:32:41Z",
+  "geometryChanged": false,
+  "files": [
+    {
+      "name": "34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html",
+      "role": "exact v96 viewer candidate"
+    },
+    {
+      "name": "34_Fresnaye_Walkthrough_v96_StaticIntegrityQA_v1.json",
+      "role": "static code/model/source/transport integrity QA"
+    },
+    {
+      "name": "34_Fresnaye_Walkthrough_v96_BuildState.json",
+      "role": "build state"
+    },
+    {
+      "name": "34_Fresnaye_Walkthrough_v96_ChiefOfStaff_Handoff_v1.md",
+      "role": "Chief of Staff handoff"
+    },
+    {
+      "name": "34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_Portable.zip",
+      "role": "portable viewer package"
+    },
+    {
+      "name": "34_Fresnaye_Level02_v96_RichParity_StaticHost.zip",
+      "role": "static-host deployment package"
+    }
+  ],
+  "viewerSha256": "0a4d5404288843cd376030158feeae682ea042f776bc1f98ee8eaf84afd7583f",
+  "viewerBytes": 253348,
+  "transportParts": 12,
+  "acceptance": "STATIC_READY__RUNTIME_PUBLIC_QA_AND_HUMAN_ACCEPTANCE_OPEN"
+}
