@@ -1,0 +1,167 @@
+name: v89 text-safe static stage, public browser gate and guarded promotion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/v89-static.zip.b64'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fresnaye-v89-textsafe-stage-promote
+  cancel-in-progress: false
+
+jobs:
+  qa-promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout main payload
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Decode and verify exact static-host payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f deploy/v89-static.zip.b64
+          normalized=$(tr -d '[:space:]' < deploy/v89-static.zip.b64)
+          printf '%s' "$normalized" | sha256sum | grep -q '^f392dae8a3271b191694fcd8f80dca618456beabc3cf9085b544e802d50c2564 '
+          printf '%s' "$normalized" | base64 -d > /tmp/v89-static.zip
+          echo '8deef3eaa7e937a8e0676f7cffc3a959a69d15a74961a32ec5bd7e5f2d64e370  /tmp/v89-static.zip' | sha256sum -c -
+          rm -rf /tmp/v89-stage && mkdir -p /tmp/v89-stage
+          unzip -q /tmp/v89-static.zip -d /tmp/v89-stage
+          python - <<'PYVERIFY'
+          import json,hashlib,gzip,base64,pathlib
+          root=pathlib.Path('/tmp/v89-stage'); meta=json.loads((root/'walkthrough-v89-ready.json').read_text())
+          assert meta['viewerSha256']=='993dbf26cab468fc52190965316dd4239117b057cbaaf95714cb27f0575c24f4'
+          assert meta['viewerBytes']==247862 and meta['sourceContract']=='SA44-DL66-v23-PROMOTED'
+          assert meta['sourceIdentityDigest']=='aac6f99178a62e7e90c498036a8c94c7cf7def5a618a2a432126e10904d7aa49'
+          assert meta['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          b64=''
+          for n in meta['transportParts']:
+              norm=''.join((root/n).read_text().split())
+              assert hashlib.sha256(norm.encode()).hexdigest()==meta['transportPartNormalizedSha256'][n]
+              b64+=norm
+          raw=gzip.decompress(base64.b64decode(b64))
+          assert len(raw)==meta['viewerBytes'] and hashlib.sha256(raw).hexdigest()==meta['viewerSha256']
+          required=['walkthrough-v89.html','walkthrough-v89.manifest.webmanifest','walkthrough-v89.sw.js']+meta['transportParts']
+          assert all((root/n).exists() for n in required)
+          print('static transport exact PASS')
+          PYVERIFY
+      - name: Stage versioned candidate on gh-pages without touching production index
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          rm -rf /tmp/pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/v89-stage/* /tmp/pages/
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-v89.html walkthrough-v89-ready.json walkthrough-v89.part*.b64 walkthrough-v89.manifest.webmanifest walkthrough-v89.sw.js
+          git commit -m 'Stage exact v89 SA44 rich walkthrough candidate' || true
+          git push origin HEAD:gh-pages
+      - name: Wait for public candidate sentinel
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v89-ready.json'; ok=0
+          for i in $(seq 1 60); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q '993dbf26cab468fc52190965316dd4239117b057cbaaf95714cb27f0575c24f4' && printf '%s' "$body" | grep -q 'SA44-DL66-v23-PROMOTED'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Write public browser QA harness
+        shell: bash
+        run: |
+          cat > /tmp/v89-liveqa.cjs <<'JS'
+          const { chromium, devices } = require('playwright');
+          const fs=require('fs');
+          const CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const VIEW='993dbf26cab468fc52190965316dd4239117b057cbaaf95714cb27f0575c24f4';
+          const SOURCE='SA44-DL66-v23-PROMOTED';
+          const DIGEST='aac6f99178a62e7e90c498036a8c94c7cf7def5a618a2a432126e10904d7aa49';
+          const ok=(v,m)=>{if(!v)throw new Error(m)};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(page,url,review=false){const sep=url.includes('?')?'&':'?';await page.goto(url+sep+(review?'reviewqa=1&':'')+'bust='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await page.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});if(review)await page.waitForFunction(()=>window.__FRESNAYE_REVIEW_QA?.pass===true,null,{timeout:90000});}
+          async function run(url,mode,outfile){const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});const tier=mode==='root'?'production':'durable-candidate',out={artifact:'34_Fresnaye_Walkthrough_v89_'+(mode==='root'?'Root':'Candidate')+'_PublicBrowserQA_v1',timestamp:new Date().toISOString(),url,canonicalObjSha256:CAN,viewerSha256:VIEW,sourceContract:SOURCE,sourceIdentityDigest:DIGEST,pass:false};try{
+            const rc=await browser.newContext({viewport:{width:1365,height:768}}),r=await rc.newPage();await ready(r,url,true);const rq=await r.evaluate(()=>window.__FRESNAYE_REVIEW_QA),st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest),hi=await r.evaluate(()=>window.__FRESNAYE_QA.verifyHostedArtifactIntegrity());ok(rq.pass&&rq.corePass&&rq.hostTier===tier,'review readiness/tier');ok(st.pass&&st.modelHash===CAN,'self-test/hash');ok(hi.pass&&hi.status==='PASS'&&hi.artifactSha256===VIEW&&hi.transport==='gzip-base64-parts'&&hi.partIntegrity===true,'host transport integrity');ok(rq.sourceIdentityDigest===DIGEST,'source digest');ok(/^WebGL[12]$/.test(rq.renderer),'WebGL renderer required');const pwa=await r.evaluate(()=>window.__FRESNAYE_QA.pwaState());if(mode==='candidate')ok(pwa.registrationAllowed===false&&pwa.registrationSkipped===true,'candidate PWA scope safety');else{ok(pwa.registrationAllowed===true,'production PWA registration allowed');await r.waitForFunction(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !!reg&&reg.scope.endsWith('/34-fresnaye/')},{timeout:30000});}out.review={pass:true,renderer:rq.renderer,selfTests:Object.values(st.tests).filter(Boolean).length,total:Object.keys(st.tests).length,hostTier:rq.hostTier,hostIntegrity:hi};await rc.close();
+            const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let errs=[];p.on('pageerror',e=>errs.push(String(e)));await ready(p,url);const qa=await p.evaluate(()=>window.__FRESNAYE_QA);ok(qa.runtimeSha256===CAN&&qa.vertices===5769&&qa.triangles===8907,'desktop model identity/topology');await p.locator('#reset').click();let a=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;await p.keyboard.down('w');await p.waitForTimeout(720);await p.keyboard.up('w');await p.waitForTimeout(120);let b=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;ok(dist(a,b)>.2,'desktop keyboard movement');await p.locator('[data-start="living"]').click();await p.waitForTimeout(100);ok((await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).start==='living','living start');await p.locator('#reset').click();await p.locator('#enter').click();await p.waitForTimeout(180);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.mouse.move(650,380);await p.mouse.move(800,380,{steps:2});await p.waitForTimeout(100);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');ok(errs.length===0,'desktop page errors');out.desktop={pass:true,keyboardMovementM:+dist(a,b).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),pageErrors:errs};await dc.close();
+            const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let merr=[];m.on('pageerror',e=>merr.push(String(e)));await ready(m,url);ok(await m.evaluate(()=>matchMedia('(pointer:coarse)').matches),'coarse pointer');let ma=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;const sb=await m.locator('#stick').boundingBox(),sess=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-45,id:1,radiusX:4,radiusY:4}]});await m.waitForTimeout(720);await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(120);let mb=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos;ok(dist(ma,mb)>.18,'mobile joystick');const lb=await m.locator('#look').boundingBox(),cy0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw,lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5;await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]});await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(100);const cy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(cy1-cy0)>.05,'mobile look');ok(await m.evaluate(()=>{let b=document.getElementById('mobileReset').getBoundingClientRect();return document.elementFromPoint(b.left+b.width/2,b.top+b.height/2)?.id==='mobileReset'}),'mobile reset hit target');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok((await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).start==='entrance','mobile reset');ok(merr.length===0,'mobile page errors');out.mobile={pass:true,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(cy1-cy0).toFixed(3),reset:true,pageErrors:merr};await mc.close();out.pass=true;
+          }finally{await browser.close()}fs.writeFileSync(outfile,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));}
+          const [,,url,mode,outfile]=process.argv;run(url,mode,outfile).catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node --check /tmp/v89-liveqa.cjs
+      - name: Run public candidate QA
+        shell: bash
+        run: node /tmp/v89-liveqa.cjs 'https://lgalansky.github.io/34-fresnaye/walkthrough-v89.html' candidate /tmp/v89-candidate-qa.json
+      - name: Guarded production promotion
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/pages
+          git pull --ff-only origin gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp index.html /tmp/v89-index-before.html
+          cp walkthrough-v89.html index.html
+          cp /tmp/v89-candidate-qa.json v89-public-browser-qa.json
+          cat > v89-production-health.json <<'JSON'
+          {"viewer":"v89","canonicalModel":"v23","canonicalObjSha256":"c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5","viewerSha256":"993dbf26cab468fc52190965316dd4239117b057cbaaf95714cb27f0575c24f4","sourceContract":"SA44-DL66-v23-PROMOTED","sourceIdentityDigest":"aac6f99178a62e7e90c498036a8c94c7cf7def5a618a2a432126e10904d7aa49","geometryChanged":false,"candidatePublicBrowserQA":"PASS","rootPublicBrowserQA":"PENDING"}
+          JSON
+          git add index.html v89-public-browser-qa.json v89-production-health.json
+          git commit -m 'Promote browser-accepted v89 SA44 rich walkthrough'
+          git push origin HEAD:gh-pages
+      - name: Wait for production root v89
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://lgalansky.github.io/34-fresnaye/'; ok=0
+          for i in $(seq 1 60); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q '993dbf26cab468fc52190965316dd4239117b057cbaaf95714cb27f0575c24f4' && printf '%s' "$body" | grep -q 'walkthrough-v89.part04.b64'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - name: Run production-root browser QA
+        id: rootqa
+        shell: bash
+        run: node /tmp/v89-liveqa.cjs 'https://lgalansky.github.io/34-fresnaye/' root /tmp/v89-root-qa.json
+      - name: Persist production-root QA evidence
+        if: success()
+        shell: bash
+        run: |
+          cd /tmp/pages
+          git pull --ff-only origin gh-pages
+          cp /tmp/v89-root-qa.json v89-root-browser-qa.json
+          python - <<'PY2'
+          import json
+          p='v89-production-health.json';d=json.load(open(p));d['rootPublicBrowserQA']='PASS';json.dump(d,open(p,'w'),indent=2);open(p,'a').write('\n')
+          PY2
+          git add v89-root-browser-qa.json v89-production-health.json
+          git commit -m 'Record v89 production-root browser QA'
+          git push origin HEAD:gh-pages
+      - name: Roll back production index if root QA fails
+        if: failure() && steps.rootqa.outcome == 'failure'
+        shell: bash
+        run: |
+          cd /tmp/pages
+          git pull --ff-only origin gh-pages || true
+          cp /tmp/v89-index-before.html index.html
+          git add index.html
+          git commit -m 'Rollback v89 index after failed production-root QA' || true
+          git push origin HEAD:gh-pages || true
