@@ -1,0 +1,168 @@
+name: v89 provenance static stage and public browser QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/v89-provenance.seg04.b64'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fresnaye-v89-provenance-public-qa
+  cancel-in-progress: false
+
+jobs:
+  stage-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact transfer payload
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify and decode static-host package
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in deploy/v89-provenance.seg{01..04}.b64; do test -f "$f"; done
+          normalized=$(cat deploy/v89-provenance.seg{01..04}.b64 | tr -d '[:space:]')
+          printf '%s' "$normalized" | sha256sum | grep -q '^01fd22b2f6eec38e5359fb1ccb460fb58f1e49ca38192c1a1299556868918133 '
+          printf '%s' "$normalized" | base64 -d > /tmp/v89-static.zip
+          echo '01f1a11d382597af8f75cb80ce90d4efaac1f26e546d1764c9bc9fb168b84303  /tmp/v89-static.zip' | sha256sum -c -
+          rm -rf /tmp/v89-stage && mkdir -p /tmp/v89-stage
+          unzip -q /tmp/v89-static.zip -d /tmp/v89-stage
+          python - <<'PYVERIFY'
+          import json,hashlib,gzip,base64,pathlib
+          root=pathlib.Path('/tmp/v89-stage')
+          meta=json.loads((root/'walkthrough-v89-ready.json').read_text())
+          assert meta['viewer']=='Walkthrough_v89_v23CanonicalRichProductionParity_SA45DL67_ProvenanceSnapshot_PublicQA'
+          assert meta['viewerSha256']=='f07726c64b5b4c64c086a95a07fd78a2ee05b3f206798499db17b8176dde5e29'
+          assert meta['viewerBytes']==248457
+          assert meta['sourceContract']=='SA45-DL67-v23-PROMOTED'
+          assert meta['sourceIdentityDigest']=='771942b561fb09a4aca45c18c74182e9faaf940a16a7474ecc5645f448cfe91b'
+          assert meta['sourceRevisionCheckedUtc']=='2026-09-08T10:31:38Z'
+          assert meta['sourceSnapshotFreshAtBuild'] is True
+          assert meta['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          assert meta['vertices']==5769 and meta['triangles']==8907
+          assert meta['geometryChanged'] is False and meta['stageComplete'] is True
+          assert len(meta['transportParts'])==16
+          b64=''.join(''.join((root/n).read_text().split()) for n in meta['transportParts'])
+          raw=gzip.decompress(base64.b64decode(b64))
+          assert len(raw)==meta['viewerBytes'] and hashlib.sha256(raw).hexdigest()==meta['viewerSha256']
+          manifest=(root/'walkthrough-v89.manifest.webmanifest').read_text()
+          assert 'Source Architect v45' in manifest and 'discrepancy log v67' in manifest and 'revision watch v29' in manifest
+          print('exact package PASS')
+          PYVERIFY
+
+      - name: Stage versioned v89 candidate only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          rm -rf /tmp/pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/v89-stage/walkthrough-v89.html /tmp/pages/
+          cp /tmp/v89-stage/walkthrough-v89-ready.json /tmp/pages/
+          cp /tmp/v89-stage/walkthrough-v89.part*.b64 /tmp/pages/
+          cp /tmp/v89-stage/walkthrough-v89.manifest.webmanifest /tmp/pages/
+          cp /tmp/v89-stage/walkthrough-v89.sw.js /tmp/pages/
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-v89.html walkthrough-v89-ready.json walkthrough-v89.part*.b64 walkthrough-v89.manifest.webmanifest walkthrough-v89.sw.js
+          git commit -m 'Stage exact v89 provenance-rich walkthrough candidate' || true
+          git push origin HEAD:gh-pages
+
+      - name: Wait for exact candidate to be served
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v89-ready.json'; ok=0
+          for i in $(seq 1 72); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q 'f07726c64b5b4c64c086a95a07fd78a2ee05b3f206798499db17b8176dde5e29' && printf '%s' "$body" | grep -q '771942b561fb09a4aca45c18c74182e9faaf940a16a7474ecc5645f448cfe91b'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Public candidate desktop/mobile browser QA
+        shell: bash
+        run: |
+          cat > /tmp/v89-liveqa.cjs <<'JS'
+          const { chromium, devices } = require('playwright');
+          const fs=require('fs');
+          const URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v89.html';
+          const CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const VIEW='f07726c64b5b4c64c086a95a07fd78a2ee05b3f206798499db17b8176dde5e29';
+          const SOURCE='SA45-DL67-v23-PROMOTED';
+          const DIGEST='771942b561fb09a4aca45c18c74182e9faaf940a16a7474ecc5645f448cfe91b';
+          const ok=(v,m)=>{if(!v)throw new Error(m)};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(page,review=false){
+            await page.goto(URL+'?'+(review?'reviewqa=1&':'')+'bust='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+            await page.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});
+            if(review)await page.waitForFunction(()=>window.__FRESNAYE_REVIEW_QA?.pass===true,null,{timeout:90000});
+          }
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            const out={artifact:'34_Fresnaye_Walkthrough_v89_Candidate_PublicBrowserQA_v1',timestamp:new Date().toISOString(),url:URL,canonicalObjSha256:CAN,viewerSha256:VIEW,sourceContract:SOURCE,sourceIdentityDigest:DIGEST,pass:false};
+            try{
+              const rc=await browser.newContext({viewport:{width:1365,height:768}}),r=await rc.newPage();
+              await ready(r,true);
+              const rq=await r.evaluate(()=>window.__FRESNAYE_REVIEW_QA), st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest), hi=await r.evaluate(()=>window.__FRESNAYE_QA.verifyHostedArtifactIntegrity()), meta=await r.evaluate(()=>window.__FRESNAYE_LIVE_META), pwa=await r.evaluate(()=>window.__FRESNAYE_QA.pwaState());
+              ok(rq.pass&&rq.corePass&&rq.hostTier==='durable-candidate','review readiness/tier');
+              ok(st.pass&&st.modelHash===CAN&&Object.values(st.tests).every(Boolean),'self-test/hash');
+              ok(hi.pass&&hi.status==='PASS'&&hi.artifactSha256===VIEW&&hi.viewerBytes===248457&&hi.parts===16,'host transport integrity');
+              ok(meta.sourceContract===SOURCE&&meta.sourceIdentityDigest===DIGEST&&meta.modelSha256===CAN&&meta.vertices===5769&&meta.triangles===8907&&meta.geometryChanged===false,'live identity');
+              ok(/^WebGL[12]$/.test(rq.renderer),'WebGL renderer required');
+              ok(pwa.registrationAllowed===false&&pwa.registrationSkipped===true,'candidate PWA scope safety');
+              out.review={pass:true,renderer:rq.renderer,selfTests:Object.values(st.tests).filter(Boolean).length,total:Object.keys(st.tests).length,hostTier:rq.hostTier,hostIntegrity:hi,pwa};
+              await rc.close();
+
+              const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(); let errs=[]; p.on('pageerror',e=>errs.push(String(e))); await ready(p,false);
+              const qa=await p.evaluate(()=>window.__FRESNAYE_QA); ok(qa.runtimeSha256===CAN&&qa.vertices===5769&&qa.triangles===8907,'desktop model identity/topology');
+              await p.locator('#reset').click(); let a=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos; await p.keyboard.down('w'); await p.waitForTimeout(720); await p.keyboard.up('w'); await p.waitForTimeout(120); let b=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos; ok(dist(a,b)>.2,'desktop keyboard movement');
+              await p.locator('[data-start="living"]').click(); await p.waitForTimeout(100); ok((await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).start==='living','living start');
+              await p.locator('#reset').click(); await p.locator('#enter').click(); await p.waitForTimeout(180); ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');
+              const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; await p.mouse.move(650,380); await p.mouse.move(800,380,{steps:2}); await p.waitForTimeout(100); const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; ok(Math.abs(y1-y0)>.02,'mouse look'); ok(errs.length===0,'desktop page errors');
+              out.desktop={pass:true,keyboardMovementM:+dist(a,b).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),pageErrors:errs}; await dc.close();
+
+              const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(); let merr=[]; m.on('pageerror',e=>merr.push(String(e))); await ready(m,false); ok(await m.evaluate(()=>matchMedia('(pointer:coarse)').matches),'coarse pointer');
+              let ma=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos; const sb=await m.locator('#stick').boundingBox(),sess=await mc.newCDPSession(m),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2; await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy,id:1,radiusX:4,radiusY:4}]}); await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-45,id:1,radiusX:4,radiusY:4}]}); await m.waitForTimeout(720); await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]}); await m.waitForTimeout(120); let mb=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).pos; ok(dist(ma,mb)>.18,'mobile joystick');
+              const lb=await m.locator('#look').boundingBox(),cy0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw,lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5; await sess.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:lx,y:ly,id:2,radiusX:4,radiusY:4}]}); await sess.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:lx+70,y:ly-8,id:2,radiusX:4,radiusY:4}]}); await sess.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]}); await m.waitForTimeout(100); const cy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; ok(Math.abs(cy1-cy0)>.05,'mobile look');
+              await m.locator('#mobileReset').click(); await m.waitForTimeout(100); ok((await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).start==='entrance','mobile reset'); ok(merr.length===0,'mobile page errors');
+              out.mobile={pass:true,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(cy1-cy0).toFixed(3),reset:true,pageErrors:merr}; await mc.close(); out.pass=true;
+            } finally {await browser.close()}
+            fs.writeFileSync('/tmp/v89-candidate-qa.json',JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2));
+          })().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node --check /tmp/v89-liveqa.cjs
+          node /tmp/v89-liveqa.cjs
+
+      - name: Persist candidate QA evidence without production promotion
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/pages
+          git pull --ff-only origin gh-pages
+          cp /tmp/v89-candidate-qa.json v89-public-browser-qa.json
+          cat > v89-candidate-health.json <<'JSON'
+          {"viewer":"v89","canonicalModel":"v23","canonicalObjSha256":"c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5","viewerSha256":"f07726c64b5b4c64c086a95a07fd78a2ee05b3f206798499db17b8176dde5e29","sourceContract":"SA45-DL67-v23-PROMOTED","sourceIdentityDigest":"771942b561fb09a4aca45c18c74182e9faaf940a16a7474ecc5645f448cfe91b","geometryChanged":false,"candidatePublicBrowserQA":"PASS","productionPromotion":false}
+          JSON
+          git add v89-public-browser-qa.json v89-candidate-health.json
+          git commit -m 'Record v89 public candidate desktop mobile QA'
+          git push origin HEAD:gh-pages
