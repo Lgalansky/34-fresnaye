@@ -17,37 +17,52 @@ concurrency:
 jobs:
   stage:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout main transport
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-      - name: Verify exact transport package
+
+      - name: Verify exact v88 transport package
         shell: bash
         run: |
           set -euo pipefail
           test -f deploy/v88-static.zip
-          cp deploy/v88-static.zip /tmp/v88-static.zip
           rm -rf /tmp/v88stage && mkdir /tmp/v88stage
-          unzip -q /tmp/v88-static.zip -d /tmp/v88stage
-          for f in walkthrough-v88.html walkthrough-v88.part01.b64 walkthrough-v88.part02.b64 walkthrough-v88.part03.b64 walkthrough-v88.part04.b64 walkthrough-v88.sw.js walkthrough-v88.manifest.webmanifest walkthrough-v88-ready.json; do test -s "/tmp/v88stage/$f"; done
+          unzip -q deploy/v88-static.zip -d /tmp/v88stage
+          for f in walkthrough-v88.html walkthrough-v88.part01.b64 walkthrough-v88.part02.b64 walkthrough-v88.part03.b64 walkthrough-v88.part04.b64 walkthrough-v88.sw.js walkthrough-v88.manifest.webmanifest walkthrough-v88-ready.json; do
+            test -s "/tmp/v88stage/$f"
+          done
           python - <<'PY'
-          import base64,gzip,hashlib,json,pathlib
+          import base64,gzip,hashlib,json,pathlib,re
           p=pathlib.Path('/tmp/v88stage')
           meta=json.loads((p/'walkthrough-v88-ready.json').read_text())
-          assert meta['viewer']=='Walkthrough_v88_v23CanonicalRichProductionParity_SA43DL65_HostIntegrity_PublicQA'
-          assert meta['viewerSha256']=='2ecaa5caf47c77c9e29455e66ecc0c2be39a1998792f916054c880892f0db439'
-          assert meta['viewerBytes']==247348
+          expected_viewer='Walkthrough_v88_v23CanonicalRichProductionParity_SA43DL65_HostIntegrity_PublicQA'
+          canonical='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          parts=['walkthrough-v88.part01.b64','walkthrough-v88.part02.b64','walkthrough-v88.part03.b64','walkthrough-v88.part04.b64']
+          assert meta['viewer']==expected_viewer
           assert meta['sourceContract']=='SA43-DL65-v23-PROMOTED'
-          assert meta['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          assert meta['sourceArchitect']=='v43' and meta['discrepancyLog']=='v65' and meta['revisionWatch']=='v27'
+          assert meta['model']=='v23' and meta['modelSha256']==canonical
+          assert meta['vertices']==5769 and meta['triangles']==8907
           assert meta['geometryChanged'] is False and meta['stageComplete'] is True
-          data=gzip.decompress(base64.b64decode(''.join((p/x).read_text().strip() for x in meta['transportParts'])))
-          assert len(data)==meta['viewerBytes'] and hashlib.sha256(data).hexdigest()==meta['viewerSha256']
+          assert meta['transport']=='gzip-base64-parts' and meta['transportParts']==parts
+          data=gzip.decompress(base64.b64decode(''.join((p/x).read_text().strip() for x in parts)))
+          assert len(data)==meta['viewerBytes']
+          assert hashlib.sha256(data).hexdigest()==meta['viewerSha256']
           loader=(p/'walkthrough-v88.html').read_text()
-          assert meta['viewerSha256'] in loader and 'walkthrough-v88.part04.b64' in loader
-          print('transport exact-byte QA PASS')
+          assert meta['viewerSha256'] in loader and str(meta['viewerBytes']) in loader
+          assert canonical in loader and 'SA43-DL65-v23-PROMOTED' in loader
+          scripts=re.findall(r'<script[^>]*>(.*?)</script>',loader,re.S)
+          assert scripts
+          (p/'loader-check.js').write_text('\n'.join(scripts))
+          print('v88 exact transport PASS',meta['viewerSha256'],meta['viewerBytes'])
           PY
+          node --check /tmp/v88stage/loader-check.js
+          node --check /tmp/v88stage/walkthrough-v88.sw.js
+
       - name: Publish complete candidate to gh-pages
         shell: bash
         run: |
@@ -62,6 +77,9 @@ jobs:
           cp /tmp/v88stage/walkthrough-v88.manifest.webmanifest .
           cp /tmp/v88stage/walkthrough-v88-ready.json .
           git add walkthrough-v88.html walkthrough-v88.part*.b64 walkthrough-v88.sw.js walkthrough-v88.manifest.webmanifest walkthrough-v88-ready.json
-          if git diff --cached --quiet; then echo 'Candidate already staged'; exit 0; fi
+          if git diff --cached --quiet; then
+            echo 'Exact v88 candidate already staged'
+            exit 0
+          fi
           git commit -m 'Stage exact v88 SA43 rich walkthrough candidate'
           git push origin HEAD:gh-pages
