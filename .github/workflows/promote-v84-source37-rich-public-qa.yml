@@ -1,0 +1,157 @@
+name: Promote v84 Source37 rich walkthrough with public browser QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/promote-v84-source37-rich-public-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote-rich-v84:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Configure repo and load verified build scripts
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main:refs/remotes/origin/main
+          git show origin/main:.github/scripts/build_v84_compact.py > /tmp/build_v84.py
+          git show origin/main:.github/scripts/liveqa-v84.cjs > /tmp/liveqa-v84.cjs
+          python -m py_compile /tmp/build_v84.py
+          node --check /tmp/liveqa-v84.cjs
+
+      - name: Reconstruct exact v81 baseline and build v84 without geometry edits
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64,gzip,hashlib,pathlib
+          parts=['walkthrough-v81.part01.b64','walkthrough-v81.part02.b64','walkthrough-v81.part03.b64','walkthrough-v81.part04-05.b64','walkthrough-v81.part06-07.b64','walkthrough-v81.part08-09.b64','walkthrough-v81.part10.b64','walkthrough-v81.part11.b64','walkthrough-v81.part12.b64']
+          for p in parts: assert pathlib.Path(p).exists(), p
+          raw=gzip.decompress(base64.b64decode(''.join(pathlib.Path(p).read_text().strip() for p in parts)))
+          sha=hashlib.sha256(raw).hexdigest(); assert sha=='b69bccf8783337911513ea5a3eff3d6744224a24c516d963c8365a797442a289',sha
+          pathlib.Path('/tmp/v81.html').write_bytes(raw)
+          print('V81_BASELINE_PASS',len(raw),sha)
+          PY
+          python /tmp/build_v84.py /tmp/v81.html walkthrough-v84.html
+          python - <<'PY'
+          import hashlib,json,pathlib,re
+          p=pathlib.Path('walkthrough-v84.html'); b=p.read_bytes(); s=b.decode(); sha=hashlib.sha256(b).hexdigest()
+          assert sha=='d5971ec59c1e5c35701449d2e3f3c0f2a83ae7232603b3f623174ef07a792601',sha
+          CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          assert all(x in s for x in ['content="v84"','SA37-DL58-v23-PROMOTED','Walkthrough_v84_v23CanonicalRichProductionParity_SA37DL58',CAN,'pocketDoorClearanceSourceStaged'])
+          assert 'v81' not in s and 'SA36-DL57-v23-PROMOTED' not in s
+          blocks=[m.group(2) for m in re.finditer(r'<script([^>]*)>(.*?)</script>',s,re.S|re.I) if 'src=' not in m.group(1).lower() and m.group(2).strip()]
+          pathlib.Path('/tmp/v84-inline.js').write_text('\n;\n'.join(blocks)); assert blocks
+          q={'artifact':'34_Fresnaye_Walkthrough_v84_StagedStaticQA_v1','date':'2026-09-08','status':'PASS_STAGED_NOT_PRODUCTION','viewer':'v84 Rich Production Parity Source37','viewerSha256':sha,'viewerBytes':len(b),'canonicalModel':'v23','canonicalObjSha256':CAN,'canonicalGlbSha256':'7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49','vertices':5769,'triangles':8907,'sourceContract':'SA37-DL58-v23-PROMOTED','sourceArchitect':'v37','discrepancyLog':'v58','revisionWatch':'v21','geometryChanged':False,'richHostTierQARepair':True,'publicBrowserQA':'PENDING'}
+          pathlib.Path('v84-staged-static-qa.json').write_text(json.dumps(q,indent=2)+'\n')
+          print('V84_STATIC_PASS',len(b),sha)
+          PY
+          node --check /tmp/v84-inline.js
+
+      - name: Publish versioned v84 candidate only
+        shell: bash
+        run: |
+          git add walkthrough-v84.html v84-staged-static-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Stage v84 Source37 rich walkthrough for public QA'
+            git push origin HEAD:gh-pages
+          fi
+
+      - name: Wait for versioned v84 candidate
+        shell: bash
+        run: |
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v84.html'; ok=0
+          for i in $(seq 1 72); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q 'content="v84"' && printf '%s' "$body" | grep -q 'SA37-DL58-v23-PROMOTED'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+
+      - name: Setup Playwright Chromium
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install browser QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser-test versioned v84 candidate
+        shell: bash
+        run: TEST_URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v84.html' OUT='live-browser-qa-v84-candidate.json' node /tmp/liveqa-v84.cjs
+
+      - name: Promote browser-passed v84 to production root
+        shell: bash
+        run: |
+          cp index.html /tmp/index-before-v84.html
+          if test -f health.json; then cp health.json /tmp/health-before-v84.json; fi
+          python - <<'PY'
+          import hashlib,json,pathlib
+          r=json.loads(pathlib.Path('live-browser-qa-v84-candidate.json').read_text()); assert r['pass'] is True
+          b=pathlib.Path('walkthrough-v84.html').read_bytes(); sha=hashlib.sha256(b).hexdigest(); assert sha=='d5971ec59c1e5c35701449d2e3f3c0f2a83ae7232603b3f623174ef07a792601'
+          pathlib.Path('index.html').write_bytes(b)
+          h={'status':'V84_SOURCE37_RICH_DEPLOYED__ROOT_BROWSER_RETEST_PENDING','viewer':'v84 Rich Production Parity Source37','viewerSha256':sha,'canonicalModel':'v23','canonicalObjSha256':'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5','canonicalGlbSha256':'7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49','vertices':5769,'triangles':8907,'sourceContract':'SA37-DL58-v23-PROMOTED','geometryChanged':False,'richSimulatorFeatureParity':True,'candidateBrowserQA':r,'durableOrigin':'https://lgalansky.github.io/34-fresnaye/','versionedViewer':'https://lgalansky.github.io/34-fresnaye/walkthrough-v84.html','humanContinuousAcceptance':'OUTSTANDING'}
+          pathlib.Path('health.json').write_text(json.dumps(h,indent=2)+'\n')
+          PY
+          git add index.html health.json live-browser-qa-v84-candidate.json
+          git commit -m 'Promote browser-passed v84 rich walkthrough to production'
+          git push origin HEAD:gh-pages
+          touch /tmp/v84-promoted
+
+      - name: Wait for v84 production root
+        shell: bash
+        run: |
+          URL='https://lgalansky.github.io/34-fresnaye/'; ok=0
+          for i in $(seq 1 72); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-root-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q 'content="v84"' && printf '%s' "$body" | grep -q 'SA37-DL58-v23-PROMOTED'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+
+      - name: Browser-test production root
+        shell: bash
+        run: TEST_URL='https://lgalansky.github.io/34-fresnaye/' OUT='live-browser-qa-v84-root.json' node /tmp/liveqa-v84.cjs
+
+      - name: Persist verified v84 deployment QA
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          c=json.loads(pathlib.Path('live-browser-qa-v84-candidate.json').read_text()); r=json.loads(pathlib.Path('live-browser-qa-v84-root.json').read_text()); assert c['pass'] and r['pass']
+          dep={'artifact':'34_Fresnaye_Walkthrough_v84_DeploymentQA_v1','date':'2026-09-08','status':'PASS_PUBLIC_VERSIONED_AND_ROOT_RICH_BROWSER_QA','viewer':'v84 Rich Production Parity Source37','viewerSha256':'d5971ec59c1e5c35701449d2e3f3c0f2a83ae7232603b3f623174ef07a792601','canonicalModel':'v23','canonicalObjSha256':'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5','canonicalGlbSha256':'7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49','vertices':5769,'triangles':8907,'sourceContract':'SA37-DL58-v23-PROMOTED','geometryChanged':False,'versionedUrl':'https://lgalansky.github.io/34-fresnaye/walkthrough-v84.html','productionUrl':'https://lgalansky.github.io/34-fresnaye/','candidateBrowserQA':c,'productionBrowserQA':r,'richFeatureParityVerified':True,'humanContinuousAcceptance':'OUTSTANDING'}
+          pathlib.Path('v84-deployment-qa.json').write_text(json.dumps(dep,indent=2)+'\n')
+          h=json.loads(pathlib.Path('health.json').read_text()); h['status']='V84_SOURCE37_RICH_PUBLIC_BROWSER_QA_PASS';h['productionBrowserQA']=r;pathlib.Path('health.json').write_text(json.dumps(h,indent=2)+'\n')
+          PY
+          git add live-browser-qa-v84-root.json v84-deployment-qa.json health.json
+          git commit -m 'Record v84 rich production public browser QA'
+          git push origin HEAD:gh-pages
+
+      - name: Roll back production if any post-promotion gate fails
+        if: failure()
+        shell: bash
+        run: |
+          if test -f /tmp/v84-promoted; then
+            cp /tmp/index-before-v84.html index.html
+            if test -f /tmp/health-before-v84.json; then cp /tmp/health-before-v84.json health.json; fi
+            git add index.html health.json || true
+            if ! git diff --cached --quiet; then
+              git commit -m 'Rollback v84 after failed production verification'
+              git push origin HEAD:gh-pages
+            fi
+          fi
