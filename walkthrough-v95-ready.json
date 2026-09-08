@@ -1,0 +1,51 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v95_ReadySentinel",
+  "stageComplete": true,
+  "viewerVersion": "v95",
+  "viewerSha256": "63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249",
+  "viewerBytes": 250254,
+  "canonicalModel": "v23",
+  "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "glbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "vertices": 5769,
+  "triangles": 8907,
+  "geometryChanged": false,
+  "sourceContract": "SA51-DL72-RW35-v23-CURRENT_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+  "sourceIdentityDigest": "2f708567698e45ec8f39428c27c3b0cb47fb3c7146a7882fec592b36efe0a4a2",
+  "sourceRevisionCheckedUtc": "2026-09-08T16:34:56Z",
+  "viewerBuildUtc": "2026-09-08T17:35:53Z",
+  "sourceSnapshotFreshAtBuild": true,
+  "sourceAdjudicationStatus": "CURRENT_SOURCE_ARCHITECT_V51_ADDITIVE__LEVEL02_BASELINE_V50__NO_GEOMETRY_AUTHORIZATION",
+  "currentMaterialSourceBlockerCount": 1,
+  "currentMaterialSourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written horizontal witness. No radius/centre/tangent may be invented or obtained by scaling.",
+  "transport": "gzip-base64-parts",
+  "transportParts": [
+    "walkthrough-v95.final.part01.b64",
+    "walkthrough-v95.final.part02.b64",
+    "walkthrough-v95.final.part03.b64",
+    "walkthrough-v95.final.part04.b64",
+    "walkthrough-v95.final.part05.b64",
+    "walkthrough-v95.final.part06.b64",
+    "walkthrough-v95.final.part07.b64",
+    "walkthrough-v95.final.part08.b64",
+    "walkthrough-v95.final.part09.b64",
+    "walkthrough-v95.final.part10.b64",
+    "walkthrough-v95.final.part11.b64",
+    "walkthrough-v95.final.part12.b64"
+  ],
+  "transportGzipBytes": 120312,
+  "transportBase64Chars": 160416,
+  "sourceArtifactHashes": {
+    "handoffV51": "f41ff2db80569304bc9376019fa12a5f03424f973447430a0a04260e22d0227f",
+    "level02BaselineHandoffV50": "a6e16b9c6d8995ec8fbeae36f800add6b1acf6e735c9cfbf23a6c47a91c56cd4",
+    "discrepancyLogV72": "84ce789a7b431b515676e610ea7fcdc275d5be1e05958e1fd5f448439d81ca2d",
+    "revisionWatchV35": "6d68532db6867edd132600016a6dff0da3ed271bbdf4c642794b84b13c207a52",
+    "combinedIdentity": "2f708567698e45ec8f39428c27c3b0cb47fb3c7146a7882fec592b36efe0a4a2"
+  },
+  "inputRecoveryContract": {
+    "pointerLockExitReset": true,
+    "lostPointerCaptureReset": true
+  },
+  "productionPromotionAllowed": false,
+  "promotionHoldReason": "Source Architect geometry_authorization=false; exact curved/unwitnessed bulkhead footprints remain source-locked; human continuous acceptance outstanding."
+}
