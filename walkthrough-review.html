@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>34 Fresnaye — Verified Walkthrough Review</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:#101010;color:#f5f5f5;min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(720px,100%);background:#181818;border:1px solid #333;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0008}h1{font-size:clamp(24px,5vw,38px);margin:0 0 8px}.sub{color:#bbb;margin:0 0 22px}.row{padding:12px 0;border-top:1px solid #2d2d2d;display:flex;gap:16px;justify-content:space-between;align-items:flex-start}.row b{min-width:150px}.ok{color:#81d99b}.warn{color:#ffd27a}.bad{color:#ff8d8d}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}a.btn{display:inline-block;padding:12px 16px;border-radius:10px;background:#f2f2f2;color:#111;text-decoration:none;font-weight:700;pointer-events:none;opacity:.45}a.btn.ready{pointer-events:auto;opacity:1}.secondary{background:#2a2a2a!important;color:#fff!important}.small{font-size:13px;color:#aaa;line-height:1.45;margin-top:18px;word-break:break-word}@media(max-width:560px){.row{display:block}.row b{display:block;margin-bottom:5px}.card{padding:18px;border-radius:14px}}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>34 Fresnaye walkthrough</h1>
+<p class="sub">Stable review gate. It only opens a candidate after its exact viewer/model identity and public browser QA evidence match the published review manifest.</p>
+<div class="row"><b>Gate</b><span id="gate">Checking…</span></div>
+<div class="row"><b>Candidate</b><span id="candidate">—</span></div>
+<div class="row"><b>Canonical model</b><span id="model">—</span></div>
+<div class="row"><b>Browser QA</b><span id="qa">—</span></div>
+<div class="row"><b>Source state</b><span id="source">—</span></div>
+<div class="row"><b>Final acceptance</b><span id="acceptance">—</span></div>
+<div class="actions"><a id="open" class="btn" href="#">Open verified walkthrough</a><a class="btn secondary ready" href="./">Production root</a></div>
+<div id="detail" class="small">No architectural geometry is modified by this gate.</div>
+</main>
+<script>
+(async()=>{
+ const $=id=>document.getElementById(id), stamp=Date.now();
+ try{
+  const m=await fetch('./walkthrough-review.json?b='+stamp,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('review manifest HTTP '+r.status);return r.json()});
+  const r=await fetch('./'+m.reviewCandidate.readySentinel+'?b='+stamp,{cache:'no-store'}).then(x=>{if(!x.ok)throw Error('ready sentinel HTTP '+x.status);return x.json()});
+  const q=await fetch('./v95-public-browser-qa.json?b='+stamp,{cache:'no-store'}).then(x=>{if(!x.ok)throw Error('public QA HTTP '+x.status);return x.json()});
+  const c=m.reviewCandidate;
+  const identity=r.stageComplete===true&&r.geometryChanged===false&&r.viewerSha256===c.viewerSha256&&r.viewerBytes===c.viewerBytes&&r.modelSha256===c.modelSha256&&r.glbSha256===c.glbSha256&&r.vertices===c.vertices&&r.triangles===c.triangles;
+  const qa=q.pass===true&&q.viewerSha256===c.viewerSha256&&q.canonicalObjSha256===c.modelSha256&&q.geometryChanged===false&&q.desktop?.pass===true&&q.mobile?.pass===true&&q.desktop?.renderer==='WebGL2'&&q.mobile?.renderer==='WebGL2'&&q.review?.selfTests===q.review?.total&&q.review?.mainRoute?.collisionValidated===true;
+  const safe=identity&&qa&&c.geometryChanged===false;
+  $('candidate').textContent=c.viewerVersion+' · '+c.viewerBytes.toLocaleString()+' bytes · '+c.viewerSha256.slice(0,12)+'…';
+  $('model').textContent=c.canonicalModel+' · '+c.vertices.toLocaleString()+' vertices / '+c.triangles.toLocaleString()+' triangles · '+c.modelSha256.slice(0,12)+'…';
+  $('qa').innerHTML=qa?'<span class="ok">PASS</span> · desktop + mobile WebGL2 · 57/57 · collision route verified':'<span class="bad">BLOCKED</span> · published QA evidence mismatch';
+  $('source').innerHTML='<span class="warn">'+m.sourceState.latestSourceArchitectObserved+'</span> · Level 02 baseline unchanged · geometry authorization '+String(m.sourceState.geometryAuthorization);
+  $('acceptance').innerHTML='<span class="warn">OPEN</span> · genuine human Entrance → Living → Kitchen → Main Bedroom walk still required';
+  $('gate').innerHTML=safe?'<span class="ok">VERIFIED REVIEW READY</span>':'<span class="bad">BLOCKED</span>';
+  $('detail').textContent='Latest source sync: '+m.sourceState.latestSourceArchitectObserved+'; Level 02 effect: '+m.sourceState.level02EffectOfV59+'. Remaining source lock: '+m.sourceState.materialLevel02SourceBlocker;
+  if(safe){const a=$('open');a.href='./'+c.loader;a.classList.add('ready')}
+ }catch(e){$('gate').innerHTML='<span class="bad">BLOCKED</span>';$('detail').textContent='Review gate error: '+(e?.message||e);console.error(e)}
+})();
+</script>
+</body>
+</html>
