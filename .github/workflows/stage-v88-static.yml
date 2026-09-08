@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'deploy/v88-static.zip'
-      - '.github/workflows/stage-v88-static.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
