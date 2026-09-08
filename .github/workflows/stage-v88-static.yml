@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: fresnaye-v88-stage
+  cancel-in-progress: false
+
 jobs:
   stage:
     runs-on: ubuntu-latest
@@ -19,22 +23,35 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Verify transport and preserve package
+      - name: Verify exact transport package
         shell: bash
         run: |
+          set -euo pipefail
           test -f deploy/v88-static.zip
           cp deploy/v88-static.zip /tmp/v88-static.zip
           rm -rf /tmp/v88stage && mkdir /tmp/v88stage
           unzip -q /tmp/v88-static.zip -d /tmp/v88stage
-          test -f /tmp/v88stage/walkthrough-v88.html
-          test -f /tmp/v88stage/walkthrough-v88.part04.b64
-          test -f /tmp/v88stage/walkthrough-v88.sw.js
-          test -f /tmp/v88stage/walkthrough-v88.manifest.webmanifest
-          grep -q '2b42a29f98dee6927ae0e45c0ca8908b165abc32bd0d7f88f127456b33c046f6' /tmp/v88stage/walkthrough-v88.html
-          grep -q 'SA42-DL64-v23-PROMOTED' /tmp/v88stage/walkthrough-v88.html
-      - name: Publish complete candidate atomically to gh-pages
+          for f in walkthrough-v88.html walkthrough-v88.part01.b64 walkthrough-v88.part02.b64 walkthrough-v88.part03.b64 walkthrough-v88.part04.b64 walkthrough-v88.sw.js walkthrough-v88.manifest.webmanifest walkthrough-v88-ready.json; do test -s "/tmp/v88stage/$f"; done
+          python - <<'PY'
+          import base64,gzip,hashlib,json,pathlib
+          p=pathlib.Path('/tmp/v88stage')
+          meta=json.loads((p/'walkthrough-v88-ready.json').read_text())
+          assert meta['viewer']=='Walkthrough_v88_v23CanonicalRichProductionParity_SA43DL65_HostIntegrity_PublicQA'
+          assert meta['viewerSha256']=='2ecaa5caf47c77c9e29455e66ecc0c2be39a1998792f916054c880892f0db439'
+          assert meta['viewerBytes']==247348
+          assert meta['sourceContract']=='SA43-DL65-v23-PROMOTED'
+          assert meta['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          assert meta['geometryChanged'] is False and meta['stageComplete'] is True
+          data=gzip.decompress(base64.b64decode(''.join((p/x).read_text().strip() for x in meta['transportParts'])))
+          assert len(data)==meta['viewerBytes'] and hashlib.sha256(data).hexdigest()==meta['viewerSha256']
+          loader=(p/'walkthrough-v88.html').read_text()
+          assert meta['viewerSha256'] in loader and 'walkthrough-v88.part04.b64' in loader
+          print('transport exact-byte QA PASS')
+          PY
+      - name: Publish complete candidate to gh-pages
         shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git fetch origin gh-pages
@@ -43,17 +60,8 @@ jobs:
           cp /tmp/v88stage/walkthrough-v88.part*.b64 .
           cp /tmp/v88stage/walkthrough-v88.sw.js .
           cp /tmp/v88stage/walkthrough-v88.manifest.webmanifest .
-          cat > walkthrough-v88-ready.json <<'JSON'
-          {
-            "viewer": "v88",
-            "viewerSha256": "2b42a29f98dee6927ae0e45c0ca8908b165abc32bd0d7f88f127456b33c046f6",
-            "canonicalModel": "v23",
-            "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
-            "sourceContract": "SA42-DL64-v23-PROMOTED",
-            "geometryChanged": false,
-            "stageComplete": true
-          }
-          JSON
+          cp /tmp/v88stage/walkthrough-v88-ready.json .
           git add walkthrough-v88.html walkthrough-v88.part*.b64 walkthrough-v88.sw.js walkthrough-v88.manifest.webmanifest walkthrough-v88-ready.json
-          git commit -m 'Stage exact v88 rich walkthrough candidate'
+          if git diff --cached --quiet; then echo 'Candidate already staged'; exit 0; fi
+          git commit -m 'Stage exact v88 SA43 rich walkthrough candidate'
           git push origin HEAD:gh-pages
