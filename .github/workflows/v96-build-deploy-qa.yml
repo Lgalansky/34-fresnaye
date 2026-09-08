@@ -1,0 +1,86 @@
+name: v96 build deploy and public QA
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - 'v96-deploy-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build-deploy-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Reconstruct and build exact v96 candidate
+        shell: bash
+        run: |
+          python - <<'PY'
+          import gzip,base64,pathlib
+          src=pathlib.Path('v96-deploy-builder.py.gz.b64').read_text().strip()
+          pathlib.Path('/tmp/deploy_build_v96.py').write_bytes(gzip.decompress(base64.b64decode(src)))
+          PY
+          python /tmp/deploy_build_v96.py
+          test "$(sha256sum 34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html | awk '{print $1}')" = '0a4d5404288843cd376030158feeae682ea042f776bc1f98ee8eaf84afd7583f'
+          test "$(wc -c < 34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html)" = '253348'
+
+      - name: Verify viewer JavaScript syntax
+        shell: bash
+        run: node --check walkthrough-v96-inline.js
+
+      - name: Publish versioned candidate without touching production root
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-v96.html walkthrough-v96-ready.json walkthrough-v96.manifest.webmanifest walkthrough-v96.sw.js walkthrough-v96.final.part*.b64 34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html 34_Fresnaye_Walkthrough_v96_StaticIntegrityQA_v1.json 34_Fresnaye_Walkthrough_v96_BuildState.json 34_Fresnaye_Walkthrough_v96_ChiefOfStaff_Handoff_v1.md 34_Fresnaye_Walkthrough_v96_RunArtifactManifest_v1.json
+          git commit -m 'Deploy v96 acceptance-integrity walkthrough candidate'
+          git push origin HEAD:gh-pages
+
+      - name: Wait for GitHub Pages v96 candidate
+        shell: bash
+        run: |
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v96.html'
+          READY='https://lgalansky.github.io/34-fresnaye/walkthrough-v96-ready.json'
+          ok=0
+          for i in $(seq 1 72); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            ready=$(curl -fsSL --connect-timeout 10 --max-time 30 "$READY?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q '0a4d5404288843cd376030158feeae682ea042f776bc1f98ee8eaf84afd7583f' \
+              && printf '%s' "$ready" | grep -q 'SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Extract and run v96 public QA harness
+        shell: bash
+        run: |
+          awk '/cat > \/tmp\/v96-liveqa.cjs <<.JS./{flag=1;next} flag && /^          JS$/{exit} flag{sub(/^          /,"");print}' .github/workflows/v96-public-browser-qa.yml > /tmp/v96-liveqa.cjs
+          test -s /tmp/v96-liveqa.cjs
+          node /tmp/v96-liveqa.cjs
+
+      - name: Persist passing public QA evidence
+        shell: bash
+        run: |
+          test "$(node -e "const q=require('./v96-public-browser-qa.json');process.stdout.write(String(q.pass))")" = 'true'
+          git add v96-public-browser-qa.json
+          git commit -m 'Record v96 public browser QA'
+          git push origin HEAD:gh-pages
