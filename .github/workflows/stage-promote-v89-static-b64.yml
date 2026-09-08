@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'deploy/v89-static.part05.b64'
+      - 'deploy/v89-static.seg12.b64'
 
 permissions:
   contents: write
@@ -27,8 +27,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in deploy/v89-static.part{01..05}.b64; do test -f "$f"; done
-          normalized=$(cat deploy/v89-static.part{01..05}.b64 | tr -d '[:space:]')
+          for f in deploy/v89-static.seg{01..12}.b64; do test -f "$f"; done
+          normalized=$(cat deploy/v89-static.seg{01..12}.b64 | tr -d '[:space:]')
           printf '%s' "$normalized" | sha256sum | grep -q '^f392dae8a3271b191694fcd8f80dca618456beabc3cf9085b544e802d50c2564 '
           printf '%s' "$normalized" | base64 -d > /tmp/v89-static.zip
           echo '8deef3eaa7e937a8e0676f7cffc3a959a69d15a74961a32ec5bd7e5f2d64e370  /tmp/v89-static.zip' | sha256sum -c -
@@ -133,7 +133,7 @@ jobs:
           URL='https://lgalansky.github.io/34-fresnaye/'; ok=0
           for i in $(seq 1 60); do
             body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
-            if printf '%s' "$body" | grep -q '993dbf26cab468fc52190965316dd4239117b0575cbaaf95714cb27f0575c24f4' && printf '%s' "$body" | grep -q 'walkthrough-v89.part04.b64'; then ok=1; break; fi
+            if printf '%s' "$body" | grep -q '993dbf26cab468fc52190965316dd4239117b057cbaaf95714cb27f0575c24f4' && printf '%s' "$body" | grep -q 'walkthrough-v89.part04.b64'; then ok=1; break; fi
             sleep 5
           done
           test "$ok" = 1
