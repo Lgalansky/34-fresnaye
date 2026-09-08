@@ -1,0 +1,8 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_DeployTrigger",
+  "timestampUtc": "2026-09-08T22:40:43Z",
+  "viewerSha256": "0a4d5404288843cd376030158feeae682ea042f776bc1f98ee8eaf84afd7583f",
+  "canonicalModel": "v23",
+  "geometryChanged": false,
+  "purpose": "Build, deploy and public-browser-QA the versioned v96 acceptance-integrity candidate; production root remains untouched."
+}
