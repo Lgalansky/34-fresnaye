@@ -1,4 +1,5 @@
 name: Walkthrough v96 portable r8 offline-guard QA v1
+# QA harness handles automatic online-event recovery before optional Retry click.
 
 on:
   workflow_dispatch:
