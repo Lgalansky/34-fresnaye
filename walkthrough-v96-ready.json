@@ -16,6 +16,10 @@
   "viewerBuildUtc": "2026-09-08T22:32:41Z",
   "sourceSnapshotFreshAtBuild": true,
   "sourceAdjudicationStatus": "CURRENT_SOURCE_ARCHITECT_V58_ADDITIVE_LATER_LEVEL__LEVEL02_BASELINE_V50__NO_GEOMETRY_AUTHORIZATION",
+  "latestSourceCompatibilityObserved": "v67",
+  "latestSourceCompatibilityLevel02Effect": "NONE",
+  "latestSourceCompatibilityGeometryAuthorization": false,
+  "latestSourceCompatibilityNote": "Source Architect v67 is additive Level03-only, preserves canonical Level02 v23 and grants no geometry authorization; v96 viewer/model bytes therefore remain geometry-compatible pending fresh public-browser QA.",
   "currentMaterialSourceBlockerCount": 1,
   "currentMaterialSourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written horizontal witness. No radius/centre/tangent may be invented or obtained by scaling.",
   "transport": "gzip-base64-parts",
@@ -43,13 +47,7 @@
     "combinedIdentity": "54b6857632032a18c68c23a05e98801b8a770c60d92fae8704a5429cba7f78ea"
   },
   "acceptanceIntegrityContract": {
-    "sequence": [
-      "entrance",
-      "living",
-      "kitchen",
-      "bedroom",
-      "entrance"
-    ],
+    "sequence": ["entrance", "living", "kitchen", "bedroom", "entrance"],
     "minimumDistanceM": 40,
     "minimumDurationSec": 12,
     "collisionRequired": true,
