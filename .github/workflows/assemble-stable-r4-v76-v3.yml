@@ -24,14 +24,22 @@ jobs:
           cat .github/qa/stable-r4-v76-liveqa-v3.b64.part* | base64 -d > /tmp/stable-v3.yml
           echo 'fd558ffa09c6f0824e29120070f60af5947d8ad544531b368a8cf34d1aba5990  /tmp/stable-v3.yml' | sha256sum -c -
           B='https://lgalansky.github.io/34-fresnaye'
-          curl -fsSL "$B/source-state/34_Fresnaye_SourceArchitect_handoff_v77.json?isolated=$GITHUB_RUN_ID" -o /tmp/source-v77.json
-          curl -fsSL "$B/engineering/incremental-geometry-pipeline-v2-v77.json?isolated=$GITHUB_RUN_ID" -o /tmp/pipeline-v77.json
-          curl -fsSL "$B/engineering/geometry-delta-plan-source-v77-v1.json?isolated=$GITHUB_RUN_ID" -o /tmp/delta-v77.json
-          curl -fsSL "$B/engineering/geometry-delta-planner-qa-v12.json?isolated=$GITHUB_RUN_ID" -o /tmp/planner-qa-v12.json
-          echo 'cfa3cd0ce79272066bd8eff758b66db7ba9b1329429f92e42598d4deb9d7b6bf  /tmp/source-v77.json' | sha256sum -c -
-          echo '7eccfecef0afc57fc8e04bdb97ef167257236a5833d6eb59190eefcf91399805  /tmp/pipeline-v77.json' | sha256sum -c -
-          echo 'e77a769a79e5cb02b30ba2f2ff19490844c8dc981c14cdaa5308b047aea662b8  /tmp/delta-v77.json' | sha256sum -c -
-          echo '6fbc37280e237f774889317c2107450a34fab83b3443ef3f61c6078c51fb20d9  /tmp/planner-qa-v12.json' | sha256sum -c -
+          ok=0
+          for i in $(seq 1 60); do
+            curl -fsSL "$B/source-state/34_Fresnaye_SourceArchitect_handoff_v77.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/source-v77.json || true
+            curl -fsSL "$B/engineering/incremental-geometry-pipeline-v2-v77.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/pipeline-v77.json || true
+            curl -fsSL "$B/engineering/geometry-delta-plan-source-v77-v1.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/delta-v77.json || true
+            curl -fsSL "$B/engineering/geometry-delta-planner-qa-v12.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/planner-qa-v12.json || true
+            if printf '%s\n' \
+              'cfa3cd0ce79272066bd8eff758b66db7ba9b1329429f92e42598d4deb9d7b6bf  /tmp/source-v77.json' \
+              '7eccfecef0afc57fc8e04bdb97ef167257236a5833d6eb59190eefcf91399805  /tmp/pipeline-v77.json' \
+              'e77a769a79e5cb02b30ba2f2ff19490844c8dc981c14cdaa5308b047aea662b8  /tmp/delta-v77.json' \
+              '6fbc37280e237f774889317c2107450a34fab83b3443ef3f61c6078c51fb20d9  /tmp/planner-qa-v12.json' | sha256sum -c - >/dev/null 2>&1; then
+              ok=1; break
+            fi
+            sleep 3
+          done
+          test "$ok" = 1
           python3 - <<'PY'
           import json,re,textwrap
           s=json.load(open('/tmp/source-v77.json')); d=json.load(open('/tmp/delta-v77.json')); q=json.load(open('/tmp/planner-qa-v12.json'))
