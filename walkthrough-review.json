@@ -1,11 +1,13 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v3",
-  "updatedUtc": "2026-09-09T01:36:30Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v4",
+  "updatedUtc": "2026-09-09T04:29:26Z",
   "reviewCandidate": {
     "viewerVersion": "v95",
     "loader": "walkthrough-v95.html",
     "readySentinel": "walkthrough-v95-ready.json",
     "publicBrowserQaEvidence": "v95-public-browser-qa.json",
+    "pwaManifest": "walkthrough-v95.manifest.webmanifest",
+    "serviceWorker": "walkthrough-v95.sw.js",
     "viewerSha256": "63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249",
     "viewerBytes": 250254,
     "canonicalModel": "v23",
@@ -17,18 +19,19 @@
     "automatedPublicCandidateReviewReady": true
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v62",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v62.json",
-    "sourceArchitectHandoffSha256": "71d281a0a63700a92cf0987b5ca79bec9967377fd9c14edf354ef5cb78fc6c60",
-    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__NO_NEW_ARCHILAB_SOURCE__LEVEL03_OPENING_COMPONENT_READINESS_CONSOLIDATED",
+    "latestSourceArchitectObserved": "v64",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v64.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v64.json",
+    "sourceArchitectHandoffSha256": "c4ed6f3cd39e102b3dc66a6c1d815201618e0564ea3277c7a0cd5cf618bc3e0f",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__LEVEL04_PARAPET_DATUM_COMPLETENESS_ADVANCED__370_CANDIDATE_QUARANTINED_BY_ENDPOINT_OWNERSHIP__NO_MODEL_EDIT",
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
     "level02Effect": "NONE",
     "publicBrowserEvidenceSourceArchitect": "v51",
     "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
-    "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and transition segments lacking their own written radius/centre/tangent/horizontal witness. No scaling or inference.",
-    "laterLevelProgress": "Source Architect v62 consolidates Level 03 opening/component readiness only; it does not authorize or alter Level 02 geometry."
+    "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness. No scaling or inference.",
+    "laterLevelProgress": "Source Architect v64 adds Level 04 parapet datum/source-preparation evidence only. Explicit 88.750 m top-of-parapet is carried; adjacent written 370 mm remains quarantined because endpoint ownership to the 88.380 m FFL is not established. Level 02 effect NONE."
   },
   "acceptance": {
     "finalStatus": "OPEN",
