@@ -1,0 +1,26 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v8",
+  "date": "2026-09-09",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v5.py",
+  "plannerSha256": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+  "sourceV72HandoffSha256": "ee7727583d2a41fc35b6c40489e5c181af06e217a32ecfe7b4e1f86b63cde462",
+  "pipelineV72Sha256": "2a56a9664e50becd16a573688b0f8b80c7365a44035c71aa27c53fcb4912ffb8",
+  "deltaPlanV72Sha256": "6f65df4ed019fbc0f7a419a8e262745566c4964224cbb73b8904878f41a0b31a",
+  "checks": {
+    "py_compile": true,
+    "normalized_v72_schema_read": true,
+    "v72_no_op_short_circuit": true,
+    "canonical_parent_v23": true,
+    "viewer_reuse_v96": true,
+    "no_geometry_build": true,
+    "no_full_model_regeneration": true,
+    "source_geometry_authorization_false": true,
+    "source_only_non_none_short_circuit": true,
+    "authorized_missing_changed_ids_fails_closed": true,
+    "authorized_changed_ids_patch_plan": true,
+    "deduplicates_changed_ids": true
+  },
+  "pass": true,
+  "geometryChanged": false,
+  "improvement": "Treat explicit NONE__* Level02 effects as true no-op short-circuits while remaining fail-closed for authorized changes without explicit element IDs."
+}
