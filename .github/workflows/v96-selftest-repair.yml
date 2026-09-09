@@ -1,0 +1,66 @@
+name: v96 self-test repair and exact transport rebuild
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v96-selftest-repair.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Patch false identity self-test and rebuild transport
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64,gzip,hashlib,json,pathlib
+          src=pathlib.Path('34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html')
+          raw=src.read_bytes(); text=raw.decode('utf-8')
+          old=".includes('Walkthrough v95 RICH PRODUCTION PARITY')"
+          new=".includes('Walkthrough v96 RICH PRODUCTION PARITY')"
+          assert text.count(old)==1, f'expected exactly one stale identity assertion, found {text.count(old)}'
+          text=text.replace(old,new)
+          raw=text.encode('utf-8'); src.write_bytes(raw)
+          vh=hashlib.sha256(raw).hexdigest(); vb=len(raw)
+          gz=gzip.compress(raw,compresslevel=9,mtime=0); enc=base64.b64encode(gz).decode('ascii')
+          # Split into twelve deterministic contiguous transport fragments.
+          n=12; q,r=divmod(len(enc),n); pos=0; parts=[]
+          for i in range(n):
+            ln=q+(1 if i<r else 0); part=enc[pos:pos+ln]; pos+=ln
+            name=f'walkthrough-v96.final.part{i+1:02d}.b64'; pathlib.Path(name).write_text(part+'\n'); parts.append(name)
+          assert pos==len(enc)
+          CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          C='SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH'
+          A='CURRENT_SOURCE_ARCHITECT_V58_ADDITIVE_LATER_LEVEL__LEVEL02_BASELINE_V50__NO_GEOMETRY_AUTHORIZATION'
+          loader='''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="fresnaye-loader" content="v96"><meta name="fresnaye-viewer-sha256" content="{vh}"><meta name="fresnaye-model-sha256" content="{can}"><meta name="fresnaye-source-contract" content="{c}"><meta name="fresnaye-source-adjudication" content="{a}"><meta name="fresnaye-ready-sentinel" content="walkthrough-v96-ready.json"><title>34 Fresnaye Walkthrough v96</title><style>html,body{{margin:0;width:100%;height:100%;background:#111;color:#fff;font-family:sans-serif}}#s{{padding:24px}}</style></head><body><div id="s">Verifying exact walkthrough package…</div><script>(async()=>{{const P={parts},E='{vh}',M='{can}',C='{c}',A='{a}',S=document.getElementById('s');try{{let t='';for(const p of P){{const r=await fetch(p,{{cache:'no-store'}});if(!r.ok)throw Error(p+' '+r.status);t+=(await r.text()).trim()}}let b=Uint8Array.from(atob(t),c=>c.charCodeAt(0)),ds=new DecompressionStream('gzip'),raw=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(ds)).arrayBuffer()),dig=[...new Uint8Array(await crypto.subtle.digest('SHA-256',raw))].map(x=>x.toString(16).padStart(2,'0')).join('');if(dig!==E)throw Error('viewer integrity mismatch');window.__FRESNAYE_TRANSPORT_META={{pass:true,viewerSha256:dig,viewerBytes:raw.length,parts:P.length,modelSha256:M,sourceContract:C,sourceAdjudicationStatus:A,geometryAuthorization:false}};document.open();document.write(new TextDecoder().decode(raw));document.close()}}catch(e){{window.__FRESNAYE_TRANSPORT_META={{pass:false,error:String(e&&e.message||e)}};S.textContent='Walkthrough blocked: '+(e&&e.message||e);console.error(e)}}}})();</script></body></html>'''.format(vh=vh,can=CAN,c=C,a=A,parts=json.dumps(parts,separators=(',',':')))
+          pathlib.Path('walkthrough-v96.html').write_text(loader,encoding='utf-8')
+          ready=json.loads(pathlib.Path('walkthrough-v96-ready.json').read_text())
+          ready.update(viewerSha256=vh,viewerBytes=vb,transportGzipBytes=len(gz),transportBase64Chars=len(enc),latestSourceCompatibilityObserved='v67',latestSourceCompatibilityLevel02Effect='NONE',latestSourceCompatibilityGeometryAuthorization=False,latestSourceCompatibilityNote='Source Architect v67 is additive Level03-only, preserves canonical Level02 v23 and grants no geometry authorization; repaired v96 viewer changes QA assertion only and does not mutate architectural geometry.')
+          ready['repair']='SELFTEST_IDENTITY_ASSERTION_V95_TO_V96_ONLY'
+          pathlib.Path('walkthrough-v96-ready.json').write_text(json.dumps(ready,indent=2)+'\n')
+          qa=json.loads(pathlib.Path('34_Fresnaye_Walkthrough_v96_StaticIntegrityQA_v1.json').read_text())
+          qa['timestampUtc']='2026-09-09T07:45:00Z';qa['viewerSha256']=vh;qa['viewerBytes']=vb;qa['transportExactReconstruction']=True;qa['status']='PASS_STATIC_PENDING_FRESH_RUNTIME';qa['repair']='SELFTEST_IDENTITY_ASSERTION_V95_TO_V96_ONLY'
+          pathlib.Path('34_Fresnaye_Walkthrough_v96_StaticIntegrityQA_v2.json').write_text(json.dumps(qa,indent=2)+'\n')
+          # Exact reconstruction proof before commit.
+          joined=''.join(pathlib.Path(x).read_text().strip() for x in parts)
+          rebuilt=gzip.decompress(base64.b64decode(joined,validate=True))
+          assert rebuilt==raw and hashlib.sha256(rebuilt).hexdigest()==vh
+          print(json.dumps({'viewerSha256':vh,'viewerBytes':vb,'gzipBytes':len(gz),'base64Chars':len(enc),'parts':len(parts),'geometryChanged':False}))
+          PY
+      - name: Commit repaired candidate
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html walkthrough-v96.html walkthrough-v96-ready.json walkthrough-v96.final.part*.b64 34_Fresnaye_Walkthrough_v96_StaticIntegrityQA_v2.json
+          git commit -m 'Repair v96 identity self-test and rebuild exact transport'
+          git push origin HEAD:gh-pages
