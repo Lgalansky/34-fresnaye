@@ -1,0 +1,49 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v68",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T10:34:18+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "remaining_material_lock": "Exact curved/unwitnessed ceiling-bulkhead footprint geometry lacking written radius/centre/tangent or owned horizontal witness.",
+    "effect_of_v68": "NONE"
+  },
+  "v68_material_advance": {
+    "level": "L03",
+    "subject": "L03_S01 / L03_S02 brickwork rough-opening width ownership",
+    "finding": "FRE_WD_207_REV_A dimension-terminal audit closes the two instance-specific brickwork rough widths at 1500 mm each. The first written 1500 span directly owns the opening segment labelled L03_S01; the second directly owns L03_S02. FRE_WD_402 independently schedules both components at 1500x2100.",
+    "boundary": "Only rough-opening WIDTH is newly closed. The masonry U/S/head for S01/S02 remains open; scheduled 2100 component height is not promoted to brickwork head geometry."
+  },
+  "unresolved_ambiguities": [
+    "Level02 exact curved/unwitnessed ceiling/bulkhead footprint geometry.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 FRE_WD_205 D11 brickwork tag drift and D11 masonry rough width.",
+    "Level03 D02 duplicate authoritative schedule ID/system ownership.",
+    "Level03 D04 confirmed component/system schedule omission.",
+    "Level03 iD02 2100 brickwork head versus 2150 scheduled panel/leaf conflict.",
+    "Level03 skylight identity/extra-instance mapping and curb/upstand/rough-opening/frame-flashing interface.",
+    "Level03 S01/S02 instance-specific masonry U/S/head ownership.",
+    "Level03 S03 overall grille width/height.",
+    "Level04 written 370mm parapet-adjacent vertical endpoint ownership remains quarantined."
+  ],
+  "source_watch": "Fresh Outlook checks found no newer Archilab source on 2026-09-09; 2026-09-08T13:49:17Z same-scale package remains latest known issue.",
+  "chief_of_staff_action": "Adopt v68 for later Level03 shutter opening widths: S01 rough width=1500 mm and S02 rough width=1500 mm are now source-owned by FRE_WD_207. Keep their masonry heads locked, keep S03 overall size locked, and retain all prior Level02/Level01/Level03 exceptions. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_S01_S02_ShutterEvidenceRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level03_ShutterExceptionRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level03_S01_S02_BrickworkWidthOwnershipEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v51.json",
+    "34_Fresnaye_SourceArchitect_Run68_ArtifactManifest_v1.json"
+  ]
+}
