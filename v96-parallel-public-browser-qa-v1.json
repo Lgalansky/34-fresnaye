@@ -1,0 +1,83 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_ParallelLoader_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T08:38:38.559Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-v96.html",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "geometryChanged": false,
+  "loaderMode": "parallel-v1",
+  "desktop": {
+    "pass": true,
+    "keyboardMovementM": 0.75,
+    "pointerLock": true,
+    "mouseLook": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "joystickMovementM": 0.827,
+    "touchLook": true,
+    "reset": true,
+    "pageErrors": []
+  },
+  "review": {
+    "pass": true,
+    "selfTests": 60,
+    "renderer": "WebGL2",
+    "mainRoute": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    },
+    "transportLoadMs": 101
+  },
+  "pass": true
+}
