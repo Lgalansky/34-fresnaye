@@ -75,10 +75,10 @@
   "sourceOnlyAdvance": {
     "status": "L04_LEAN_TO_ROOF_3DEG_SOURCE_CLOSED__MAIN_ROOF_REMAINS_LOCKED",
     "level": "L04",
-    "subject": "Explicit 3° lean-to roof pitch and associated written construction note",
+    "subject": "Explicit 3\u00b0 lean-to roof pitch and associated written construction note",
     "sourceClosed": true,
     "pitchDegrees": 3,
-    "finding": "FRE_WD_203_REV_B, FRE_WD_204_REV_B and FRE_WD_304_REV_B independently carry the written REPLACE EXISTING 3° LEAN TO ROOF note. The pitch is therefore source-closed at 3° for that specific lean-to condition only; the same note also specifies Clip-Lok covering, flashing/counterflashing, 75x50 purlins, 115x38 rafters and 38x38 battens @400 equal spacing.",
+    "finding": "FRE_WD_203_REV_B, FRE_WD_204_REV_B and FRE_WD_304_REV_B independently carry the written REPLACE EXISTING 3\u00b0 LEAN TO ROOF note. The pitch is therefore source-closed at 3\u00b0 for that specific lean-to condition only; the same note also specifies Clip-Lok covering, flashing/counterflashing, 75x50 purlins, 115x38 rafters and 38x38 battens @400 equal spacing.",
     "boundary": "Adds a later-stage roof source closure without touching geometry. The main Mazista roof pitch, eaves/ridge horizontal extents and the 370mm parapet-adjacent condition remain locked.",
     "geometryAction": "NONE"
   }
