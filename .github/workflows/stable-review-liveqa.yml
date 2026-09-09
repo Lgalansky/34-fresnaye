@@ -1,4 +1,4 @@
-name: Stable review live HTTP QA
+name: Stable review live QA v13
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   liveqa:
@@ -16,107 +16,90 @@ jobs:
     timeout-minutes: 25
     env:
       BASE: https://lgalansky.github.io/34-fresnaye
-      VHASH: 1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded
-      OBJHASH: c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5
-      GLBHASH: 7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          fetch-depth: 0
-
-      - name: Wait for stable v96 Source v70 direct-loader publication
+      - name: Wait for stable gate v13 publication
         shell: bash
         run: |
           set -euo pipefail
           fresh=0
-          for attempt in $(seq 1 48); do
+          for attempt in $(seq 1 60); do
             h=$(curl -fsSL --connect-timeout 10 --max-time 30 "$BASE/walkthrough-review.html?qa=${GITHUB_RUN_ID}-${attempt}" 2>/dev/null || true)
             m=$(curl -fsSL --connect-timeout 10 --max-time 30 "$BASE/walkthrough-review.json?qa=${GITHUB_RUN_ID}-${attempt}" 2>/dev/null || true)
-            if grep -q 'current loader QA' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v70"' <<<"$m" && grep -q '"loaderMode": "direct-v2-parallel-fallback"' <<<"$m" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v10' <<<"$m"; then fresh=1; break; fi
+            if grep -q 'Stable gate v13' <<<"$h" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v13' <<<"$m" && grep -q '"schemaVersion": 13' <<<"$m"; then fresh=1; break; fi
             sleep 5
           done
           test "$fresh" = 1
 
-      - name: Verify Source v70 and source-only delta short circuit
+      - name: Verify published identities, Source state and delta pipeline
         shell: bash
         run: |
           set -euo pipefail
           tmp=$(mktemp -d)
-          curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=source" -o "$tmp/m.json"
+          curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=identity-${GITHUB_RUN_ID}" -o "$tmp/m.json"
           python3 - "$tmp" "$BASE" <<'PY'
           import hashlib,json,pathlib,re,subprocess,sys
-          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); s=m['sourceState']; gp=m['geometryPipeline']; c=m['reviewCandidate']
-          def get(path,out): subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa=source','-o',str(out)],check=True)
-          get(s['sourceArchitectHandoffPublicPath'],p/'s.json'); get(gp['publicPath'],p/'pipeline.json'); get(gp['currentDeltaPlanPublicPath'],p/'plan.json'); get(gp['plannerQaPublicPath'],p/'plannerqa.json')
-          sb=(p/'s.json').read_bytes(); sh=json.loads(sb); source_hash=hashlib.sha256(sb).hexdigest(); pb=(p/'pipeline.json').read_bytes(); pipeline=json.loads(pb); pipeline_hash=hashlib.sha256(pb).hexdigest(); plan=json.loads((p/'plan.json').read_text()); plannerqa=json.loads((p/'plannerqa.json').read_text())
-          observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); legacy=(sh.get(f'run{digits}_new_progress') or {}).get('Level02_effect'); current=(sh.get('level02_priority_state') or {}).get(f'effect_of_v{digits}'); effect=str(current if current is not None else legacy).strip().rstrip('.').upper(); expected=str(s['level02Effect']).strip().rstrip('.').upper()
-          assert observed=='v70' and source_hash==s['sourceArchitectHandoffSha256']=='0db7ba8755617d86c293783c5e073b69177c1794a692d1b9ced887f97f522f29'
-          assert sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json') and sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and effect==expected=='SOURCE_EXCEPTION_NARROWED__NO_GEOMETRY_AUTHORIZATION'
-          assert s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
-          assert pipeline_hash==gp['sha256']=='63ffe733dcfa3a29d9e8bc25d87c08aea5266c802be881eb630b63a2e09710ef'
-          assert pipeline['artifact']==gp['artifact'] and pipeline['geometryChanged'] is False and pipeline['canonical']['level02']==c['canonicalModel']=='v23'
-          assert pipeline['sourceObserved']['sourceArchitect']==observed and pipeline['sourceObserved']['level02Effect']==s['level02Effect'] and pipeline['sourceObserved']['geometryAuthorization'] is False
-          assert pipeline['optimization']['strategy']==gp['strategy']=='CONTENT_ADDRESSED_DELTA_BUILD' and pipeline['optimization']['noOpShortCircuit'] is True and pipeline['optimization']['fullModelRegenerationDefault'] is False
-          assert plannerqa['pass'] is True and plannerqa['geometryChanged'] is False and plannerqa['checks']['v70_source_only_short_circuit'] is True and plannerqa['checks']['authorized_missing_changed_ids_fails_closed'] is True
-          assert plan['sourceArchitect']==observed and plan['sourceHandoffSha256']==source_hash and plan['pipelineSha256']==pipeline_hash and plan['canonicalParent']==c['canonicalModel']
-          assert plan['decision']==gp['currentDecision']=='SOURCE_ONLY_SHORT_CIRCUIT' and plan['geometryBuildRequired'] is gp['geometryBuildRequired'] is False and plan['fullModelRegenerationRequired'] is gp['fullModelRegenerationRequired'] is False and plan['geometryChanged'] is False
-          assert plan['changedElementIds']==[] and plan['sourceAffectedElementIds']==['Circular stepped ceiling bulkhead over toilet cubicle']
-          print('source+delta PASS',observed,source_hash,pipeline_hash,plan['decision'])
-          PY
-
-      - name: Verify exact v96 direct primary, fallback package and browser evidence
-        shell: bash
-        run: |
-          set -euo pipefail
-          tmp=$(mktemp -d)
-          curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=candidate" -o "$tmp/m.json"
-          python3 - "$tmp" "$BASE" <<'PY'
-          import base64,gzip,hashlib,json,pathlib,subprocess,sys
-          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; a=m['acceptance']
-          def get(path,out): subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa=candidate','-o',str(out)],check=True)
-          for path,name in [(c['readySentinel'],'r.json'),(c['loader'],'loader.html'),(c['pwaManifest'],'manifest'),(c['serviceWorker'],'sw.js'),(c['publicBrowserQaEvidence'],'q.json'),(c['primaryLoaderQaEvidence'],'lq.json')]: get(path,p/name)
-          r=json.loads((p/'r.json').read_text()); loader=(p/'loader.html').read_text(); pwa=json.loads((p/'manifest').read_text()); sw=(p/'sw.js').read_text(); q=json.loads((p/'q.json').read_text()); lq=json.loads((p/'lq.json').read_text())
-          assert c['viewerVersion']=='v96' and r['stageComplete'] is True and r['geometryChanged'] is False and c['geometryChanged'] is False
-          assert r['viewerSha256']==c['viewerSha256']==sys.argv[3] if len(sys.argv)>3 else r['viewerSha256']==c['viewerSha256']
-          assert c['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded' and r['viewerBytes']==c['viewerBytes']==253348
-          assert r['modelSha256']==c['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' and r['glbSha256']==c['glbSha256']=='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49'
-          assert r['vertices']==c['vertices']==5769 and r['triangles']==c['triangles']==8907
-          assert 'direct-v2-parallel-fallback' in loader and c['viewerSha256'] in loader and c['modelSha256'] in loader
-          direct=lq['transport']['directAsset']; get(direct,p/'viewer.html'); raw=(p/'viewer.html').read_bytes(); assert len(raw)==253348 and hashlib.sha256(raw).hexdigest()==c['viewerSha256']
-          parts=r['transportParts']; assert len(parts)==12 and all(x in loader for x in parts); enc=[]
-          for i,x in enumerate(parts,1): o=p/f'p{i:02d}'; get(x,o); enc.append(o.read_text().strip())
-          joined=''.join(enc); assert len(joined)==r['transportBase64Chars']; gz=base64.b64decode(joined,validate=True); assert len(gz)==r['transportGzipBytes']; fallback=gzip.decompress(gz); assert fallback==raw
-          assert pwa['id']=='./'+c['loader'] and pwa['start_url']=='./'+c['loader'] and pwa['scope']=='./' and c['serviceWorkerCache'] in sw and './'+direct in sw and all('./'+x in sw for x in parts)
-          assert q['pass'] is True and q['acceptanceIntegrity']['pass'] is True and q['acceptanceIntegrity']['minDistanceM']==40 and q['acceptanceIntegrity']['minDurationSec']==12 and q['acceptanceIntegrity']['transportHashBound'] is True
-          assert lq['pass'] is True and lq['transport']['pass'] is True and lq['transport']['mode']=='direct-v2' and lq['transport']['fetchConcurrency']==1 and lq['viewerSha256']==c['viewerSha256'] and lq['canonicalObjSha256']==c['modelSha256'] and lq['canonicalGlbSha256']==c['glbSha256']
-          assert lq['desktop']['pass'] and lq['mobile']['pass'] and lq['desktop']['renderer']=='WebGL2' and lq['mobile']['renderer']=='WebGL2' and lq['review']['pass'] is True and lq['review']['selfTests']==lq['review']['total']==60 and lq['review']['mainRoute']['collisionValidated'] is True and lq['review']['mainRoute']['pass'] is True
+          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; s=m['sourceState']; g=m['geometryPipeline']; gate=m['stableGate']; a=m['acceptance']
+          def get(path,name):
+              out=p/name
+              subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa={name}','-o',str(out)],check=True)
+              return out
+          def h(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          gatep=get(gate['publicPath'],'gate.html'); loader=get(c['portableLoader'],'loader.html'); qap=get(c['portableQaEvidence'],'portable-qa.json'); ready=get(c['readySentinel'],'ready.json'); viewer=get(c['directViewerAsset'],'viewer.html')
+          source=get(s['sourceArchitectHandoffPublicPath'],'source.json'); pipe=get(g['publicPath'],'pipeline.json'); planner=get(g['plannerPublicPath'],'planner.py'); plan=get(g['currentDeltaPlanPublicPath'],'plan.json'); plannerqa=get(g['plannerQaPublicPath'],'plannerqa.json')
+          assert m['artifact']=='34_Fresnaye_Walkthrough_StableReviewManifest_v13' and m['schemaVersion']==13
+          assert gate['sourceVersionAgnostic'] is True and h(gatep)==gate['sha256']
+          gt=gatep.read_text(); assert 'Stable gate v13' in gt and "'effect_of_'+v" in gt and 'sourceVersionAgnostic' not in gt
+          assert h(loader)==c['portableLoaderSha256'] and c['viewerSha256'] in loader.read_text() and c['modelSha256'] in loader.read_text()
+          qa=json.loads(qap.read_text()); assert h(qap)==c['portableQaSha256'] and qa['pass'] is True and qa['viewerSha256']==c['viewerSha256'] and qa['canonicalObjSha256']==c['modelSha256']
+          assert qa['desktop']['pass'] and qa['desktop']['renderer']=='WebGL2' and qa['desktop']['keyboardMovementM']>0.1 and qa['desktop']['pointerLock'] is True and qa['desktop']['mouseLookYawRad']>0.05 and qa['desktop']['collisionValidated'] is True
+          assert qa['mobile']['pass'] and qa['mobile']['renderer']=='WebGL2' and qa['mobile']['joystickMovementM']>0.1 and qa['mobile']['touchLookYawRad']>0.05 and qa['mobile']['reset'] is True and qa['mobile']['collisionValidated'] is True and qa['offline']['pass'] and qa['forcedFallback']['pass']
+          r=json.loads(ready.read_text()); assert r['stageComplete'] is True and r['geometryChanged'] is False and r['viewerVersion']==c['viewerVersion'] and r['viewerSha256']==c['viewerSha256'] and r['viewerBytes']==c['viewerBytes'] and r['modelSha256']==c['modelSha256'] and r['glbSha256']==c['glbSha256'] and r['vertices']==c['vertices'] and r['triangles']==c['triangles']
+          assert len(viewer.read_bytes())==c['viewerBytes'] and h(viewer)==c['viewerSha256']
+          sj=json.loads(source.read_text()); sv=s['latestSourceArchitectObserved']; assert re.fullmatch(r'v\d+',sv) and h(source)==s['sourceArchitectHandoffSha256'] and sj['artifact']=='34_Fresnaye_SourceArchitect_handoff_'+sv and sj['canonical_geometry_changed'] is False and sj['geometry_authorization'] is s['geometryAuthorization'] is False
+          key='effect_of_'+sv; eff=(sj.get('level02_priority_state') or {}).get(key); assert str(eff).strip().rstrip('.').upper()==str(s['level02Effect']).strip().rstrip('.').upper()
+          pj=json.loads(pipe.read_text()); dp=json.loads(plan.read_text()); aq=json.loads(plannerqa.read_text())
+          assert h(pipe)==g['sha256'] and h(planner)==g['plannerSha256'] and h(plan)==g['currentDeltaPlanSha256'] and h(plannerqa)==g['plannerQaSha256']
+          assert pj['artifact']==g['artifact'] and pj['sourceObserved']['sourceArchitect']==sv and pj['canonical']['level02']==c['canonicalModel'] and pj['geometryChanged'] is False
+          assert dp['sourceArchitect']==sv and dp['planner']==g['planner'] and dp['decision']==g['currentDecision'] and dp['geometryBuildRequired'] is g['geometryBuildRequired'] is False and dp['fullModelRegenerationRequired'] is g['fullModelRegenerationRequired'] is False and dp['fullBrowserRegressionRequired'] is g['fullBrowserRegressionRequired'] is False
+          assert aq['pass'] is True and aq['geometryChanged'] is False and aq['plannerSha256']==g['plannerSha256'] and aq['checks']['authorized_missing_changed_ids_fails_closed'] is True and aq['checks']['authorized_changed_ids_patch_plan'] is True
           assert a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False and a['minimumDistanceM']==40 and a['minimumDurationSec']==12
-          print('candidate PASS: direct-v2 exact viewer + 12-part byte-identical fallback + WebGL2 desktop/mobile 60/60 + acceptance hold')
+          print('IDENTITY PASS',sv,g['currentDecision'],c['viewerVersion'],c['canonicalModel'])
           PY
-          node --check "$tmp/sw.js"
+          node --check <(python3 - <<'PY'
+          import re,pathlib
+          s=pathlib.Path('$tmp/gate.html').read_text()
+          print(re.search(r'<script>([\s\S]*?)</script>',s).group(1))
+          PY
+          )
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - shell: bash
+      - name: Install Chromium QA runtime
+        shell: bash
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Verify live stable gate enables the exact v96 candidate
-        shell: bash
-        run: |
-          cat > stable-gate.cjs <<'JS'
-          const {chromium}=require('playwright'),fs=require('fs');
-          (async()=>{const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV70DirectGateQA_v1',timestampUtc:new Date().toISOString(),url:'https://lgalansky.github.io/34-fresnaye/walkthrough-review.html',geometryChanged:false,sourceArchitect:'v70',viewerVersion:'v96',pass:false};const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{const p=await b.newPage({viewport:{width:1280,height:800}});let errors=[];p.on('pageerror',e=>errors.push(String(e)));await p.goto(out.url+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),null,{timeout:90000});const href=await p.locator('#open').getAttribute('href'),source=await p.locator('#source').textContent(),pipeline=await p.locator('#pipeline').textContent(),qa=await p.locator('#qa').textContent(),portable=await p.locator('#portable').textContent();if(href!=='./walkthrough-v96.html'||!source.includes('v70')||!source.includes('SOURCE EXCEPTION NARROWED')||!pipeline.includes('SOURCE ONLY SHORT CIRCUIT')||!qa.includes('PASS')||!portable.includes('PASS')||errors.length)throw Error(JSON.stringify({href,source,pipeline,qa,portable,errors}));out.href=href;out.source=source;out.pipeline=pipeline;out.qa=qa;out.portable=portable;out.pageErrors=errors;out.pass=true;fs.writeFileSync('stable-v70-direct-gate-qa-v1.json',JSON.stringify(out,null,2)+'\n')}finally{await b.close()}})().catch(e=>{console.error(e.stack||e);process.exit(1)});
-          JS
-          node stable-gate.cjs
 
-      - name: Persist stable v70 gate QA evidence
+      - name: Verify live stable gate and preferred walkthrough load
         shell: bash
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add stable-v70-direct-gate-qa-v1.json
-          git commit -m 'Record stable v70 direct gate QA v1'
-          git push origin HEAD:gh-pages
+          cat > stable-v13.cjs <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const base='https://lgalansky.github.io/34-fresnaye/';
+            const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const p=await b.newPage({viewport:{width:1280,height:800}}); const errors=[]; p.on('pageerror',e=>errors.push(String(e)));
+              await p.goto(base+'walkthrough-review.html?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+              await p.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),null,{timeout:90000});
+              const gate=await p.locator('#gate').textContent(), source=await p.locator('#source').textContent(), pipe=await p.locator('#pipe').textContent(), qa=await p.locator('#qa').textContent(), href=await p.locator('#open').getAttribute('href');
+              if(!gate.includes('VERIFIED REVIEW READY')||!source.includes('v72')||!pipe.includes('NO OP SHORT CIRCUIT')||!qa.includes('PASS')||href!=='./v96/'||errors.length) throw Error(JSON.stringify({gate,source,pipe,qa,href,errors}));
+              await p.goto(base+'v96/?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+              await p.waitForFunction(()=>document.querySelector('canvas') && !document.body.innerText.includes('Walkthrough blocked'),null,{timeout:90000});
+              const canvas=await p.locator('canvas').count(); if(canvas<1) throw Error('preferred walkthrough did not create a canvas');
+              console.log('LIVE GATE PASS', {source,pipe,qa,href,canvas});
+            } finally { await b.close(); }
+          })().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node stable-v13.cjs
