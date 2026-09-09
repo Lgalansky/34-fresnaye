@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Fail-closed source-to-geometry delta planner for 34 Fresnaye.
 
-This planner never edits geometry. It converts a Source Architect handoff into a
-small deterministic build/QA plan. It deliberately short-circuits when Level 02
-has no effect, avoiding unnecessary whole-model regeneration.
+The planner never edits geometry. It converts the latest Source Architect handoff
+into a deterministic build/QA decision. Source-only clarifications are allowed to
+short-circuit without a model rebuild when geometry authorization is false; an
+authorized geometry change still requires explicit changed_element_ids.
 """
 from __future__ import annotations
 import argparse, hashlib, json, pathlib, re, sys
@@ -26,18 +27,35 @@ def source_version(handoff: dict[str, Any]) -> str:
     return f"v{m.group(1)}"
 
 
-def level02_effect(handoff: dict[str, Any], version: str) -> str:
-    key = f"run{version[1:]}_new_progress"
-    progress = handoff.get(key, {})
-    effect = str(progress.get("Level02_effect", "")).strip().rstrip(".").upper()
-    if not effect:
-        raise ValueError(f"missing {key}.Level02_effect")
-    return effect
+def level02_effect(handoff: dict[str, Any], version: str) -> tuple[str, str]:
+    """Read current normalized schema first, then the legacy runNN schema."""
+    current_path = f"level02_priority_state.effect_of_{version}"
+    current = handoff.get("level02_priority_state", {}).get(f"effect_of_{version}")
+    if current is not None and str(current).strip():
+        return str(current).strip().rstrip(".").upper(), current_path
+
+    legacy_key = f"run{version[1:]}_new_progress"
+    legacy = handoff.get(legacy_key, {}).get("Level02_effect")
+    if legacy is not None and str(legacy).strip():
+        return str(legacy).strip().rstrip(".").upper(), f"{legacy_key}.Level02_effect"
+
+    raise ValueError(f"missing Level 02 effect for {version} in normalized or legacy schema")
+
+
+def source_affected_ids(handoff: dict[str, Any]) -> list[str]:
+    ids = handoff.get("source_affected_element_ids")
+    if isinstance(ids, list):
+        return sorted(set(x.strip() for x in ids if isinstance(x, str) and x.strip()))
+    advance = handoff.get("v70_material_advance") or handoff.get("material_advance") or {}
+    subject = str(advance.get("subject", "")).strip()
+    if subject:
+        return [subject]
+    return []
 
 
 def plan(handoff: dict[str, Any], handoff_sha: str, pipeline: dict[str, Any], pipeline_sha: str) -> dict[str, Any]:
     version = source_version(handoff)
-    effect = level02_effect(handoff, version)
+    effect, effect_path = level02_effect(handoff, version)
     auth = handoff.get("geometry_authorization") is True
     canonical_changed = handoff.get("canonical_geometry_changed") is True
 
@@ -46,35 +64,46 @@ def plan(handoff: dict[str, Any], handoff_sha: str, pipeline: dict[str, Any], pi
 
     base = {
         "artifact": f"34_Fresnaye_GeometryDeltaPlan_Source_{version}_v1",
+        "planner": "34_Fresnaye_GeometryDeltaPlanner_v3",
         "sourceArchitect": version,
         "sourceHandoffSha256": handoff_sha,
+        "level02EffectSchemaPath": effect_path,
         "pipeline": pipeline.get("artifact"),
         "pipelineSha256": pipeline_sha,
         "canonicalParent": pipeline.get("canonical", {}).get("level02"),
+        "viewerReuseCandidate": pipeline.get("viewer", {}).get("version"),
         "geometryAuthorization": auth,
         "level02Effect": effect,
         "geometryChanged": False,
     }
 
-    if effect == "NONE" and not auth:
+    if not auth:
+        source_only = effect != "NONE"
         return {
             **base,
-            "decision": "NO_OP_SHORT_CIRCUIT",
+            "decision": "SOURCE_ONLY_SHORT_CIRCUIT" if source_only else "NO_OP_SHORT_CIRCUIT",
+            "sourceAffectedElementIds": source_affected_ids(handoff),
             "changedElementIds": [],
             "geometryBuildRequired": False,
             "fullModelRegenerationRequired": False,
             "fullBrowserRegressionRequired": False,
-            "qa": ["source_identity", "canonical_identity", "deployment_source_sync"],
-            "reason": "Level 02 effect is NONE and geometry authorization is false; preserve canonical model and reuse viewer.",
+            "qa": ["source_identity", "source_effect_classification", "canonical_identity", "deployment_source_sync"],
+            "reason": (
+                "Source Architect records a Level 02 source clarification but geometry authorization is false; "
+                "preserve canonical model and reuse viewer."
+                if source_only else
+                "Level 02 effect is NONE and geometry authorization is false; preserve canonical model and reuse viewer."
+            ),
         }
 
     changed = handoff.get("changed_element_ids")
     if not isinstance(changed, list) or not changed or not all(isinstance(x, str) and x.strip() for x in changed):
-        raise ValueError("source affects/authorizes Level 02 but explicit changed_element_ids are absent; fail closed")
+        raise ValueError("geometry is authorized but explicit changed_element_ids are absent; fail closed")
 
     return {
         **base,
         "decision": "PATCH_PLAN_REQUIRED",
+        "sourceAffectedElementIds": source_affected_ids(handoff),
         "changedElementIds": sorted(set(x.strip() for x in changed)),
         "geometryBuildRequired": True,
         "fullModelRegenerationRequired": False,
