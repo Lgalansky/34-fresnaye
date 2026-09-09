@@ -1,0 +1,21 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_StableV7_Diagnostic_v1",
+  "manifest": "34_Fresnaye_Walkthrough_StableReviewManifest_v7",
+  "sourceHash": "acc2251dded17eae1e87d49958c8302e268ce5df39a83def2a0479475c37e158",
+  "sourceExpected": "77450fb077142b1b2338a19ce2e601378093e1c2b66766801485f177cb596956",
+  "pipelineHash": "47a61c54f6ac2045962d2840027bb8031e01bfdfc5a5bf6b64a6f79117d26388",
+  "pipelineExpected": "47a61c54f6ac2045962d2840027bb8031e01bfdfc5a5bf6b64a6f79117d26388",
+  "effect": "NONE",
+  "sourceArtifact": "34_Fresnaye_SourceArchitect_handoff_v67",
+  "sourceGeometryChanged": false,
+  "sourceAuthorization": false,
+  "pipelineSource": "v67",
+  "pipelineLevel02": "v23",
+  "plannerQaPass": true,
+  "planSource": "v67",
+  "planSourceHash": "77450fb077142b1b2338a19ce2e601378093e1c2b66766801485f177cb596956",
+  "planPipelineHash": "47a61c54f6ac2045962d2840027bb8031e01bfdfc5a5bf6b64a6f79117d26388",
+  "planDecision": "NO_OP_SHORT_CIRCUIT",
+  "candidate": "v96",
+  "pass": false
+}
