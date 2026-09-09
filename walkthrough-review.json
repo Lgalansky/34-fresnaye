@@ -1,6 +1,6 @@
 {
   "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v10",
-  "updatedUtc": "2026-09-09T09:42:00Z",
+  "updatedUtc": "2026-09-09T09:49:00Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "loader": "walkthrough-v96.html",
@@ -9,7 +9,7 @@
     "primaryLoaderQaEvidence": "v96-direct-primary-qa-v3.json",
     "pwaManifest": "walkthrough-v96.manifest.webmanifest",
     "serviceWorker": "walkthrough-v96.sw.js",
-    "serviceWorkerCache": "fresnaye-v96-r3",
+    "serviceWorkerCache": "fresnaye-v96-r4",
     "loaderMode": "direct-v2-parallel-fallback",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
     "viewerBytes": 253348,
