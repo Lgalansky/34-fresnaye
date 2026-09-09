@@ -1,0 +1,56 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v79",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T21:25:43+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume written dimensions/IDs/FFLs/sections/elevations/brickwork/schedules and direct architect clarifications only. Never visually scale, convert graphic/vector distance into millimetres, curve-fit, repair IDs by assumption, or invent missing construction.",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "closure_summary": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22": "former D21 physical instance1 corrected to D22; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090; explicit finished/overall wall thickness400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100; central leaf with25mm side clearances; exact leaf thickness remains approximate only",
+      "L02_iD08": "rough855 / U-S2400 / pocket90; central leaf with20mm side clearances; exact leaf thickness remains approximate only"
+    },
+    "priority_register": "34_Fresnaye_SourceArchitect_Level02_PriorityFive_ClosureRegister_v2.json"
+  },
+  "v79_material_advance": {
+    "level": "L02",
+    "subject": "Architect correspondence ownership-scope correction",
+    "finding": "Michael's 2026-09-09 email explicitly says that two vaulted ceilings — one opposite the guest toilet and one on the opposite side — are still in the design process. The email does not explicitly name the separate drawing callout CIRCULAR CEILING STEPPED BULKHEAD OVER TOILET CUBICLE.",
+    "correction_to_v78": "Split the source state. The two architect-described vaulted conditions are OPEN_DESIGN_NOT_FROZEN. The named circular stepped toilet-cubicle condition remains OPEN_EXACT_CURVE_AND_STEP_GEOMETRY, while its design-freeze status is not explicitly established by that email.",
+    "source_safety_reason": "Do not transfer status between separately described conditions by adjacency, count or assumed equivalence.",
+    "geometry_effect": "NONE__SOURCE_CLASSIFICATION_CORRECTION_ONLY"
+  },
+  "current_level02_locks": [
+    "Named CIRCULAR CEILING STEPPED BULKHEAD OVER TOILET CUBICLE: exact curve/step construction remains unwritten; design-freeze status for this named condition is not explicitly established.",
+    "Architect-described vaulted ceiling opposite guest toilet: design not frozen; exact plan/tag mapping remains open.",
+    "Architect-described vaulted ceiling on opposite side: design not frozen; exact plan/tag mapping remains open."
+  ],
+  "preliminary_section_rule": "If the promised section arrives before the architect workshop outcome, treat it as PRELIMINARY_SUBJECT_TO_CHANGE unless Archilab explicitly marks it final/current. Establish its exact condition ownership before consumption.",
+  "carry_forward_later_stage_state": {
+    "L01": "Complex curved/stepped/nested ceiling boundaries; stair-soffit exact slope/termination; D11 tag drift/rough width; W06 rough width; W08 brickwork head; W04/W05/W06 25mm interface allocations remain open.",
+    "L03": "D02 duplicate schedule-system ownership; D04 schedule omission; iD02 2100 rough head vs 2150 scheduled component; skylight IDs/curb/upstand/structural rough opening/frame-flashing; S01/S02 masonry heads; S03 overall grille size remain open.",
+    "L04": "Main Mazista roof numeric pitch/eaves/ridge extents and 370mm parapet-adjacent ownership remain open; explicit 3 degrees is lean-to only."
+  },
+  "source_watch": "Fresh Outlook check found no Archilab source newer than the 2026-09-09T16:41:59Z RE: Render email and no new attachment.",
+  "chief_of_staff_action": "Adopt v79 over v78 for correspondence semantics. Keep the five priority openings closed and canonical geometry unchanged. Treat only the two explicitly described vaulted conditions as design-not-frozen; do not apply that status to the named circular stepped toilet-cubicle bulkhead unless Archilab explicitly links them.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level02_ArchitectCorrespondenceScopeCorrection_v1.json",
+    "34_Fresnaye_SourceArchitect_Level02_CircularSteppedToiletBulkhead_GeometryException_v3.json",
+    "34_Fresnaye_SourceArchitect_Level02_VaultedCeiling_DesignFreezeRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_WholeHouse_OpenSourceExceptionsRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v62.json"
+  ]
+}
