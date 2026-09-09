@@ -1,6 +1,6 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v8",
-  "updatedUtc": "2026-09-09T08:03:00Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v9",
+  "updatedUtc": "2026-09-09T08:42:00Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "loader": "walkthrough-v96.html",
@@ -19,11 +19,11 @@
     "automatedPublicCandidateReviewReady": true
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v68",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v68.json",
-    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v68.json",
-    "sourceArchitectHandoffSha256": "6fe06371eaa1311d357079b623a7ad70ed3653945cd4ca484d98e79206644cbb",
-    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S01_S02_BRICKWORK_ROUGH_WIDTHS_SOURCE_CLOSED_1500_EACH__HEADS_AND_S03_SIZE_REMAIN_OPEN__NO_MODEL_EDIT",
+    "latestSourceArchitectObserved": "v69",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v69.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v69.json",
+    "sourceArchitectHandoffSha256": "3f8c8511847a74abd4310595a9e5654dd03af4829b70a128827f336bf3910dda",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S01_S02_FALSE_2100_MASONRY_HEAD_CANDIDATE_EXCLUDED__HEADS_REMAIN_OPEN__NO_MODEL_EDIT",
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
     "level02Effect": "NONE",
@@ -31,14 +31,14 @@
     "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
     "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness. No scaling or inference.",
-    "laterLevelProgress": "Source Architect v68 source-closes Level 03 S01/S02 brickwork rough-opening widths at 1500 mm each; their masonry U/S/head ownership remains open and S03 overall size remains open. Level 02 effect NONE."
+    "laterLevelProgress": "Source Architect v69 excludes nearby 2100 U/S annotations from Level 03 S01/S02 shutter masonry-head ownership. S01/S02 rough widths remain 1500 mm each and scheduled components remain 1500x2100, but masonry heads remain unsourced and locked. Level 02 effect NONE."
   },
   "geometryPipeline": {
     "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
-    "publicPath": "engineering/incremental-geometry-pipeline-v2.json",
-    "sha256": "a93b0173dd40b8a80510b25f2fce0a51b2aadbafa5e324cbe266124c16613a31",
-    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v4.json",
-    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v68-v1.json",
+    "publicPath": "engineering/incremental-geometry-pipeline-v2-v69.json",
+    "sha256": "aa7539dffbdc76e76aeacff576b7ad8235e55bb65ec4f818d933d3525d81bf98",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v5.json",
+    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v69-v1.json",
     "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
     "currentDecision": "NO_OP_SHORT_CIRCUIT",
     "fullModelRegenerationRequired": false,
