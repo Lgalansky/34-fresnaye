@@ -1,0 +1,40 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v65",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T07:28:02+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S03_COUNT_FUNCTION_IDENTITY_CLOSED_AND_FALSE_DIMENSION_CANDIDATES_EXCLUDED__OVERALL_GRILLE_SIZE_STILL_OPEN__NO_MODEL_EDIT",
+  "level02_state": "Retain Source Architect v50/discrepancy log v72 dimensional state. D09, corrected D22/former D21 physical instance 1, W11, iD05 and iD08 remain source-closed; later W09/G04/entrance allocation/ceiling-height and explicit horizontal witness closures remain intact.",
+  "current_material_level02_source_lock": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness.",
+  "run65_new_progress": {
+    "new_Archilab_source": "NONE after fresh Outlook check; latest remains 2026-09-08T13:49:17Z.",
+    "Level03_S03": "L03_S03 is source-closed for ID, count=3 and function/descriptor (aluminium weather-proof louvered grille into roof void) across Level04 plan/elevation/section/schedule evidence.",
+    "Level03_S03_false_candidates": "Native-PDF ownership audit shows the two 2100 schedule-row dimensions belong to L03_S01 and L03_S02, not S03, and also excludes nearby 1000/1000, 1330, 4080 and roof-overall 6515/9190 from S03 dimensional ownership. Exact overall grille width/height remain unsourced.",
+    "Level04_effect": "RoofStorey SourcePreparationRegister advanced to v4 with S03 ownership hardening; other Level04 datum/roof-build-up state unchanged.",
+    "Level02_effect": "NONE."
+  },
+  "unresolved_ambiguities": [
+    "Level02 curved/unwitnessed ceiling/bulkhead footprint geometry.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where missing turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 FRE_WD_205 D11 brickwork tag drift and D11 masonry rough width.",
+    "Level03 D02 duplicate schedule ID/system ownership: 3000x2100 frameless versus 1500x2100 aluminium records.",
+    "Level03 D04 confirmed component/system schedule omission.",
+    "Level03 iD02 2100 brickwork head versus 2150 scheduled panel/leaf conflict.",
+    "Level03 skylight width/length/curb/upstand/rough-opening dimensions.",
+    "Level03 S03 roof-void grille explicit overall width/height.",
+    "Level04 written 370mm parapet-adjacent vertical has unresolved opposite-end datum ownership and remains quarantined."
+  ],
+  "chief_of_staff_action": "Adopt v65 as additive later-level source evidence only. Keep Level02 source/geometry state unchanged. Treat L03_S03 count/function/identity as closed, explicitly reject the audited nearby numeric candidates as grille dimensions, and retain exact S03 overall width/height as an open Archilab clarification. Retain all v64 component/ceiling/skylight/parapet locks.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_S03_RoofVoidGrille_DimensionalOwnershipAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_S03_RoofVoidGrille_DimensionalOwnershipEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level03_S03_RoofVoidGrille_ExceptionRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level04_RoofStorey_SourcePreparationRegister_v4.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v48.json",
+    "34_Fresnaye_SourceArchitect_Run65_ArtifactManifest_v1.json"
+  ]
+}
