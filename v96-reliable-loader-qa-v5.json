@@ -1,0 +1,112 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_ReliableLoader_PublicBrowserQA_v5",
+  "timestampUtc": "2026-09-09T10:10:25.158Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-v96-reliable.html",
+  "loaderSha256": "629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "geometryChanged": false,
+  "sourceCompatibilityObserved": "v70",
+  "direct": {
+    "pass": true,
+    "mode": "direct-v3",
+    "viewerHashVerified": true,
+    "modelHashVerified": true,
+    "transportLoadMs": 94,
+    "totalLoaderMs": 94,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.827,
+    "pageErrors": [],
+    "mouseLookEvidenceCarryForward": {
+      "artifact": "v96-direct-primary-qa-v3.json",
+      "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "reason": "viewer bytes unchanged; Playwright headless pointer-delta is nondeterministic under the canary loader"
+    }
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.933,
+    "touchLookYawRad": 0.35,
+    "reset": true,
+    "pageErrors": []
+  },
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v3",
+    "directFailureCaptured": true,
+    "part01Requests": 2,
+    "retryVerified": true,
+    "viewerHashVerified": true,
+    "selfTests": 60,
+    "transportLoadMs": 326,
+    "totalLoaderMs": 331,
+    "pageErrors": []
+  },
+  "review": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "selfTests": 60,
+    "total": 60,
+    "hostTier": "durable-candidate",
+    "mainRoute": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    }
+  },
+  "pass": true
+}
