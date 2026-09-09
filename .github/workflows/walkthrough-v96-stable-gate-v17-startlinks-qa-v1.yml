@@ -117,7 +117,7 @@ jobs:
           })();
           JS
           node --check /tmp/qa.cjs
-          node /tmp/qa.cjs
+          NODE_PATH="$GITHUB_WORKSPACE/node_modules" node /tmp/qa.cjs
       - name: Persist v17 public browser QA evidence
         if: always()
         run: |
