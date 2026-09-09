@@ -77,7 +77,14 @@
     "level": "L01",
     "subject": "Large lower-right complex 2400 AFFL suspended-ceiling straight-edge/subfield witness ownership",
     "sourceClosed": false,
-    "writtenWitnessesMm": [4842,3170,8285,3670,1920,4405],
+    "writtenWitnessesMm": [
+      4842,
+      3170,
+      8285,
+      3670,
+      1920,
+      4405
+    ],
     "boundary": "These values are source constraints only. The upper-right curved transition and complete ordered boundary remain open; no radius/tangent/curve or missing step is inferred.",
     "geometryAction": "NONE"
   }
