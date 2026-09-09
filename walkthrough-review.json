@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v21",
-  "schemaVersion": 21,
-  "updatedUtc": "2026-09-09T19:41:54.313999Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v22",
+  "schemaVersion": 22,
+  "updatedUtc": "2026-09-09T19:55:00Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -37,38 +37,40 @@
     "directViewerAsset": "34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html"
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v79",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v79.json",
-    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v79.json",
-    "sourceArchitectHandoffSha256": "9bdedbd046407d806806863d2e730481f0cffa3ce981b6bd1d5b859a8ed15643",
-    "sourceArchitectChiefOfStaffStatus": "PASS_UNCHANGED__CORRESPONDENCE_OWNERSHIP_SCOPE_CORRECTED__NO_MODEL_EDIT",
-    "level02Effect": "NONE__SOURCE_CLASSIFICATION_CORRECTION_ONLY",
+    "latestSourceArchitectObserved": "v80",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v80.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v80.json",
+    "sourceArchitectHandoffSha256": "90682214a7d4f18372fd5ec1dab75945067f83b4a23938e37e0e55b760151c94",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__STALE_V14_WIDTH_BLOCKER_RETIRED__CURRENT_LEVEL02_LOCKS_RECONCILED_TO_V79_DESIGN_STATUS__PROMISED_SECTION_INTAKE_GATE_STAGED__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+    "level02Effect": "NONE__SOURCE_REGISTER_CONSISTENCY_AND_INTAKE_PREP_ONLY",
+    "effectClassificationPublicPath": "engineering/source-v80-walkthrough-classification-v1.json",
+    "effectClassificationSha256": "aef7f81e7cbd497bbe3d2f86cee3667fb58dba27bd41a176aec5d6691f6b5caf",
     "geometryAuthorization": false,
     "newerSourceSyncChangesCandidateGeometry": false,
-    "browserQaCompatibilitySource": "v79",
-    "browserQaReuseReason": "Fresh r7 adaptive-network browser QA plus fresh all-six-start/reset/next-room QA executed against unchanged exact v96 viewer and canonical v23 model. No geometry authorization.",
-    "materialLevel02SourceBlocker": "Three separate locks remain: named circular stepped toilet-cubicle bulkhead exact curve/step geometry is unwritten and its design-freeze status is not explicitly established; two architect-described vaulted conditions are design-not-frozen and their exact plan/tag mapping remains open."
+    "browserQaCompatibilitySource": "v80",
+    "browserQaReuseReason": "Source v80 is register-consistency and promised-section intake preparation only: canonical_geometry_changed=false and geometry_authorization=false. Exact v96 viewer and canonical v23 model bytes are unchanged; protected r7 was freshly public-browser tested before and after source sync.",
+    "materialLevel02SourceBlocker": "Named circular stepped toilet-cubicle bulkhead exact written curve/step construction remains open; two architect-described vaulted conditions are not design-frozen and their exact plan/tag mapping remains open; any other curved/unwitnessed Level 02 ceiling transition lacking its own complete written construction witness remains locked."
   },
   "geometryPipeline": {
     "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
-    "publicPath": "engineering/incremental-geometry-pipeline-v2-v79.json",
-    "sha256": "62d439ed39911d568dfface458e3610039cf9bdf1d01727225d332658855a676",
-    "planner": "34_Fresnaye_GeometryDeltaPlanner_v5",
-    "plannerPublicPath": "engineering/geometry-delta-planner-v5.py",
-    "plannerSha256": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
-    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v14.json",
-    "plannerQaSha256": "22052d5b44b2e7a4890e691f90aa5f6d6a02c193b264d1bd292f8c40de945e72",
-    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v79-v1.json",
-    "currentDeltaPlanSha256": "269d78ade53267833aead4cd347ad6434c546bd7a849c193c7ff1ff17f8986f3",
-    "currentDecision": "SOURCE_ONLY_SHORT_CIRCUIT",
+    "publicPath": "engineering/incremental-geometry-pipeline-v2-v80.json",
+    "sha256": "427f9058fed95c945fdd59d367bc7c20d6926296e570d6191c6e7e9a42d04c90",
+    "planner": "34_Fresnaye_GeometryDeltaPlanner_v6",
+    "plannerPublicPath": "engineering/geometry-delta-planner-v6.py",
+    "plannerSha256": "74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v15.json",
+    "plannerQaSha256": "9992983557f4057bb65d8c8d8fc555e7afe0904da4e8159640765e266fb4c09c",
+    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v80-v1.json",
+    "currentDeltaPlanSha256": "75e9c0726826b9bed037b05114a05456cb2404427efda69474cf1ef5686bf6a3",
+    "currentDecision": "NO_OP_SHORT_CIRCUIT",
     "geometryBuildRequired": false,
     "fullModelRegenerationRequired": false,
     "fullBrowserRegressionRequired": false
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "revision": "v19",
-    "sha256": "052e30826a3dc4abd2c0e845b8435672fa8255a86c8530556d50cb1dceedce9e"
+    "revision": "v20",
+    "sha256": "dbc03013f069ef58e16d56078bd3872669c3a9100bcd9d0db2eeef8b0e7df060"
   },
   "acceptance": {
     "finalStatus": "OPEN",
