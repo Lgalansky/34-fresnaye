@@ -1,0 +1,100 @@
+name: v96 portable r2 live browser QA v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v96-portable-r2-liveqa-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE: https://lgalansky.github.io/34-fresnaye
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Wait for r2 and QA harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for i in $(seq 1 60); do
+            l=$(curl -fsSL "$BASE/v96/?qa=${GITHUB_RUN_ID}-${i}" 2>/dev/null || true)
+            h=$(curl -fsSL "$BASE/engineering/v96-portable-r2-liveqa.cjs?qa=${GITHUB_RUN_ID}-${i}" 2>/dev/null || true)
+            if grep -q 'v96-portable-r2' <<<"$l" && grep -q 'PortableFastStart_PublicBrowserQA_v4' <<<"$h"; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium and verify published code
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          curl -fsSL "$BASE/v96/?qa=code-${GITHUB_RUN_ID}" -o /tmp/loader.html
+          curl -fsSL "$BASE/v96/sw.js?qa=code-${GITHUB_RUN_ID}" -o /tmp/sw.js
+          curl -fsSL "$BASE/34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html?qa=code-${GITHUB_RUN_ID}" -o /tmp/viewer.html
+          python3 - <<'PY'
+          import hashlib,re,pathlib
+          l=pathlib.Path('/tmp/loader.html').read_text();s=pathlib.Path('/tmp/sw.js').read_text();v=pathlib.Path('/tmp/viewer.html').read_bytes()
+          assert len(v)==253348 and hashlib.sha256(v).hexdigest()=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+          assert 'fresnaye-v96-portable-r2' in l and 'source-version-agnostic' in l and 'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' in l
+          assert 'fresnaye-v96-portable-r2' in s and 'Promise.allSettled' in s and "cache:'no-cache'" in s
+          scripts=re.findall(r'<script>([\s\S]*?)</script>',l);assert len(scripts)==1;pathlib.Path('/tmp/loader.js').write_text(scripts[0])
+          PY
+          node --check /tmp/loader.js
+          node --check /tmp/sw.js
+          echo "LOADER_SHA=$(sha256sum /tmp/loader.html | awk '{print $1}')" >> "$GITHUB_ENV"
+          echo "SW_SHA=$(sha256sum /tmp/sw.js | awk '{print $1}')" >> "$GITHUB_ENV"
+      - name: Run portable r2 public browser QA
+        shell: bash
+        run: node engineering/v96-portable-r2-liveqa.cjs portable
+      - name: Publish QA v4 and Source v73 stable manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,pathlib,datetime
+          p=pathlib.Path('.')
+          def h(x): return hashlib.sha256((p/x).read_bytes()).hexdigest()
+          m=json.loads((p/'walkthrough-review.json').read_text());c=m['reviewCandidate'];s=m['sourceState'];g=m['geometryPipeline']
+          c['portableLoader']='v96/index.html';c['portableLoaderSha256']=h('v96/index.html');c['portableQaEvidence']='v96/portable-qa-v4.json';c['portableQaSha256']=h('v96/portable-qa-v4.json')
+          s.update(latestSourceArchitectObserved='v73',sourceArchitectHandoffArtifact='34_Fresnaye_SourceArchitect_handoff_v73.json',sourceArchitectHandoffPublicPath='source-state/34_Fresnaye_SourceArchitect_handoff_v73.json',sourceArchitectHandoffSha256=h('source-state/34_Fresnaye_SourceArchitect_handoff_v73.json'),sourceArchitectChiefOfStaffStatus='LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L03_THIRD_NEW_SKYLIGHT_SYMBOL_SOURCE_CLOSED_AT_600X1955__ALL_THREE_AUDITED_NEW_SKYLIGHT_SYMBOL_ENVELOPES_NOW_DIMENSIONED__ROOF_INTERFACE_REMAINS_LOCKED__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT',level02Effect='NONE__LATER_LEVEL_SOURCE_PREPARATION_ONLY',geometryAuthorization=False,newerSourceSyncChangesCandidateGeometry=False,browserQaCompatibilitySource='v73',browserQaReuseReason='v73 has Level 02 effect NONE and geometry authorization false; canonical v23 and exact v96 viewer bytes are unchanged. Portable r2 has fresh wrapper/control/cache/offline QA.')
+          g.update(publicPath='engineering/incremental-geometry-pipeline-v2-v73.json',sha256=h('engineering/incremental-geometry-pipeline-v2-v73.json'),planner='34_Fresnaye_GeometryDeltaPlanner_v5',plannerPublicPath='engineering/geometry-delta-planner-v5.py',plannerSha256=h('engineering/geometry-delta-planner-v5.py'),plannerQaPublicPath='engineering/geometry-delta-planner-qa-v9.json',plannerQaSha256=h('engineering/geometry-delta-planner-qa-v9.json'),currentDeltaPlanPublicPath='engineering/geometry-delta-plan-source-v73-v1.json',currentDeltaPlanSha256=h('engineering/geometry-delta-plan-source-v73-v1.json'),currentDecision='NO_OP_SHORT_CIRCUIT',fullModelRegenerationRequired=False,geometryBuildRequired=False,fullBrowserRegressionRequired=False)
+          m['updatedUtc']=datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+          (p/'walkthrough-review.json').write_text(json.dumps(m,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v96/portable-qa-v4.json walkthrough-review.json
+          git commit -m 'Publish portable r2 QA v4 and Source v73 stable manifest'
+          git push origin HEAD:gh-pages
+      - name: Wait for stable manifest publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for i in $(seq 1 60); do
+            m=$(curl -fsSL "$BASE/walkthrough-review.json?qa=stable-${GITHUB_RUN_ID}-${i}" 2>/dev/null || true)
+            q=$(curl -fsSL "$BASE/v96/portable-qa-v4.json?qa=stable-${GITHUB_RUN_ID}-${i}" 2>/dev/null || true)
+            if grep -q '"latestSourceArchitectObserved": "v73"' <<<"$m" && grep -q 'portable-qa-v4.json' <<<"$m" && grep -q 'PortableFastStart_PublicBrowserQA_v4' <<<"$q"; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - name: Run and publish stable gate live QA
+        shell: bash
+        run: |
+          node engineering/v96-portable-r2-liveqa.cjs stable
+          git add stable-v73-portable-r2-qa.json
+          git commit -m 'Record Source v73 portable r2 stable live QA'
+          git push origin HEAD:gh-pages
