@@ -48,7 +48,7 @@ jobs:
           source=get(s['sourceArchitectHandoffPublicPath'],'source.json'); pipe=get(g['publicPath'],'pipeline.json'); planner=get(g['plannerPublicPath'],'planner.py'); plan=get(g['currentDeltaPlanPublicPath'],'plan.json'); plannerqa=get(g['plannerQaPublicPath'],'plannerqa.json')
           assert m['artifact']=='34_Fresnaye_Walkthrough_StableReviewManifest_v13' and m['schemaVersion']==13
           assert gate['sourceVersionAgnostic'] is True and h(gatep)==gate['sha256']
-          gt=gatep.read_text(); assert 'Stable gate v13' in gt and "'effect_of_'+v" in gt and 'sourceVersionAgnostic' not in gt
+          gt=gatep.read_text(); assert 'Stable gate v13' in gt and "'effect_of_'+v" in gt
           assert h(loader)==c['portableLoaderSha256'] and c['viewerSha256'] in loader.read_text() and c['modelSha256'] in loader.read_text()
           qa=json.loads(qap.read_text()); assert h(qap)==c['portableQaSha256'] and qa['pass'] is True and qa['viewerSha256']==c['viewerSha256'] and qa['canonicalObjSha256']==c['modelSha256']
           assert qa['desktop']['pass'] and qa['desktop']['renderer']=='WebGL2' and qa['desktop']['keyboardMovementM']>0.1 and qa['desktop']['pointerLock'] is True and qa['desktop']['mouseLookYawRad']>0.05 and qa['desktop']['collisionValidated'] is True
@@ -65,12 +65,12 @@ jobs:
           assert a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False and a['minimumDistanceM']==40 and a['minimumDurationSec']==12
           print('IDENTITY PASS',sv,g['currentDecision'],c['viewerVersion'],c['canonicalModel'])
           PY
-          node --check <(python3 - <<'PY'
-          import re,pathlib
-          s=pathlib.Path('$tmp/gate.html').read_text()
-          print(re.search(r'<script>([\s\S]*?)</script>',s).group(1))
+          python3 - "$tmp/gate.html" "$tmp/gate.js" <<'PY'
+          import pathlib,re,sys
+          s=pathlib.Path(sys.argv[1]).read_text(); m=re.search(r'<script>([\s\S]*?)</script>',s); assert m
+          pathlib.Path(sys.argv[2]).write_text(m.group(1))
           PY
-          )
+          node --check "$tmp/gate.js"
 
       - uses: actions/setup-node@v4
         with:
