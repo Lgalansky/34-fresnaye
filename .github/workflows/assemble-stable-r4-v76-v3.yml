@@ -1,0 +1,28 @@
+name: Assemble stable r4 Source v76 QA v3
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/assemble-stable-r4-v76-v3.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Assemble exact workflow
+        run: |
+          set -euo pipefail
+          cat .github/qa/stable-r4-v76-liveqa-v3.b64.part* | base64 -d > .github/workflows/stable-r4-v76-liveqa-v3.yml
+          echo 'fd558ffa09c6f0824e29120070f60af5947d8ad544531b368a8cf34d1aba5990  .github/workflows/stable-r4-v76-liveqa-v3.yml' | sha256sum -c -
+      - name: Publish workflow
+        run: |
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add .github/workflows/stable-r4-v76-liveqa-v3.yml
+          git commit -m 'Add isolated portable r4 Source v76 live QA v3'
+          git push origin HEAD:main
