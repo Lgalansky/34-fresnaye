@@ -1,0 +1,49 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR6_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T18:16:44.489Z",
+  "geometryChanged": false,
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "loaderRevision": "r6",
+  "serviceWorkerRevision": "r5",
+  "warmCache": {
+    "pass": true,
+    "directPayloadRequests": 0,
+    "mode": "verified-cache-direct-v2",
+    "transportLoadMs": 205,
+    "speculativePayloadPreload": false
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.354,
+    "pointerLock": true,
+    "mouseLookYawRad": 1.455,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.467,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v7-forced",
+    "transportLoadMs": 79,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "offline": {
+    "pass": true,
+    "mode": "verified-cache-direct-v2",
+    "collisionValidated": true
+  },
+  "pass": true
+}
