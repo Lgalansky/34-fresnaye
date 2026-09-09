@@ -1,0 +1,11 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v15",
+  "timestampUtc": "2026-09-09T14:49:28.873Z",
+  "sourceArchitect": "v74",
+  "geometryChanged": false,
+  "desktop": {},
+  "mobile": {},
+  "review": {},
+  "pass": false,
+  "error": "page.waitForFunction: Timeout 90000ms exceeded.\n    at /home/runner/work/34-fresnaye/34-fresnaye/stable-v15.cjs:15:16"
+}
