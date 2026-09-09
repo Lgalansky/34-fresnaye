@@ -1,0 +1,70 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR4_SourceV77_LiveBrowserQA_v5",
+  "date": "2026-09-09",
+  "geometryChanged": false,
+  "sourceArchitect": "v77",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "viewerBytes": 253348,
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "review": {
+    "selfTests": 60,
+    "total": 60,
+    "mainRoute": {
+      "collisionValidated": true,
+      "sequence": ["Entrance", "Living", "Kitchen", "Main Bedroom", "Entrance"],
+      "legs": [
+        {"from":"Entrance","to":"Living","lengthM":9.5,"waypoints":39,"ok":true},
+        {"from":"Living","to":"Kitchen","lengthM":11.75,"waypoints":48,"ok":true},
+        {"from":"Kitchen","to":"Main Bedroom","lengthM":22.5,"waypoints":91,"ok":true},
+        {"from":"Main Bedroom","to":"Entrance","lengthM":13.0,"waypoints":53,"ok":true}
+      ]
+    }
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.325,
+    "pointerLock": true,
+    "mouseLookYawRad": 1.455,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.502,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "transport": {
+    "cacheTrustPass": true,
+    "verifiedCacheMode": "verified-cache-direct-v2",
+    "wrongMarkerRecoveryPass": true,
+    "corruptCachedBytesRecoveryPass": true,
+    "forcedFallback": {"pass":true,"mode":"parallel-fallback-v6-forced","cancelledLoser":"direct"},
+    "hedgedFallback": {"pass":true,"mode":"parallel-fallback-v6-hedged","cancelledLoser":"direct"},
+    "offline": {"pass":true,"queryStringShell":true,"mode":"verified-cache-direct-v2","collisionValidated":true,"pageErrors":[]}
+  },
+  "github": {
+    "repository": "Lgalansky/34-fresnaye",
+    "mainCommit": "74371f31d37824be0ab127f92d2d619b62de7ddc",
+    "qaRunId": 34379665044,
+    "qaJobId": 102561100741,
+    "qaConclusion": "success",
+    "diagnosticGhPagesCommit": "68182da000e0a0aa18374a425e41d1fe49b8021a",
+    "pagesDeploymentRunId": 34379787030,
+    "pagesDeploymentConclusion": "success"
+  },
+  "reviewLinks": {
+    "preferredFastStart": "https://lgalansky.github.io/34-fresnaye/v96/",
+    "stableReview": "https://lgalansky.github.io/34-fresnaye/walkthrough-review.html",
+    "exactCandidate": "https://lgalansky.github.io/34-fresnaye/walkthrough-v96.html"
+  },
+  "pass": true,
+  "acceptance": "AUTOMATED_PUBLIC_BROWSER_QA_PASS__FINAL_HUMAN_ACCEPTANCE_OPEN"
+}
