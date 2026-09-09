@@ -1,0 +1,21 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v1",
+  "geometryChanged": false,
+  "checks": [
+    {
+      "name": "python_syntax",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "v65_noop_short_circuit",
+      "pass": true
+    },
+    {
+      "name": "missing_changed_ids_fail_closed",
+      "pass": true,
+      "detail": "BLOCKED: source affects/authorizes Level 02 but explicit changed_element_ids are absent; fail closed"
+    }
+  ],
+  "pass": true
+}
