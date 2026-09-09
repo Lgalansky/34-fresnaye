@@ -1,0 +1,61 @@
+name: v96 reliable loader public browser QA v5
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v96-reliable-loader-qa-v5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Verify public canary bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v96-reliable.html'
+          EXPECT='629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49'
+          ok=0
+          for i in $(seq 1 60); do
+            curl -fsSL --connect-timeout 10 --max-time 30 "$URL?qa=$GITHUB_RUN_ID-$i" -o /tmp/loader.html 2>/dev/null || true
+            got=$(sha256sum /tmp/loader.html 2>/dev/null | awk '{print $1}' || true)
+            if [ "$got" = "$EXPECT" ]; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run focused loader QA
+        shell: bash
+        run: |
+          node --check engineering/v96-reliable-qa-v5.cjs
+          node engineering/v96-reliable-qa-v5.cjs
+      - name: Persist QA evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          test -f v96-reliable-loader-qa-v5.json || echo '{"pass":false,"error":"QA output missing"}' > v96-reliable-loader-qa-v5.json
+          git add v96-reliable-loader-qa-v5.json
+          git commit -m 'Record v96 reliable loader public QA v5' || true
+          git push origin HEAD:gh-pages
+      - name: Enforce QA pass
+        shell: bash
+        run: node -e "const q=require('./v96-reliable-loader-qa-v5.json'); if(!q.pass){console.error(q.error||q); process.exit(1)}"
