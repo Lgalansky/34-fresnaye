@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   qa:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
       - name: Wait for public r5 loader and service worker
         run: |
           set -euo pipefail
@@ -48,7 +48,12 @@ jobs:
           PY
           node --check /tmp/loader.js
       - name: Install Playwright Chromium
-        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+        run: |
+          mkdir -p /tmp/pw
+          cd /tmp/pw
+          npm init -y
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
       - name: Verify r5 desktop mobile navigation-preload and offline behavior
         run: |
           cat > /tmp/qa.cjs <<'JS'
@@ -147,12 +152,14 @@ jobs:
             if(!out.pass)process.exit(1);
           })();
           JS
-          node --check /tmp/qa.cjs
-          node /tmp/qa.cjs
+          NODE_PATH=/tmp/pw/node_modules node --check /tmp/qa.cjs
+          NODE_PATH=/tmp/pw/node_modules node /tmp/qa.cjs
       - name: Persist r5 QA evidence to gh-pages
         if: always()
         run: |
-          test -s /tmp/portable-r5-qa-v1.json
+          if [ ! -s /tmp/portable-r5-qa-v1.json ]; then
+            printf '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR5_PublicBrowserQA_v1","pass":false,"error":"QA process produced no diagnostic JSON"}\n' > /tmp/portable-r5-qa-v1.json
+          fi
           git fetch origin gh-pages
           git worktree add /tmp/pages origin/gh-pages
           cp /tmp/portable-r5-qa-v1.json /tmp/pages/v96/portable-r5-qa-v1.json
