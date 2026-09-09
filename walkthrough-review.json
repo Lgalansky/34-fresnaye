@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v18",
-  "schemaVersion": 18,
-  "updatedUtc": "2026-09-09T18:18:30Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v19",
+  "schemaVersion": 19,
+  "updatedUtc": "2026-09-09T18:34:00Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -21,7 +21,17 @@
     "portableServiceWorkerSha256": "d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e",
     "portableQaEvidence": "v96/portable-r6-qa-v1.json",
     "portableQaSha256": "889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f",
-    "preferredReviewUrl": "v96/",
+    "startResetQaEvidence": "v96/start-reset-qa-v1.json",
+    "startResetQaSha256": "9bec39e1468f1b29ff5b6c33659c67e3de22c24696183b98d9b2aaa07e02a077",
+    "preferredReviewUrl": "v96/#entrance",
+    "startLinks": {
+      "entrance": "v96/#entrance",
+      "living": "v96/#living",
+      "kitchen": "v96/#kitchen",
+      "bedroom": "v96/#bedroom",
+      "second": "v96/#second",
+      "service": "v96/#service"
+    },
     "exactCandidateUrl": "walkthrough-v96.html",
     "automatedPublicCandidateReviewReady": true,
     "directViewerAsset": "34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html"
@@ -57,8 +67,8 @@
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "revision": "v16",
-    "sha256": "083a197306344eace4aa2d554365a0a83555b49bf7def5c94240753da75877ad"
+    "revision": "v17",
+    "sha256": "18713fc54611bd825c8cc536dce713ab651894c06fa6003eb7ddc3a09e3d2c24"
   },
   "acceptance": {
     "finalStatus": "OPEN",
