@@ -1,4 +1,4 @@
-name: Assemble stable r4 Source v76 QA v3
+name: Run isolated stable r4 Source v76 QA v3
 on:
   push:
     branches: [main]
@@ -7,22 +7,48 @@ on:
 permissions:
   contents: write
 jobs:
-  assemble:
+  qa:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-      - name: Assemble exact workflow
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Reconstruct exact QA source and verify public Source v76
         run: |
           set -euo pipefail
-          cat .github/qa/stable-r4-v76-liveqa-v3.b64.part* | base64 -d > .github/workflows/stable-r4-v76-liveqa-v3.yml
-          echo 'fd558ffa09c6f0824e29120070f60af5947d8ad544531b368a8cf34d1aba5990  .github/workflows/stable-r4-v76-liveqa-v3.yml' | sha256sum -c -
-      - name: Publish workflow
+          cat .github/qa/stable-r4-v76-liveqa-v3.b64.part* | base64 -d > /tmp/stable-v3.yml
+          echo 'fd558ffa09c6f0824e29120070f60af5947d8ad544531b368a8cf34d1aba5990  /tmp/stable-v3.yml' | sha256sum -c -
+          curl -fsSL 'https://lgalansky.github.io/34-fresnaye/source-state/34_Fresnaye_SourceArchitect_handoff_v76.json?isolated=1' -o /tmp/source-v76.json
+          echo 'e4f58eb243a12f669f1f07278833f172b0b98b8d4c97785e12f2a831be2571b2  /tmp/source-v76.json' | sha256sum -c -
+          python3 - <<'PY'
+          import re,textwrap
+          t=open('/tmp/stable-v3.yml').read()
+          m=re.search(r"cat > qa\.cjs <<'JS'\n(.*?)\n\s+JS\n\s+node qa\.cjs",t,re.S)
+          assert m, 'qa.cjs block not found'
+          open('/tmp/qa.cjs','w').write(textwrap.dedent(m.group(1))+'\n')
+          PY
+          node --check /tmp/qa.cjs
+      - name: Install Chromium
+        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Run isolated public browser QA and persist result
         run: |
+          set +e
+          mkdir -p v96
+          node /tmp/qa.cjs
+          status=$?
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          mkdir -p /tmp/pages/v96
+          cp v96/portable-qa-v5.json /tmp/pages/v96/portable-qa-v5-diagnostic.json
+          cd /tmp/pages
           git config user.name 'Larry Galansky'
           git config user.email 'larry@bounceinteractive.co.uk'
-          git add .github/workflows/stable-r4-v76-liveqa-v3.yml
-          git commit -m 'Add isolated portable r4 Source v76 live QA v3'
-          git push origin HEAD:main
+          git add v96/portable-qa-v5-diagnostic.json
+          git commit -m 'Persist isolated portable r4 Source v76 QA diagnostic' || true
+          git push origin HEAD:gh-pages
+          exit $status
