@@ -1,6 +1,7 @@
 name: Walkthrough v96 portable r8 offline-guard QA v1
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/walkthrough-v96-portable-r8-offlineguard-qa-v1.yml'
