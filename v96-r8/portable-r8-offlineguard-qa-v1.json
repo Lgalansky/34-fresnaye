@@ -1,0 +1,47 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR8_OfflineColdStartGuard_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T20:35:16.551Z",
+  "geometryChanged": false,
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "loaderRevision": "r8",
+  "serviceWorkerRevision": "r5",
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v8",
+    "keyboardMovementM": 0.354,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v8",
+    "joystickMovementM": 0.748,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "resetStart": "living",
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "offlineColdStart": {
+    "pass": true,
+    "mode": "offline-cold-start-guard-r8",
+    "recoverable": true,
+    "viewerPayloadRequests": 0,
+    "navigatorOnline": false,
+    "pageErrors": []
+  },
+  "offlineWarm": {
+    "pass": true,
+    "mode": "verified-cache-direct-v2",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "collisionValidated": true
+  },
+  "pass": true
+}
