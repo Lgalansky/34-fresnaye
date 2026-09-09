@@ -1,0 +1,87 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableSource80_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T20:34:05.060Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v80",
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v80",
+    "decision": "NO_OP_SHORT_CIRCUIT",
+    "loaderOk": true,
+    "sourceOk": true,
+    "pipeOk": true,
+    "pageErrors": []
+  },
+  "starts": [
+    {
+      "key": "entrance",
+      "coords": "entrance · x 7.90 m · y 17.10 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "renderer": "WebGL2",
+      "loaderMode": "direct-v8",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "living",
+      "coords": "living · x 3.60 m · y 13.00 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "kitchen",
+      "coords": "kitchen · x 8.00 m · y 8.20 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "bedroom",
+      "coords": "bedroom · x 3.50 m · y 26.70 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "second",
+      "coords": "second · x -15.40 m · y 5.20 m · floor 0.61 m · eye 2.26 m · collision · WebGL2 · review 1/6",
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "service",
+      "coords": "service · x -5.08 m · y 2.11 m · floor -0.76 m · eye 0.89 m · collision · WebGL2 · review 1/6",
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    }
+  ],
+  "desktop": {
+    "pass": true,
+    "keyboardMovementM": 0.863,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "joystickMovementM": 0.609,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
