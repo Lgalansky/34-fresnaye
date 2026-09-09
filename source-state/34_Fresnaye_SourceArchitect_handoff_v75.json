@@ -1,0 +1,50 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v75",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T17:43:06+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "remaining_material_lock": "Exact curve/step construction for the circular toilet-cubicle bulkhead and any other curved/unwitnessed ceiling transition lacking its own written radius/diameter/centre/tangent/chord/arc-length or equivalent complete construction witness.",
+    "effect_of_v75": "NONE"
+  },
+  "v75_material_advance": {
+    "level": "L01",
+    "subject": "L01_W06 brickwork vertical opening ownership and rough-width false-candidate exclusion",
+    "finding": "FRE_WD_205 native text extraction shows U/S OPENING / 2125 / TO FINISH / SILL H/1125 as one text block immediately adjacent to L01_W06. This source-closes brickwork sill1125 and U/S2125. Native dimension-line ownership excludes local340 as only a partial W06-local span and local580 as orthogonal to the W06 joinery run. FRE_WD_401 scheduled600 remains component-only.",
+    "impact": "W06 vertical brickwork references are now closed and the +25mm schedule/brickwork vertical-reference offset is defined at both sill and head. W06 masonry rough width remains genuinely open; no false local or schedule width is promoted."
+  },
+  "unresolved_ambiguities": [
+    "Level02 circular toilet-cubicle bulkhead and other curved/unwitnessed ceiling transitions: exact curve/step construction.",
+    "Level01 complex ceiling fields: complete curved/stepped/nested boundary topology remains incomplete despite explicit straight witnesses.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 D11 brickwork tag drift and masonry rough width.",
+    "Level01 W06 masonry rough width; local340/580 excluded and schedule600 cannot substitute.",
+    "Level01 W08 brickwork U/S opening/head.",
+    "Level01 W04/W05 and W06 25mm vertical interface allocations remain unspecified; W06 now has explicit +25 at both sill and head references.",
+    "Level03 D02 duplicate schedule-system ownership; D04 schedule omission; iD02 brickwork-head2100 versus scheduled panel/leaf2150.",
+    "Level03 skylight IDs/curb/upstand/structural rough-opening/frame-flashing interfaces.",
+    "Level03 S01/S02 masonry heads; L03_S03 overall grille width/height.",
+    "Level04 main Mazista roof numeric pitch/eaves/ridge extents; 370mm parapet-adjacent endpoint ownership exception."
+  ],
+  "source_watch": "Fresh Outlook query found no Archilab message received on 2026-09-09; latest known remains 2026-09-08T13:49:17Z.",
+  "chief_of_staff_action": "Adopt v75 as additive later-Level01 source preparation. Consume W06 brickwork sill1125 and U/S2125 as explicit vertical references; keep W06 rough width locked and preserve the unassigned +25mm vertical interface. Level02 priority closure and canonical 3D geometry remain unchanged.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level01_W06_VerticalOwnershipAndRoughWidthExclusionAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level01_W06_VerticalOwnershipAndRoughWidthExclusionEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level01_WindowBrickworkOpeningEvidenceRegister_v3.json",
+    "34_Fresnaye_SourceArchitect_Level01_WindowRemainingExceptions_v3.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v58.json",
+    "34_Fresnaye_SourceArchitect_Run75_ArtifactManifest_v1.json"
+  ]
+}
