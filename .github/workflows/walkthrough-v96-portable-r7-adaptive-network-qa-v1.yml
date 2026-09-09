@@ -1,4 +1,4 @@
-name: Walkthrough v96 portable r7 adaptive-network public QA v1
+name: Walkthrough v96 portable r7 adaptive-network public QA v2
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           git config user.name 'Larry Galansky'
           git config user.email 'larry@bounceinteractive.co.uk'
           git add v96-r7
-          git commit -m 'Stage v96 portable r7 adaptive-network candidate' || true
+          git commit -m 'Refresh v96 portable r7 adaptive-network candidate' || true
           git push origin HEAD:gh-pages
       - name: Verify staged public bytes
         run: |
@@ -61,18 +61,18 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run public adaptive-network browser QA
         run: |
-          NODE_PATH=/tmp/pw/node_modules node --check engineering/walkthrough-v96-portable-r7-publicqa-v1.cjs
-          NODE_PATH=/tmp/pw/node_modules node engineering/walkthrough-v96-portable-r7-publicqa-v1.cjs
+          NODE_PATH=/tmp/pw/node_modules node --check engineering/walkthrough-v96-portable-r7-publicqa-v2.cjs
+          NODE_PATH=/tmp/pw/node_modules node engineering/walkthrough-v96-portable-r7-publicqa-v2.cjs
       - name: Persist QA evidence
         if: always()
         run: |
           set -euo pipefail
-          if [ ! -s /tmp/portable-r7-qa-v1.json ]; then
-            printf '%s\n' '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_PublicBrowserQA_v1","pass":false,"error":"QA process produced no diagnostic JSON"}' > /tmp/portable-r7-qa-v1.json
+          if [ ! -s /tmp/portable-r7-qa-v2.json ]; then
+            printf '%s\n' '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_PublicBrowserQA_v2","pass":false,"error":"QA process produced no diagnostic JSON"}' > /tmp/portable-r7-qa-v2.json
           fi
           cd /tmp/pages
           git pull --rebase origin gh-pages
-          cp /tmp/portable-r7-qa-v1.json v96-r7/portable-r7-qa-v1.json
-          git add v96-r7/portable-r7-qa-v1.json
-          git commit -m 'Persist v96 portable r7 adaptive-network public QA v1' || true
+          cp /tmp/portable-r7-qa-v2.json v96-r7/portable-r7-qa-v2.json
+          git add v96-r7/portable-r7-qa-v2.json
+          git commit -m 'Persist v96 portable r7 adaptive-network public QA v2' || true
           git push origin HEAD:gh-pages
