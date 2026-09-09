@@ -1,0 +1,38 @@
+name: Stable v7 diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/stable-v7-diagnostic.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Probe stable v7 files
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib,re,urllib.request
+          base='https://lgalansky.github.io/34-fresnaye/'
+          def get(path): return urllib.request.urlopen(base+path+'?diag=1',timeout=30).read()
+          out={'artifact':'34_Fresnaye_Walkthrough_StableV7_Diagnostic_v1'}
+          try:
+            m=json.loads(get('walkthrough-review.json')); s=m['sourceState']; gp=m['geometryPipeline']; c=m['reviewCandidate']
+            sb=get(s['sourceArchitectHandoffPublicPath']); pb=get(gp['publicPath']); sh=json.loads(sb); pj=json.loads(pb); dp=json.loads(get(gp['currentDeltaPlanPublicPath'])); pqa=json.loads(get(gp['plannerQaPublicPath']))
+            observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); current=(sh.get('level02_priority_state') or {}).get(f'effect_of_v{digits}'); legacy=(sh.get(f'run{digits}_new_progress') or {}).get('Level02_effect'); effect=str(current if current is not None else legacy).strip().rstrip('.').upper()
+            out.update(manifest=m['artifact'],sourceHash=hashlib.sha256(sb).hexdigest(),sourceExpected=s['sourceArchitectHandoffSha256'],pipelineHash=hashlib.sha256(pb).hexdigest(),pipelineExpected=gp['sha256'],effect=effect,sourceArtifact=sh.get('artifact'),sourceGeometryChanged=sh.get('canonical_geometry_changed'),sourceAuthorization=sh.get('geometry_authorization'),pipelineSource=(pj.get('sourceObserved') or {}).get('sourceArchitect'),pipelineLevel02=(pj.get('canonical') or {}).get('level02'),plannerQaPass=pqa.get('pass'),planSource=dp.get('sourceArchitect'),planSourceHash=dp.get('sourceHandoffSha256'),planPipelineHash=dp.get('pipelineSha256'),planDecision=dp.get('decision'),candidate=c['viewerVersion'])
+            out['pass']=out['sourceHash']==out['sourceExpected'] and out['pipelineHash']==out['pipelineExpected'] and effect=='NONE' and sh.get('geometry_authorization') is False and pj['sourceObserved']['sourceArchitect']==observed and pqa.get('pass') is True and dp.get('sourceHandoffSha256')==out['sourceHash'] and dp.get('pipelineSha256')==out['pipelineHash']
+          except Exception as e: out['pass']=False; out['error']=repr(e)
+          pathlib.Path('stable-v7-diagnostic.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,indent=2))
+          PY
+      - name: Persist diagnostic
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v7-diagnostic.json; git commit -m 'Record stable v7 diagnostic' || exit 0; git push origin HEAD:gh-pages
