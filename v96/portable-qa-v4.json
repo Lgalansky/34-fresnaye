@@ -1,0 +1,113 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableFastStart_PublicBrowserQA_v4",
+  "timestampUtc": "2026-09-09T13:15:36.324Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/v96/",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "loaderSha256": "75ff9feb8e6c8e02cfcef37246bfece9523727c8315224a316928004557ef813",
+  "serviceWorkerSha256": "9139359dcbb484d6a3a37f433f51f6977f2944bf74ec5a59fd1b46b43f6ece0f",
+  "cacheName": "fresnaye-v96-portable-r2",
+  "sourceCompatibility": "source-version-agnostic",
+  "geometryChanged": false,
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "initialTransportMode": "direct-v4",
+    "keyboardMovementM": 0.467,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.3,
+    "reset": true,
+    "livingStart": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.537,
+    "touchLookYawRad": 0.35,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "cache": {
+    "pass": true,
+    "mode": "cache-direct-v1",
+    "transportLoadMs": 29,
+    "cacheName": "fresnaye-v96-portable-r2"
+  },
+  "offline": {
+    "pass": true,
+    "mode": "cache-direct-v1",
+    "renderer": "WebGL2",
+    "collisionValidated": true
+  },
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v4-forced",
+    "transportLoadMs": 87,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "review": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "selfTests": 60,
+    "total": 60,
+    "mainRoute": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    }
+  },
+  "pass": true
+}
