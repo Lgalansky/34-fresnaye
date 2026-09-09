@@ -14,7 +14,7 @@ jobs:
   liveqa:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify public stable review gate and candidate identities
+      - name: Verify public stable review gate, transport and candidate identities
         shell: bash
         run: |
           set -euo pipefail
@@ -25,13 +25,24 @@ jobs:
           grep -q 'Stable review gate' "$tmp/review.html"
           grep -q 'walkthrough-review.json' "$tmp/review.html"
           python3 - "$tmp" "$base" <<'PY'
-          import json, pathlib, re, subprocess, sys
+          import base64, gzip, hashlib, json, pathlib, re, subprocess, sys
           p=pathlib.Path(sys.argv[1]); base=sys.argv[2]
           m=json.loads((p/'review.json').read_text())
           c=m['reviewCandidate']; s=m['sourceState']; a=m['acceptance']
-          subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','10','--retry-all-errors',f"{base}/{c['readySentinel']}?qa=ready",'-o',str(p/'ready.json')],check=True)
-          subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','10','--retry-all-errors',f"{base}/{c['publicBrowserQaEvidence']}?qa=browser",'-o',str(p/'publicqa.json')],check=True)
-          r=json.loads((p/'ready.json').read_text()); q=json.loads((p/'publicqa.json').read_text())
+
+          def get(path, out):
+              subprocess.run([
+                  'curl','-fsSL','--retry','12','--retry-delay','10','--retry-all-errors',
+                  f"{base}/{path}?qa=live",'-o',str(out)
+              ], check=True)
+
+          get(c['readySentinel'], p/'ready.json')
+          get(c['publicBrowserQaEvidence'], p/'publicqa.json')
+          get(c['loader'], p/'loader.html')
+          r=json.loads((p/'ready.json').read_text())
+          q=json.loads((p/'publicqa.json').read_text())
+          loader=(p/'loader.html').read_text()
+
           assert s['geometryAuthorization'] is False
           assert s['level02Effect']=='NONE'
           assert s['newerSourceSyncChangesCandidateGeometry'] is False
@@ -40,12 +51,39 @@ jobs:
           assert re.fullmatch(r'[0-9a-f]{64}', s['sourceArchitectHandoffSha256'])
           assert c['geometryChanged'] is False
           assert c['automatedPublicCandidateReviewReady'] is True
+
           assert r['stageComplete'] is True and r['geometryChanged'] is False
+          assert r['viewerVersion']==c['viewerVersion']
           assert r['viewerSha256']==c['viewerSha256']=='63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249'
           assert r['viewerBytes']==c['viewerBytes']==250254
           assert r['modelSha256']==c['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
           assert r['glbSha256']==c['glbSha256']=='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49'
           assert r['vertices']==c['vertices']==5769 and r['triangles']==c['triangles']==8907
+
+          # Verify the currently published loader declares the exact candidate/model identity
+          # and the same transport part list as the ready sentinel.
+          assert 'content="'+c['viewerSha256']+'"' in loader
+          assert 'content="'+c['modelSha256']+'"' in loader
+          assert 'DecompressionStream(\'gzip\')' in loader or 'DecompressionStream("gzip")' in loader
+          parts=r['transportParts']
+          assert len(parts)==12
+          assert all(part in loader for part in parts)
+
+          # Fetch every public transport fragment and reconstruct the exact viewer bytes.
+          encoded=[]
+          for i, part in enumerate(parts, 1):
+              out=p/f'part{i:02d}.b64'
+              get(part, out)
+              encoded.append(out.read_text().strip())
+          joined=''.join(encoded)
+          assert len(joined)==r['transportBase64Chars']==160416
+          gz=base64.b64decode(joined, validate=True)
+          assert len(gz)==r['transportGzipBytes']==120312
+          raw=gzip.decompress(gz)
+          assert len(raw)==c['viewerBytes']
+          reconstructed_sha=hashlib.sha256(raw).hexdigest()
+          assert reconstructed_sha==c['viewerSha256']
+
           assert q['pass'] is True and q['geometryChanged'] is False
           assert q['viewerSha256']==c['viewerSha256']
           assert q['canonicalObjSha256']==c['modelSha256']
@@ -56,12 +94,18 @@ jobs:
           assert a['finalStatus']=='OPEN'
           assert a['humanContinuousWalkRequired'] is True
           assert a['productionRootPromoted'] is False
+
           print(json.dumps({
             'pass': True,
             'stableReviewUrl': f'{base}/walkthrough-review.html',
             'versionedReviewUrl': f"{base}/{c['loader']}",
             'viewerVersion': c['viewerVersion'],
             'viewerSha256': c['viewerSha256'],
+            'viewerBytes': c['viewerBytes'],
+            'transportPartsVerified': len(parts),
+            'transportGzipBytes': len(gz),
+            'transportBase64Chars': len(joined),
+            'transportReconstructedSha256': reconstructed_sha,
             'canonicalModel': c['canonicalModel'],
             'modelSha256': c['modelSha256'],
             'sourceArchitectObserved': s['latestSourceArchitectObserved'],
