@@ -1,0 +1,16 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableV69GateDiagnostic_v1",
+  "manifestArtifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v9",
+  "sourceExpected": "3f8c8511847a74abd4310595a9e5654dd03af4829b70a128827f336bf3910dda",
+  "sourceActual": "cf9008382b4f1f377661785b66e4c3a136dc80895e9177940ed0a68f265ec3c5",
+  "sourceHashPass": false,
+  "pipelineExpected": "aa7539dffbdc76e76aeacff576b7ad8235e55bb65ec4f818d933d3525d81bf98",
+  "pipelineActual": "aa7539dffbdc76e76aeacff576b7ad8235e55bb65ec4f818d933d3525d81bf98",
+  "pipelineHashPass": true,
+  "sourceArtifactPass": true,
+  "sourceNoGeometryPass": true,
+  "pipelineSourcePass": true,
+  "deltaPlanPass": false,
+  "plannerQaPass": true,
+  "pass": false
+}
