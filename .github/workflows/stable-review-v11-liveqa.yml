@@ -1,0 +1,98 @@
+name: Stable review v11 live QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stable-review-v11-liveqa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BASE: https://lgalansky.github.io/34-fresnaye
+      LOADERHASH: 629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49
+      VHASH: 1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded
+      OBJHASH: c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5
+      GLBHASH: 7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Wait for stable v11 publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for i in $(seq 1 60); do
+            curl -fsSL --connect-timeout 10 --max-time 30 "$BASE/walkthrough-review.json?qa=$GITHUB_RUN_ID-$i" -o /tmp/m.json 2>/dev/null || true
+            curl -fsSL --connect-timeout 10 --max-time 30 "$BASE/walkthrough-review.html?qa=$GITHUB_RUN_ID-$i" -o /tmp/g.html 2>/dev/null || true
+            if grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v11' /tmp/m.json 2>/dev/null && grep -q 'live loader hash verified' /tmp/g.html 2>/dev/null; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - name: Verify live loader, source, model and resilient QA evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          get(){ curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/$1?qa=$GITHUB_RUN_ID" -o "$tmp/$2"; }
+          get walkthrough-review.json manifest.json
+          get walkthrough-v96.html loader.html
+          get walkthrough-v96-ready.json ready.json
+          get v96-reliable-loader-qa-v5.json loaderqa.json
+          get v96-direct-primary-qa-v3.json mouseqa.json
+          get v96-public-browser-qa-v2.json browserqa.json
+          get walkthrough-v96.sw.js sw.js
+          get source-state/34_Fresnaye_SourceArchitect_handoff_v70.json source.json
+          get engineering/incremental-geometry-pipeline-v2-v70.json pipeline.json
+          get engineering/geometry-delta-plan-source-v70-v1.json plan.json
+          get engineering/geometry-delta-planner-qa-v6.json plannerqa.json
+          node --check "$tmp/sw.js"
+          python3 - "$tmp" <<'PY'
+          import hashlib,json,pathlib,sys
+          p=pathlib.Path(sys.argv[1]); m=json.loads((p/'manifest.json').read_text()); c=m['reviewCandidate']; s=m['sourceState']; gp=m['geometryPipeline']; r=json.loads((p/'ready.json').read_text()); lq=json.loads((p/'loaderqa.json').read_text()); mq=json.loads((p/'mouseqa.json').read_text()); q=json.loads((p/'browserqa.json').read_text()); sh=json.loads((p/'source.json').read_text()); pj=json.loads((p/'pipeline.json').read_text()); dp=json.loads((p/'plan.json').read_text()); pq=json.loads((p/'plannerqa.json').read_text()); loader=(p/'loader.html').read_bytes(); sw=(p/'sw.js').read_text()
+          assert m['artifact']=='34_Fresnaye_Walkthrough_StableReviewManifest_v11'
+          assert hashlib.sha256(loader).hexdigest()==c['loaderSha256']=='629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49'
+          assert b'direct-v3-timeboxed-parallel-fallback' in loader and c['viewerSha256'].encode() in loader and c['modelSha256'].encode() in loader
+          assert c['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded' and c['viewerBytes']==253348 and c['canonicalModel']=='v23' and c['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' and c['glbSha256']=='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49' and c['vertices']==5769 and c['triangles']==8907 and c['geometryChanged'] is False
+          assert r['stageComplete'] is True and r['viewerSha256']==c['viewerSha256'] and r['modelSha256']==c['modelSha256'] and r['glbSha256']==c['glbSha256']
+          assert lq['pass'] is True and lq['loaderSha256']==c['loaderSha256'] and lq['viewerSha256']==c['viewerSha256'] and lq['canonicalObjSha256']==c['modelSha256'] and lq['direct']['pass'] is True and lq['direct']['mode']=='direct-v3' and lq['desktop']['pass'] is True and lq['desktop']['renderer']=='WebGL2' and lq['mobile']['pass'] is True and lq['mobile']['renderer']=='WebGL2' and lq['mobile']['touchLookYawRad']>0.05 and lq['forcedFallback']['pass'] is True and lq['forcedFallback']['mode']=='parallel-fallback-v3' and lq['forcedFallback']['retryVerified'] is True and lq['forcedFallback']['viewerHashVerified'] is True and lq['review']['selfTests']==60 and lq['review']['mainRoute']['collisionValidated'] is True
+          assert mq['pass'] is True and mq['viewerSha256']==c['viewerSha256'] and mq['desktop']['pointerLock'] is True and mq['desktop']['mouseLook'] is True and mq['mobile']['touchLook'] is True and mq['mobile']['reset'] is True
+          assert q['pass'] is True and q['viewerSha256']==c['viewerSha256'] and q['acceptanceIntegrity']['pass'] is True and q['acceptanceIntegrity']['minDistanceM']==40 and q['acceptanceIntegrity']['minDurationSec']==12
+          source_bytes=(p/'source.json').read_bytes(); pipeline_bytes=(p/'pipeline.json').read_bytes(); assert hashlib.sha256(source_bytes).hexdigest()==s['sourceArchitectHandoffSha256']; assert sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and s['latestSourceArchitectObserved']=='v70' and s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False
+          assert hashlib.sha256(pipeline_bytes).hexdigest()==gp['sha256'] and pj['geometryChanged'] is False and pj['canonical']['level02']=='v23' and pj['sourceObserved']['sourceArchitect']=='v70'; assert dp['decision']=='SOURCE_ONLY_SHORT_CIRCUIT' and dp['geometryBuildRequired'] is False and dp['fullModelRegenerationRequired'] is False and pq['pass'] is True
+          assert c['serviceWorkerCache']=='fresnaye-v96-r5' and 'fresnaye-v96-r5' in sw and './v96-reliable-loader-qa-v5.json' in sw and './v96-direct-primary-qa-v3.json' in sw and all('./'+x in sw for x in r['transportParts'])
+          assert m['acceptance']['finalStatus']=='OPEN' and m['acceptance']['humanContinuousWalkRequired'] is True and m['acceptance']['productionRootPromoted'] is False
+          print('stable v11 static/public evidence PASS')
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify live stable gate
+        shell: bash
+        run: |
+          cat > /tmp/gate.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV11ReliableGateQA_v1',timestampUtc:new Date().toISOString(),url:'https://lgalansky.github.io/34-fresnaye/walkthrough-review.html',sourceArchitect:'v70',viewerVersion:'v96',geometryChanged:false,pass:false};const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{const p=await b.newPage({viewport:{width:1280,height:900}});let errors=[];p.on('pageerror',e=>errors.push(String(e)));await p.goto(out.url+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),null,{timeout:90000});out.href=await p.locator('#open').getAttribute('href');out.qa=await p.locator('#qa').textContent();out.transport=await p.locator('#transport').textContent();out.source=await p.locator('#source').textContent();out.pipeline=await p.locator('#pipeline').textContent();out.portable=await p.locator('#portable').textContent();out.pageErrors=errors;if(out.href!=='./walkthrough-v96.html'||!out.qa.includes('PASS')||!out.transport.includes('PASS')||!out.source.includes('v70')||!out.pipeline.includes('SOURCE ONLY SHORT CIRCUIT')||!out.portable.includes('PASS')||errors.length)throw Error(JSON.stringify(out));out.pass=true;fs.writeFileSync('stable-v11-reliable-gate-qa-v1.json',JSON.stringify(out,null,2)+'\n')}finally{await b.close()}})().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node /tmp/gate.cjs
+      - name: Persist stable gate QA evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v11-reliable-gate-qa-v1.json
+          git commit -m 'Record stable v11 reliable gate QA v1' || true
+          git push origin HEAD:gh-pages
