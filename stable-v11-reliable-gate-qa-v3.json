@@ -1,0 +1,20 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableV11ReliableGateQA_v3",
+  "timestampUtc": "2026-09-09T10:17:22.081Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-review.html",
+  "viewerVersion": "v96",
+  "sourceArchitect": "v70",
+  "geometryChanged": false,
+  "pass": true,
+  "gate": "VERIFIED REVIEW READY",
+  "href": "./walkthrough-v96.html",
+  "candidate": "v96 · 253,348 bytes · 1540afe2fa89… · direct-v3-timeboxed-parallel-fallback",
+  "qa": "PASS · desktop/mobile WebGL2 · 60/60 · keyboard + pointer-lock/mouse-look + mobile touch/reset · collision route verified",
+  "transport": "PASS · live loader hash verified · direct-v3 + timeboxed verified 12-part retry fallback",
+  "portable": "PASS · exact viewer + fallback assets cached",
+  "source": "HASH-VERIFIED v70 · SOURCE EXCEPTION NARROWED  NO GEOMETRY AUTHORIZATION · no geometry authorization",
+  "pipeline": "DELTA PIPELINE ARMED · SOURCE ONLY SHORT CIRCUIT · no full rebuild",
+  "acceptance": "OPEN · genuine human Entrance → Living → Kitchen → Main Bedroom → Entrance walk still required",
+  "detail": "Loader SHA-256: 629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49; Source SHA-256: 0db7ba8755617d86c293783c5e073b69177c1794a692d1b9ced887f97f522f29; pipeline SHA-256: 63ffe733dcfa3a29d9e8bc25d87c08aea5266c802be881eb630b63a2e09710ef. Remaining source lock: Exact circular/stepped toilet-cubicle bulkhead curve/step construction and other curved/unwitnessed ceiling transitions lacking written radius/diameter/centre/tangent/chord/arc-length or owned horizontal witness. No scaling or inference.",
+  "pageErrors": []
+}
