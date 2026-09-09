@@ -1,0 +1,50 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v67",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T09:33:20+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "remaining_material_lock": "Exact curved/unwitnessed ceiling-bulkhead footprint geometry lacking written radius/centre/tangent or owned horizontal witness.",
+    "effect_of_v67": "NONE"
+  },
+  "v67_material_advance": {
+    "level": "L03",
+    "subject": "L03_S01 / L03_S02 shutter components",
+    "finding": "FRE_WD_402_REV_B directly schedules both L03_S01 and L03_S02 at 1500 x 2100 mm. Their IDs are cross-sheet present on Level03 plan/brickwork/section sources. These component dimensions are now source-closed for later-stage component use.",
+    "brickwork_boundary": "FRE_WD_207 contains two local written 1500 spans in the S01/S02 zone, but instance-specific masonry rough-opening/head ownership is not promoted in v67. Schedule component dimensions must not be substituted for structural openings.",
+    "S03_boundary": "L03_S03 remains x3 weather-proof louvered grille identity/function only; overall W/H remain open and 2100 is explicitly not transferred from S01/S02."
+  },
+  "unresolved_ambiguities": [
+    "Level02 exact curved/unwitnessed ceiling/bulkhead footprint geometry.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 FRE_WD_205 D11 brickwork tag drift and D11 masonry rough width.",
+    "Level03 D02 duplicate authoritative schedule ID/system ownership.",
+    "Level03 D04 confirmed component/system schedule omission.",
+    "Level03 iD02 2100 brickwork head versus 2150 scheduled panel/leaf conflict.",
+    "Level03 skylight identity/extra-instance mapping and curb/upstand/rough-opening/frame-flashing interface (two audited symbol envelopes remain source-closed at 600x1200).",
+    "Level03 S01/S02 instance-specific masonry rough-opening/head ownership.",
+    "Level03 S03 overall grille width/height.",
+    "Level04 written 370mm parapet-adjacent vertical endpoint ownership remains quarantined."
+  ],
+  "source_watch": "No Archilab email received on 2026-09-09 in fresh search; 2026-09-08T13:49:17Z same-scale package remains latest known issue.",
+  "chief_of_staff_action": "Adopt v67 for later Level03 shutter component source state. S01/S02 may consume only the explicit 1500x2100 schedule component dimensions; keep their masonry-opening interfaces and S03 overall size locked. Retain all prior Level02/Level01/Level03 exceptions. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_S01_S02_ShutterEvidenceRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_ShutterExceptionRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_S01_S02_CrossSheetEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v50.json",
+    "34_Fresnaye_SourceArchitect_Run67_ArtifactManifest_v1.json"
+  ]
+}
