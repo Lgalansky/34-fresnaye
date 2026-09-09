@@ -1,4 +1,4 @@
-name: Walkthrough v96 portable r7 adaptive-network QA and promotion v1
+name: Walkthrough v96 portable r7 adaptive-network public QA v1
 
 on:
   push:
@@ -9,9 +9,9 @@ permissions:
   contents: write
 
 jobs:
-  qa-promote:
+  qa:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,193 +19,60 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Stage exact-v96 r7 adaptive-network portable loader on gh-pages
+      - name: Stage r7 candidate on gh-pages
         run: |
           set -euo pipefail
           git fetch origin gh-pages
           git worktree add /tmp/pages origin/gh-pages
-          mkdir -p /tmp/pages/v96-r7
-          cp /tmp/pages/v96/index.html /tmp/pages/v96-r7/index.html
-          cp /tmp/pages/v96/sw.js /tmp/pages/v96-r7/sw.js
-          cp /tmp/pages/v96/manifest.webmanifest /tmp/pages/v96-r7/manifest.webmanifest
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('/tmp/pages/v96-r7/index.html')
-          s=p.read_text()
-          assert 'v96-portable-r6' in s and 'direct-v7' in s and 'HEDGE_MS=2000' in s
-          s=s.replace('v96-portable-r6','v96-portable-r7')
-          s=s.replace('verified-cache-first-no-speculative-payload-direct-v7-cancelable-hedged-parallel-fallback','verified-cache-first-no-speculative-payload-direct-v8-network-aware-cancelable-hedged-parallel-fallback')
-          s=s.replace('direct-v7','direct-v8').replace('parallel-fallback-v7','parallel-fallback-v8')
-          old="""const DIRECT_TIMEOUT_MS=6000,PART_TIMEOUT_MS=8000,HEDGE_MS=2000;
-const forceFallback=new URLSearchParams(location.search).get('qaFallback')==='1';"""
-          new="""const DIRECT_TIMEOUT_MS=6000,PART_TIMEOUT_MS=8000;
-const params=new URLSearchParams(location.search),forceFallback=params.get('qaFallback')==='1',conn=navigator.connection||navigator.mozConnection||navigator.webkitConnection,effectiveType=String(params.get('qaEffectiveType')||conn?.effectiveType||'unknown').toLowerCase(),saveData=params.get('qaSaveData')==='1'||conn?.saveData===true,hedgeDelayMs=saveData?null:(effectiveType==='slow-2g'||effectiveType==='2g'?4500:effectiveType==='3g'?3000:2000);"""
-          assert old in s
-          s=s.replace(old,new)
-          old2="""      let hedgeTimer;
-      const d=direct().then(x=>({x,mode:'direct-v8',winner:'direct'})).catch(async e=>{fallbackReason=String(e?.message||e);return{x:await fallback(),mode:'parallel-fallback-v8',winner:'fallback'}});
-      const h=new Promise((resolve,reject)=>{hedgeTimer=setTimeout(()=>{hedged=true;fallback().then(x=>resolve({x,mode:'parallel-fallback-v8-hedged',winner:'fallback'}),reject)},HEDGE_MS)});
-      const win=await Promise.any([d,h]);clearTimeout(hedgeTimer);r=win.x;mode=win.mode;"""
-          new2="""      let hedgeTimer=null;
-      const d=direct().then(x=>({x,mode:'direct-v8',winner:'direct'})).catch(async e=>{fallbackReason=String(e?.message||e);return{x:await fallback(),mode:'parallel-fallback-v8',winner:'fallback'}});
-      const h=hedgeDelayMs==null?new Promise(()=>{}):new Promise((resolve,reject)=>{hedgeTimer=setTimeout(()=>{hedged=true;fallback().then(x=>resolve({x,mode:'parallel-fallback-v8-hedged',winner:'fallback'}),reject)},hedgeDelayMs)});
-      const win=await Promise.any([d,h]);if(hedgeTimer!=null)clearTimeout(hedgeTimer);r=win.x;mode=win.mode;"""
-          assert old2 in s
-          s=s.replace(old2,new2)
-          old3="hedgeMs:HEDGE_MS,hedged,cancelledLoser,fallbackReason,cacheName:CACHE"
-          new3="hedgeMs:hedgeDelayMs,saveData,effectiveType,bandwidthPolicy:saveData?'direct-first-save-data-no-hedge':('hedged-'+effectiveType),hedged,cancelledLoser,fallbackReason,cacheName:CACHE"
-          assert old3 in s
-          s=s.replace(old3,new3)
-          p.write_text(s)
-          PY
-          python3 - <<'PY'
-          import re
-          t=open('/tmp/pages/v96-r7/index.html').read();m=re.search(r'<script>\n([\s\S]*?)\n</script>',t);assert m
-          open('/tmp/r7-loader.js','w').write(m.group(1))
-          PY
+          python3 engineering/walkthrough-v96-portable-r7-build-v1.py /tmp/pages/v96 /tmp/pages/v96-r7
           node --check /tmp/r7-loader.js
           node --check /tmp/pages/v96-r7/sw.js
-          grep -q 'v96-portable-r7' /tmp/pages/v96-r7/index.html
-          grep -q 'direct-first-save-data-no-hedge' /tmp/pages/v96-r7/index.html
-          grep -q 'hedgeDelayMs' /tmp/pages/v96-r7/index.html
           cd /tmp/pages
           git config user.name 'Larry Galansky'
           git config user.email 'larry@bounceinteractive.co.uk'
           git add v96-r7
-          git commit -m 'Stage v96 portable r7 adaptive-network loader'
+          git commit -m 'Stage v96 portable r7 adaptive-network candidate' || true
           git push origin HEAD:gh-pages
-      - name: Wait for staged r7 public bytes
+      - name: Verify staged public bytes
         run: |
           set -euo pipefail
           B='https://lgalansky.github.io/34-fresnaye'
-          LH=$(sha256sum /tmp/pages/v96-r7/index.html|awk '{print $1}')
-          SH=$(sha256sum /tmp/pages/v96-r7/sw.js|awk '{print $1}')
+          LH=$(sha256sum /tmp/pages/v96-r7/index.html | awk '{print $1}')
+          SH=$(sha256sum /tmp/pages/v96-r7/sw.js | awk '{print $1}')
           ok=0
           for i in $(seq 1 80); do
-            curl -fsSL --retry 2 --retry-delay 1 "$B/v96-r7/?r7stage=$GITHUB_RUN_ID-$i" -o /tmp/public-r7.html || true
-            curl -fsSL --retry 2 --retry-delay 1 "$B/v96-r7/sw.js?r7stage=$GITHUB_RUN_ID-$i" -o /tmp/public-r7-sw.js || true
-            if echo "$LH  /tmp/public-r7.html"|sha256sum -c - >/dev/null 2>&1 && echo "$SH  /tmp/public-r7-sw.js"|sha256sum -c - >/dev/null 2>&1; then ok=1;break;fi
+            curl -fsSL --retry 2 --retry-delay 1 "$B/v96-r7/?qa=$GITHUB_RUN_ID-$i" -o /tmp/public-r7.html || true
+            curl -fsSL --retry 2 --retry-delay 1 "$B/v96-r7/sw.js?qa=$GITHUB_RUN_ID-$i" -o /tmp/public-r7-sw.js || true
+            if echo "$LH  /tmp/public-r7.html" | sha256sum -c - >/dev/null 2>&1 && echo "$SH  /tmp/public-r7-sw.js" | sha256sum -c - >/dev/null 2>&1; then
+              ok=1
+              break
+            fi
             sleep 3
           done
           test "$ok" = 1
-          python3 - <<'PY'
-          import re
-          t=open('/tmp/public-r7.html').read();m=re.search(r'<script>\n([\s\S]*?)\n</script>',t);assert m
-          open('/tmp/public-r7-loader.js','w').write(m.group(1))
-          PY
-          node --check /tmp/public-r7-loader.js
-          node --check /tmp/public-r7-sw.js
-      - name: Install Playwright Chromium
+          grep -q 'v96-portable-r7' /tmp/public-r7.html
+          grep -q 'direct-first-save-data-no-hedge' /tmp/public-r7.html
+      - name: Install Chromium
         run: |
           mkdir -p /tmp/pw
           cd /tmp/pw
           npm init -y
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Public r7 desktop mobile cache offline fallback and adaptive-bandwidth QA
+      - name: Run public adaptive-network browser QA
         run: |
-          cat > /tmp/r7qa.cjs <<'JS'
-          const {chromium,devices}=require('playwright'),fs=require('fs');
-          const B='https://lgalansky.github.io/34-fresnaye/';
-          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
-          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
-          const CACHE='fresnaye-v96-portable-r5';
-          const DIRECT='34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html';
-          const out={artifact:'34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,loaderRevision:'r7',serviceWorkerRevision:'r5',desktop:{},mobile:{},warmCache:{},offline:{},forcedFallback:{},saveData:{},defaultHedge:{},pass:false};
-          const ok=(v,m)=>{if(!v)throw Error(m)},xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]},dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
-          async function ready(p,u){await p.goto(u,{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:90000})}
-          (async()=>{const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
-            const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();const de=[];p.on('pageerror',e=>de.push(String(e)));let directRequests=0;p.on('request',r=>{if(r.url().includes(DIRECT))directRequests++});
-            await ready(p,B+'v96-r7/?cold='+Date.now()+'#entrance');let t=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META),rr=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(t.viewerSha256===V&&t.modelSha256===M&&t.cacheName===CACHE&&typeof t.bandwidthPolicy==='string','desktop identity');ok(lm.modelSha256===M&&rr.pass&&rr.mainRoute.collisionValidated,'desktop readiness');ok(directRequests===1,'cold direct requests '+directRequests);const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(650);await p.keyboard.up('w');await p.waitForTimeout(100);const b=xy(await p.locator('#coords').textContent());ok(dist(a,b)>.15,'keyboard');await p.locator('#enter').click();await p.waitForTimeout(150);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,bubbles:true})));await p.waitForTimeout(80);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');ok(!de.length,'desktop errors');out.desktop={pass:true,renderer:lm.renderer,keyboardMovementM:+dist(a,b).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),collisionValidated:rr.mainRoute.collisionValidated,pageErrors:de};
-            await p.waitForFunction(async({cacheName,direct})=>{const c=await caches.open(cacheName),u=new URL(direct,location.href).href,r=await c.match(u);return r?.headers.get('X-Fresnaye-Verified-SHA256')==='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'}, {cacheName:CACHE,direct:'../'+DIRECT},{timeout:10000});directRequests=0;await ready(p,B+'v96-r7/?warm='+Date.now()+'#entrance');let wt=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(wt.loaderMode==='verified-cache-direct-v2'&&directRequests===0,'warm cache');out.warmCache={pass:true,directPayloadRequests:directRequests,mode:wt.loaderMode,transportLoadMs:wt.transportLoadMs,speculativePayloadPreload:wt.speculativePayloadPreload};await dc.setOffline(true);await ready(p,B+'v96-r7/?offline='+Date.now()+'#entrance');let ot=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),or=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(ot.loaderMode==='verified-cache-direct-v2'&&or.pass&&or.mainRoute.collisionValidated,'offline');out.offline={pass:true,mode:ot.loaderMode,collisionValidated:or.mainRoute.collisionValidated};await dc.setOffline(false);await dc.close();
-            const fc=await browser.newContext({viewport:{width:1280,height:720}}),f=await fc.newPage();const fe=[];f.on('pageerror',e=>fe.push(String(e)));await ready(f,B+'v96-r7/?qaFallback=1&forced='+Date.now()+'#entrance');let ft=await f.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),fr=await f.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(ft.loaderMode==='parallel-fallback-v8-forced'&&ft.viewerSha256===V&&fr.pass&&fr.mainRoute.collisionValidated&&!fe.length,'forced fallback');out.forcedFallback={pass:true,mode:ft.loaderMode,transportLoadMs:ft.transportLoadMs,collisionValidated:fr.mainRoute.collisionValidated,pageErrors:fe};await fc.close();
-            const sc=await browser.newContext({viewport:{width:1280,height:720}}),s=await sc.newPage();let sparts=0;s.on('request',r=>{if(r.url().includes('walkthrough-v96.final.part'))sparts++});await s.route('**/'+DIRECT+'*',async route=>{await new Promise(r=>setTimeout(r,3500));try{await route.continue()}catch{}});await ready(s,B+'v96-r7/?qaSaveData=1&sd='+Date.now()+'#entrance');let st=await s.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(st.loaderMode==='direct-v8'&&st.saveData===true&&st.hedged===false&&st.hedgeMs===null&&sparts===0,'save-data policy '+JSON.stringify({mode:st.loaderMode,saveData:st.saveData,hedged:st.hedged,hedgeMs:st.hedgeMs,parts:sparts}));out.saveData={pass:true,mode:st.loaderMode,hedged:st.hedged,hedgeMs:st.hedgeMs,fallbackPartRequests:sparts,bandwidthPolicy:st.bandwidthPolicy};await sc.close();
-            const hc=await browser.newContext({viewport:{width:1280,height:720}}),h=await hc.newPage();let hparts=0;h.on('request',r=>{if(r.url().includes('walkthrough-v96.final.part'))hparts++});await h.route('**/'+DIRECT+'*',async route=>{await new Promise(r=>setTimeout(r,3500));try{await route.continue()}catch{}});await ready(h,B+'v96-r7/?hedge='+Date.now()+'#entrance');let ht=await h.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(ht.loaderMode==='parallel-fallback-v8-hedged'&&ht.saveData===false&&ht.hedged===true&&ht.hedgeMs===2000&&ht.cancelledLoser==='direct'&&hparts>0,'default hedge '+JSON.stringify({mode:ht.loaderMode,saveData:ht.saveData,hedged:ht.hedged,hedgeMs:ht.hedgeMs,loser:ht.cancelledLoser,parts:hparts}));out.defaultHedge={pass:true,mode:ht.loaderMode,hedged:ht.hedged,hedgeMs:ht.hedgeMs,cancelledLoser:ht.cancelledLoser,fallbackPartRequests:hparts,bandwidthPolicy:ht.bandwidthPolicy};await hc.close();
-            const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();const me=[];m.on('pageerror',e=>me.push(String(e)));await ready(m,B+'v96-r7/?mobile='+Date.now()+'#entrance');let mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),ml=await m.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(mt.viewerSha256===V&&mt.modelSha256===M&&typeof mt.bandwidthPolicy==='string','mobile identity');await m.evaluate(()=>document.querySelector('[data-start=entrance]').click());const ma=xy(await m.locator('#coords').textContent()),sb=await m.locator('#stick').boundingBox();ok(sb&&sb.width>20&&sb.height>20,'stick');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(650);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.15,'joystick');const lb=await m.locator('#look').boundingBox();ok(lb&&lb.width>50&&lb.height>50,'look');const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,my0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});const my1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(my1-my0)>.04,'touch look');await m.locator('#mobileReset').click();await m.waitForTimeout(80);ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.12,'reset');let mr=await m.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(mr.mainRoute.collisionValidated&&!me.length,'mobile collision/errors');out.mobile={pass:true,renderer:ml.renderer,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(my1-my0).toFixed(3),reset:true,collisionValidated:mr.mainRoute.collisionValidated,pageErrors:me};await mc.close();
-            out.pass=Object.entries(out).filter(([k,v])=>['desktop','mobile','warmCache','offline','forcedFallback','saveData','defaultHedge'].includes(k)).every(([,v])=>v.pass===true);
-          }catch(e){out.error=String(e?.stack||e)}finally{await browser.close();fs.writeFileSync('/tmp/portable-r7-qa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
-          JS
-          NODE_PATH=/tmp/pw/node_modules node --check /tmp/r7qa.cjs
-          NODE_PATH=/tmp/pw/node_modules node /tmp/r7qa.cjs
-      - name: Promote QA-passed r7 and stable gate v19
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import json,hashlib,re,datetime
-          P=Path('/tmp/pages')
-          qa=json.load(open('/tmp/portable-r7-qa-v1.json'));assert qa['pass'] is True
-          (P/'v96/index.html').write_bytes((P/'v96-r7/index.html').read_bytes())
-          (P/'v96/portable-r7-qa-v1.json').write_bytes(Path('/tmp/portable-r7-qa-v1.json').read_bytes())
-          g=(P/'walkthrough-review.html').read_text()
-          g=g.replace('v18-source79-r6-startlinks-v1','v19-source79-r7-startlinks-v1').replace('Stable gate v18.','Stable gate v19.')
-          g=re.sub(r" const loaderOk=.*?;\n const swOk=.*?;\n", " const loaderTag='v96-portable-'+c.portableLoaderRevision,swTag='fresnaye-v96-portable-'+c.portableServiceWorkerRevision;\n const loaderOk=lh===c.portableLoaderSha256&&lt.includes(c.viewerSha256)&&lt.includes(c.modelSha256)&&lt.includes(loaderTag)&&lt.includes('speculativePayloadPreload:false')&&!lt.includes('rel=\\\"preload\\\"')&&lt.includes('hedged-parallel-fallback')&&lt.includes('direct-first-save-data-no-hedge')&&lt.includes('hedgeDelayMs');\n const swOk=wh===c.portableServiceWorkerSha256&&wt.includes(swTag)&&wt.includes('navigationPreload.enable')&&wt.includes('X-Fresnaye-Verified-SHA256')&&wt.includes(\"cache:'no-store'\");\n", g, count=1)
-          g=re.sub(r" const qaOk=.*?;\n const srq=", " const qaOk=qh===c.portableQaSha256&&q.pass===true&&q.loaderRevision===c.portableLoaderRevision&&q.serviceWorkerRevision===c.portableServiceWorkerRevision&&q.viewerSha256===c.viewerSha256&&q.canonicalObjSha256===c.modelSha256&&q.warmCache?.pass===true&&q.warmCache?.directPayloadRequests===0&&q.warmCache?.speculativePayloadPreload===false&&q.desktop?.pass===true&&q.desktop?.renderer==='WebGL2'&&q.desktop?.keyboardMovementM>0.1&&q.desktop?.pointerLock===true&&q.desktop?.mouseLookYawRad>0.05&&q.desktop?.collisionValidated===true&&q.desktop?.pageErrors?.length===0&&q.mobile?.pass===true&&q.mobile?.renderer==='WebGL2'&&q.mobile?.joystickMovementM>0.1&&q.mobile?.touchLookYawRad>0.05&&q.mobile?.reset===true&&q.mobile?.collisionValidated===true&&q.mobile?.pageErrors?.length===0&&q.offline?.pass===true&&q.forcedFallback?.pass===true&&q.saveData?.pass===true&&q.saveData?.fallbackPartRequests===0&&q.defaultHedge?.pass===true&&q.defaultHedge?.hedged===true;\n const srq=", g, count=1)
-          g=g.replace('HASH-VERIFIED R6/R5','HASH-VERIFIED R7/R5').replace('Public r6 QA ','Public r7 QA ')
-          g=g.replace('cache first · zero warm payload requests · hedged fallback','cache first · adaptive hedge · Save-Data duplicate-bandwidth suppression · offline fallback')
-          assert 'v19-source79-r7-startlinks-v1' in g and 'direct-first-save-data-no-hedge' in g and 'q.saveData?.pass===true' in g
-          (P/'walkthrough-review.html').write_text(g)
-          def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
-          m=json.load(open(P/'walkthrough-review.json'))
-          m['artifact']='34_Fresnaye_Walkthrough_StableReviewManifest_v21';m['schemaVersion']=21;m['updatedUtc']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
-          c=m['reviewCandidate'];c['portableLoaderRevision']='r7';c['portableLoaderSha256']=h(P/'v96/index.html');c['portableQaEvidence']='v96/portable-r7-qa-v1.json';c['portableQaSha256']=h(P/'v96/portable-r7-qa-v1.json')
-          s=m['sourceState'];s['browserQaCompatibilitySource']='v79';s['browserQaReuseReason']='Source v79 has no geometry authorization and canonical v23/exact v96 are unchanged. Portable r7 is freshly public-browser tested for desktop/mobile controls, collision, warm cache, offline, forced fallback, adaptive default hedge and Save-Data duplicate-bandwidth suppression.'
-          m['stableGate']['revision']='v19';m['stableGate']['sha256']=h(P/'walkthrough-review.html')
-          open(P/'walkthrough-review.json','w').write(json.dumps(m,indent=2)+'\n')
-          print('loader',c['portableLoaderSha256'],'qa',c['portableQaSha256'],'gate',m['stableGate']['sha256'])
-          PY
-          python3 - <<'PY'
-          import re
-          t=open('/tmp/pages/walkthrough-review.html').read();m=re.search(r'<script>\n([\s\S]*?)\n</script>',t);assert m
-          open('/tmp/gate19.js','w').write(m.group(1))
-          PY
-          node --check /tmp/gate19.js
-          cd /tmp/pages
-          git add v96/index.html v96/portable-r7-qa-v1.json walkthrough-review.html walkthrough-review.json
-          git commit -m 'Promote v96 portable r7 adaptive network loader and gate v19'
-          git pull --rebase origin gh-pages
-          git push origin HEAD:gh-pages
-      - name: Wait for exact promoted r7 and gate v19 public state
-        run: |
-          set -euo pipefail
-          B='https://lgalansky.github.io/34-fresnaye'
-          ok=0
-          for i in $(seq 1 100); do
-            curl -fsSL --retry 2 --retry-delay 1 "$B/v96/?promote=$GITHUB_RUN_ID-$i" -o /tmp/promoted-loader.html || true
-            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.html?promote=$GITHUB_RUN_ID-$i" -o /tmp/promoted-gate.html || true
-            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.json?promote=$GITHUB_RUN_ID-$i" -o /tmp/promoted-man.json || true
-            curl -fsSL --retry 2 --retry-delay 1 "$B/v96/portable-r7-qa-v1.json?promote=$GITHUB_RUN_ID-$i" -o /tmp/promoted-qa.json || true
-            if python3 - <<'PY'
-          import hashlib,json
-          h=lambda p:hashlib.sha256(open(p,'rb').read()).hexdigest()
-          try:
-            local=json.load(open('/tmp/pages/walkthrough-review.json'));pub=json.load(open('/tmp/promoted-man.json'))
-            assert pub['schemaVersion']==21 and pub['sourceState']['latestSourceArchitectObserved']=='v79' and pub['reviewCandidate']['portableLoaderRevision']=='r7' and pub['stableGate']['revision']=='v19'
-            assert h('/tmp/promoted-loader.html')==pub['reviewCandidate']['portableLoaderSha256']==h('/tmp/pages/v96/index.html')
-            assert h('/tmp/promoted-gate.html')==pub['stableGate']['sha256']==h('/tmp/pages/walkthrough-review.html')
-            assert h('/tmp/promoted-qa.json')==pub['reviewCandidate']['portableQaSha256']==h('/tmp/pages/v96/portable-r7-qa-v1.json')
-            assert pub==local
-          except Exception: raise SystemExit(1)
-          PY
-            then ok=1;break;fi
-            sleep 3
-          done
-          test "$ok" = 1
-      - name: Fresh stable gate v19 all-start public browser QA
-        run: |
-          cat > /tmp/gateqa.cjs <<'JS'
-          const {chromium}=require('playwright'),fs=require('fs');const B='https://lgalansky.github.io/34-fresnaye/',V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',starts={entrance:['7.90','17.10'],living:['3.60','13.00'],kitchen:['8.00','8.20'],bedroom:['3.50','26.70'],second:['-15.40','5.20'],service:['-5.08','2.11']};const out={artifact:'34_Fresnaye_Walkthrough_StableGateV19_Source79_R7_AllStarts_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v79',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,gate:{},startLinks:[],pass:false},ok=(v,m)=>{if(!v)throw Error(m)};(async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{const c=await b.newContext({viewport:{width:1365,height:768}}),p=await c.newPage(),errs=[];p.on('pageerror',e=>errs.push(String(e)));await p.goto(B+'walkthrough-review.html?gate19='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_STABLE_GATE_QA?.pass===true,{}, {timeout:90000});const g=await p.evaluate(()=>window.__FRESNAYE_STABLE_GATE_QA);ok(g.sourceArchitect==='v79'&&g.viewerSha256===V&&g.modelSha256===M&&g.loaderOk&&g.swOk&&g.qaOk&&g.startResetOk&&g.identity&&g.sourceOk&&g.pipeOk,'gate');const primary=await p.locator('#open').getAttribute('href');ok(primary==='./v96/#entrance','primary');ok(await p.locator('[data-start-link]').count()===6,'buttons');ok(!errs.length,'gate errors');out.gate={pass:true,preferredHref:primary,buttonCount:6,pageErrors:errs};for(const [key,[x,y]] of Object.entries(starts)){const href=await p.locator(`[data-start-link="${key}"]`).getAttribute('href');ok(href===`./v96/#${key}`,'href '+key);const q=await c.newPage(),qe=[];q.on('pageerror',e=>qe.push(String(e)));await q.goto(B+`v96/?gate19=${Date.now()}#${key}`,{waitUntil:'domcontentloaded',timeout:90000});await q.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:90000});await q.waitForSelector('#coords',{timeout:90000});const t=await q.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await q.evaluate(()=>window.__FRESNAYE_LIVE_META),coords=await q.locator('#coords').innerText();const pass=t.viewerSha256===V&&t.modelSha256===M&&typeof t.bandwidthPolicy==='string'&&lm.renderer==='WebGL2'&&coords.startsWith(key+' ·')&&coords.includes(`x ${x} m`)&&coords.includes(`y ${y} m`)&&coords.includes('collision')&&!qe.length;out.startLinks.push({key,href,coords,renderer:lm.renderer,loaderMode:t.loaderMode,bandwidthPolicy:t.bandwidthPolicy,pageErrors:qe,pass});ok(pass,'start '+key);await q.close()}out.pass=out.gate.pass&&out.startLinks.length===6&&out.startLinks.every(x=>x.pass);await c.close()}catch(e){out.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('/tmp/stable-v79-r7-gate-v19-publicbrowserqa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
-          JS
-          NODE_PATH=/tmp/pw/node_modules node --check /tmp/gateqa.cjs
-          NODE_PATH=/tmp/pw/node_modules node /tmp/gateqa.cjs
-      - name: Persist stable gate v19 public QA evidence
+          NODE_PATH=/tmp/pw/node_modules node --check engineering/walkthrough-v96-portable-r7-publicqa-v1.cjs
+          NODE_PATH=/tmp/pw/node_modules node engineering/walkthrough-v96-portable-r7-publicqa-v1.cjs
+      - name: Persist QA evidence
         if: always()
         run: |
           set -euo pipefail
-          if [ ! -s /tmp/stable-v79-r7-gate-v19-publicbrowserqa-v1.json ]; then printf '{"artifact":"34_Fresnaye_Walkthrough_StableGateV19_Source79_R7_AllStarts_PublicBrowserQA_v1","pass":false,"error":"QA process produced no diagnostic JSON"}\n' >/tmp/stable-v79-r7-gate-v19-publicbrowserqa-v1.json; fi
+          if [ ! -s /tmp/portable-r7-qa-v1.json ]; then
+            printf '%s\n' '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_PublicBrowserQA_v1","pass":false,"error":"QA process produced no diagnostic JSON"}' > /tmp/portable-r7-qa-v1.json
+          fi
           cd /tmp/pages
           git pull --rebase origin gh-pages
-          cp /tmp/stable-v79-r7-gate-v19-publicbrowserqa-v1.json stable-v79-r7-gate-v19-publicbrowserqa-v1.json
-          git add stable-v79-r7-gate-v19-publicbrowserqa-v1.json
-          git commit -m 'Persist stable gate v19 Source79 r7 public browser QA v1' || true
+          cp /tmp/portable-r7-qa-v1.json v96-r7/portable-r7-qa-v1.json
+          git add v96-r7/portable-r7-qa-v1.json
+          git commit -m 'Persist v96 portable r7 adaptive-network public QA v1' || true
           git push origin HEAD:gh-pages
