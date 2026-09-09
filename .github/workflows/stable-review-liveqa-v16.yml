@@ -1,0 +1,91 @@
+name: Stable review live QA v16
+# Fresh public Source/identity/gate + desktop/mobile interaction verification. No geometry mutation.
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/stable-review-liveqa-v16.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BASE: https://lgalansky.github.io/34-fresnaye
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: gh-pages, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+
+      - name: Public identity and JavaScript gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/fv16
+          for i in $(seq 1 40); do
+            curl -fsSL --retry 3 --retry-delay 1 "$BASE/walkthrough-review.json?qa=v16-$GITHUB_RUN_ID-$i" -o /tmp/fv16/m.json || true
+            if python3 - <<'PY'
+          import json,sys
+          try:
+            m=json.load(open('/tmp/fv16/m.json')); sys.exit(0 if m.get('schemaVersion',0)>=14 and m.get('sourceState',{}).get('latestSourceArchitectObserved')=='v74' else 1)
+          except: sys.exit(1)
+          PY
+            then break; fi
+            sleep 3
+          done
+          python3 - "$BASE" <<'PY'
+          import hashlib,json,pathlib,subprocess,sys,re,traceback
+          base=sys.argv[1]; p=pathlib.Path('/tmp/fv16'); m=json.load(open(p/'m.json')); c=m['reviewCandidate']; s=m['sourceState']; g=m['geometryPipeline']; gate=m['stableGate']
+          out={'artifact':'34_Fresnaye_Walkthrough_v96_StableReviewIdentityQA_v16','sourceArchitect':s['latestSourceArchitectObserved'],'geometryChanged':False,'checks':{},'hashes':{},'pass':False}
+          def h(b): return hashlib.sha256(b).hexdigest()
+          def get(path):
+            b=subprocess.check_output(['curl','-fsSL','--retry','8','--retry-delay','2',f'{base}/{path}?qa=v16-{pathlib.Path(path).name}']); return b
+          def ck(k,v): out['checks'][k]=bool(v); assert v,k
+          try:
+            gateb=get(gate['publicPath']); loader=get(c['portableLoader']); viewer=get(c['directViewerAsset']); source=get(s['sourceArchitectHandoffPublicPath']); pipe=get(g['publicPath']); plan=get(g['currentDeltaPlanPublicPath']); pqa=get(g['plannerQaPublicPath']); planner=get(g['plannerPublicPath'])
+            out['hashes']={'gate':h(gateb),'loader':h(loader),'viewer':h(viewer),'source':h(source),'pipeline':h(pipe),'plan':h(plan),'plannerQa':h(pqa),'planner':h(planner)}
+            ck('manifest_v14_plus',m['schemaVersion']>=14); ck('gate_hash',h(gateb)==gate['sha256']); ck('loader_hash',h(loader)==c['portableLoaderSha256']); ck('viewer_exact',len(viewer)==c['viewerBytes'] and h(viewer)==c['viewerSha256']); ck('source_hash',h(source)==s['sourceArchitectHandoffSha256']); ck('pipeline_hash',h(pipe)==g['sha256']); ck('delta_hash',h(plan)==g['currentDeltaPlanSha256']); ck('planner_qa_hash',h(pqa)==g['plannerQaSha256']); ck('planner_hash',h(planner)==g['plannerSha256'])
+            sj=json.loads(source); dp=json.loads(plan); aq=json.loads(pqa); ck('source_no_geometry',sj['canonical_geometry_changed'] is False and sj['geometry_authorization'] is False and sj['level02_priority_state']['effect_of_v74']=='NONE'); ck('delta_no_op',dp['decision']=='NO_OP_SHORT_CIRCUIT' and dp['geometryBuildRequired'] is False and dp['fullModelRegenerationRequired'] is False); ck('planner_fail_closed',aq['pass'] is True and aq['checks']['authorized_missing_changed_ids_fails_closed'] is True and aq['checks']['authorized_changed_ids_patch_plan'] is True)
+            text=gateb.decode(); match=re.search(r'<script>([\s\S]*?)</script>',text); ck('gate_script_present',bool(match)); (p/'gate.js').write_text(match.group(1)); out['pass']=True
+          except Exception as e: out['error']=f'{type(e).__name__}: {e}';out['traceback']=traceback.format_exc(limit=6)
+          pathlib.Path('stable-v16-identity-qa.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,indent=2));sys.exit(0 if out['pass'] else 1)
+          PY
+          node --check /tmp/fv16/gate.js
+
+      - name: Install Chromium
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Fresh public gate and controls
+        shell: bash
+        run: |
+          cat > /tmp/fv16/run.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const base='https://lgalansky.github.io/34-fresnaye/';
+          const manifest=JSON.parse(fs.readFileSync('walkthrough-review.json','utf8')), exp=manifest.reviewCandidate;
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v16',timestampUtc:new Date().toISOString(),sourceArchitect:manifest.sourceState.latestSourceArchitectObserved,geometryChanged:false,review:{},desktop:{},mobile:{},pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)},xy=t=>{let m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]},dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p){await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY'&&window.__FRESNAYE_LIVE_META?.modelSha256,{},{timeout:90000})}
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const gp=await b.newPage({viewport:{width:1280,height:800}});let ge=[];gp.on('pageerror',e=>ge.push(String(e)));await gp.goto(base+'walkthrough-review.html?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await gp.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),{},{timeout:90000});out.review={gate:await gp.locator('#gate').textContent(),source:await gp.locator('#source').textContent(),pipeline:await gp.locator('#pipe').textContent(),href:await gp.locator('#open').getAttribute('href'),pageErrors:ge};ok(out.review.source.includes('v74')&&out.review.href==='./v96/'&&!ge.length,'gate');await gp.close();
+            const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let de=[];p.on('pageerror',e=>de.push(String(e)));await p.goto(base+'v96/?qa=d-'+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await ready(p);let tm=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META),rq=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(tm.viewerSha256===exp.viewerSha256&&tm.modelSha256===exp.modelSha256&&lm.modelSha256===exp.modelSha256&&lm.canonicalModel==='v23'&&rq.pass&&/^WebGL[12]$/.test(rq.renderer),'desktop identity/readiness');let a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(650);await p.keyboard.up('w');await p.waitForTimeout(120);let z=xy(await p.locator('#coords').textContent());ok(dist(a,z)>.15,'keyboard');await p.locator('#reset').click();await p.waitForTimeout(100);ok(dist(xy(await p.locator('#coords').textContent()),[7.9,17.1])<.12,'reset');await p.locator('[data-start="living"]').click();await p.waitForTimeout(100);ok(dist(xy(await p.locator('#coords').textContent()),[3.6,13])<.12,'living start');await p.locator('#enter').click();await p.waitForTimeout(180);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');let y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:110,movementY:0,bubbles:true})));await p.waitForTimeout(100);let y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&!de.length,'mouse/page errors');out.desktop={pass:true,renderer:lm.renderer,keyboardMovementM:+dist(a,z).toFixed(3),reset:true,livingStart:true,pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),mainRoute:rq.mainRoute,pageErrors:de};await dc.close();
+            const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let me=[];m.on('pageerror',e=>me.push(String(e)));await m.goto(base+'v96/?qa=m-'+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await ready(m);let mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),ml=await m.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(mt.viewerSha256===exp.viewerSha256&&ml.modelSha256===exp.modelSha256,'mobile identity');await m.evaluate(()=>document.querySelector('[data-start=entrance]').click());await m.waitForTimeout(80);let ma=xy(await m.locator('#coords').textContent()),sb=await m.locator('#stick').boundingBox();ok(sb,'stick');let sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(650);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(120);let mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.15,'joystick');let lb=await m.locator('#look').boundingBox();ok(lb,'look');let lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,my0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-6,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-6,isPrimary:true,bubbles:true});await m.waitForTimeout(100);let my1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(my1-my0)>.04,'touch look');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.12&&!me.length,'mobile reset/errors');out.mobile={pass:true,renderer:ml.renderer,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(my1-my0).toFixed(3),reset:true,pageErrors:me};await mc.close();out.pass=true;
+          }catch(e){out.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('stable-v16-live-browser-qa.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
+          JS
+          node /tmp/fv16/run.cjs
+
+      - name: Persist QA evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v16-identity-qa.json stable-v16-live-browser-qa.json 2>/dev/null || true
+          git diff --cached --quiet || { git commit -m 'Record stable v16 live QA evidence'; git push origin HEAD:gh-pages; }
