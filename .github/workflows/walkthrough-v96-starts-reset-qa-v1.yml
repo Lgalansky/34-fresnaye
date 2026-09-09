@@ -1,0 +1,98 @@
+name: Walkthrough v96 public starts and reset QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-starts-reset-qa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Verify all public starts and reset behavior
+        run: |
+          cat > /tmp/qa.cjs <<'JS'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const URL='https://lgalansky.github.io/34-fresnaye/v96/?startsResetQa='+Date.now();
+          const EXPECTED_VIEWER='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const EXPECTED_MODEL='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const starts={
+            living:{x:'3.60',y:'13.00'},
+            kitchen:{x:'8.00',y:'8.20'},
+            bedroom:{x:'3.50',y:'26.70'},
+            entrance:{x:'7.90',y:'17.10'},
+            second:{x:'-15.40',y:'5.20'},
+            service:{x:'-5.08',y:'2.11'}
+          };
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});
+            const ctx=await browser.newContext({viewport:{width:1440,height:900}});
+            const page=await ctx.newPage(); const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
+            await page.goto(URL,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true,{timeout:60000});
+            await page.waitForSelector('[data-start="living"]',{timeout:60000});
+            const transport=await page.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);
+            if(transport.viewerSha256!==EXPECTED_VIEWER) throw Error('viewer hash mismatch');
+            if(transport.modelSha256!==EXPECTED_MODEL) throw Error('model hash mismatch');
+            const results=[];
+            for(const [key,e] of Object.entries(starts)){
+              await page.click(`[data-start="${key}"]`);
+              await page.waitForTimeout(80);
+              const coords=await page.locator('#coords').innerText();
+              const ok=coords.startsWith(key+' ·') && coords.includes(`x ${e.x} m`) && coords.includes(`y ${e.y} m`) && coords.includes('collision');
+              results.push({key,coords,ok}); if(!ok) throw Error('start mismatch '+key+': '+coords);
+            }
+            // Reset must return to the currently selected start after actual keyboard motion.
+            await page.click('[data-start="living"]');
+            const before=await page.locator('#coords').innerText();
+            await page.keyboard.down('KeyW'); await page.waitForTimeout(350); await page.keyboard.up('KeyW'); await page.waitForTimeout(80);
+            const moved=await page.locator('#coords').innerText();
+            if(moved===before) throw Error('keyboard motion did not move camera before reset test');
+            await page.click('#reset'); await page.waitForTimeout(80);
+            const reset=await page.locator('#coords').innerText();
+            const resetPass=reset.startsWith('living ·') && reset.includes('x 3.60 m') && reset.includes('y 13.00 m');
+            if(!resetPass) throw Error('reset did not restore living start: '+reset);
+            // Next-room control must cycle to Kitchen from Living.
+            await page.click('#next'); await page.waitForTimeout(80);
+            const next=await page.locator('#coords').innerText();
+            const nextPass=next.startsWith('kitchen ·') && next.includes('x 8.00 m') && next.includes('y 8.20 m');
+            if(!nextPass) throw Error('next-room control failed: '+next);
+            // Hash deep-link must restore an explicit review start on a clean page.
+            const page2=await ctx.newPage(); const errors2=[]; page2.on('pageerror',e=>errors2.push(String(e)));
+            await page2.goto('https://lgalansky.github.io/34-fresnaye/v96/#entrance',{waitUntil:'domcontentloaded',timeout:60000});
+            await page2.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true,{timeout:60000});
+            await page2.waitForSelector('#coords',{timeout:60000}); await page2.waitForTimeout(150);
+            const deep=await page2.locator('#coords').innerText();
+            const deepLinkPass=deep.startsWith('entrance ·') && deep.includes('x 7.90 m') && deep.includes('y 17.10 m');
+            if(!deepLinkPass) throw Error('entrance hash deep-link failed: '+deep);
+            const out={artifact:'34_Fresnaye_Walkthrough_v96_StartReset_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,viewerVersion:'v96',viewerSha256:EXPECTED_VIEWER,canonicalModel:'v23',canonicalObjSha256:EXPECTED_MODEL,transportMode:transport.loaderMode,allStartLocations:results,allStartsPass:results.every(r=>r.ok),keyboardMovedBeforeReset:moved!==before,resetPass,nextRoomPass:nextPass,entranceDeepLinkPass:deepLinkPass,pageErrors:[...errors,...errors2],pass:results.every(r=>r.ok)&&resetPass&&nextPass&&deepLinkPass&&errors.length===0&&errors2.length===0};
+            fs.writeFileSync('/tmp/start-reset-qa.json',JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2));
+            await browser.close(); if(!out.pass) process.exit(1);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node --check /tmp/qa.cjs
+          node /tmp/qa.cjs
+      - name: Persist public QA evidence to gh-pages
+        run: |
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/start-reset-qa.json /tmp/pages/v96/start-reset-qa-v1.json
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add v96/start-reset-qa-v1.json
+          git commit -m 'Persist v96 all-start and reset public QA v1' || true
+          git push origin HEAD:gh-pages
