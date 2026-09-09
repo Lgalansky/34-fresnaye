@@ -1,0 +1,26 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlan_Source_v68_v1",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v2",
+  "sourceArchitect": "v68",
+  "sourceHandoffSha256": "6fe06371eaa1311d357079b623a7ad70ed3653945cd4ca484d98e79206644cbb",
+  "level02EffectSchemaPath": "level02_priority_state.effect_of_v68",
+  "pipeline": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "pipelineSha256": "a93b0173dd40b8a80510b25f2fce0a51b2aadbafa5e324cbe266124c16613a31",
+  "canonicalParent": "v23",
+  "viewerReuseCandidate": "v96",
+  "geometryAuthorization": false,
+  "level02Effect": "NONE",
+  "geometryChanged": false,
+  "remainingLevel02Lock": "Exact curved/unwitnessed ceiling-bulkhead footprint geometry lacking written radius/centre/tangent or owned horizontal witness.",
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "qa": [
+    "source_identity",
+    "canonical_identity",
+    "deployment_source_sync"
+  ],
+  "reason": "Level 02 effect is NONE and geometry authorization is false; preserve canonical model and reuse viewer."
+}
