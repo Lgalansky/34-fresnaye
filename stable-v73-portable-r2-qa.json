@@ -1,0 +1,22 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v23",
+  "timestampUtc": "2026-09-09T13:18:07.919Z",
+  "runId": "34356154483",
+  "sourceArchitect": "v73",
+  "pass": true,
+  "gate": "VERIFIED REVIEW READY",
+  "preferredHref": "./v96/",
+  "preferredUrl": "https://lgalansky.github.io/34-fresnaye/v96/",
+  "sourceText": "HASH-VERIFIED v73 · NONE__LATER_LEVEL_SOURCE_PREPARATION_ONLY · no geometry authorization",
+  "pipelineText": "NO OP SHORT CIRCUIT · exact viewer/model QA reused by hash",
+  "canvases": 2,
+  "renderer": "WebGL2",
+  "selfTests": 60,
+  "collisionValidated": true,
+  "transportMode": "direct-v4",
+  "cacheName": "fresnaye-v96-portable-r2",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gatePageErrors": [],
+  "walkthroughPageErrors": []
+}
