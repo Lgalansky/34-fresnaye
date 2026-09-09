@@ -13,11 +13,12 @@
 <body>
 <main class="card">
 <h1>34 Fresnaye walkthrough</h1>
-<p class="sub">Stable review gate. It opens the candidate only when its exact viewer/model identity and public browser QA evidence match the published review manifest.</p>
+<p class="sub">Stable review gate. It opens the candidate only when the exact viewer/model identity, public browser QA, latest source handoff and portable-package assets all match the published review manifest.</p>
 <div class="row"><b>Gate</b><span id="gate">Checking…</span></div>
 <div class="row"><b>Candidate</b><span id="candidate">—</span></div>
 <div class="row"><b>Canonical model</b><span id="model">—</span></div>
 <div class="row"><b>Browser QA</b><span id="qa">—</span></div>
+<div class="row"><b>Portable package</b><span id="portable">—</span></div>
 <div class="row"><b>Source state</b><span id="source">—</span></div>
 <div class="row"><b>Final acceptance</b><span id="acceptance">—</span></div>
 <div class="actions"><a id="open" class="btn" href="#">Open verified walkthrough</a><a class="btn secondary ready" href="./">Production root</a></div>
@@ -26,23 +27,41 @@
 <script>
 (async()=>{
  const $=id=>document.getElementById(id), stamp=Date.now();
+ const hex=buf=>[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
  try{
-  const m=await fetch('./walkthrough-review.json?b='+stamp,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('review manifest HTTP '+r.status);return r.json()});
-  const c=m.reviewCandidate;
-  const r=await fetch('./'+c.readySentinel+'?b='+stamp,{cache:'no-store'}).then(x=>{if(!x.ok)throw Error('ready sentinel HTTP '+x.status);return x.json()});
-  const q=await fetch('./'+c.publicBrowserQaEvidence+'?b='+stamp,{cache:'no-store'}).then(x=>{if(!x.ok)throw Error('public QA HTTP '+x.status);return x.json()});
+  const get=async path=>{
+   const x=await fetch('./'+path+'?b='+stamp,{cache:'no-store'});
+   if(!x.ok)throw Error(path+' HTTP '+x.status);
+   return x;
+  };
+  const m=await get('walkthrough-review.json').then(r=>r.json());
+  const c=m.reviewCandidate, s=m.sourceState;
+  const r=await get(c.readySentinel).then(x=>x.json());
+  const q=await get(c.publicBrowserQaEvidence).then(x=>x.json());
+  const sourceResp=await get(s.sourceArchitectHandoffPublicPath);
+  const sourceBytes=await sourceResp.arrayBuffer();
+  const sourceHash=hex(await crypto.subtle.digest('SHA-256',sourceBytes));
+  const sh=JSON.parse(new TextDecoder().decode(sourceBytes));
+  const pwa=await get(c.pwaManifest).then(x=>x.json());
+  const sw=await get(c.serviceWorker).then(x=>x.text());
+
   const identity=r.stageComplete===true&&r.geometryChanged===false&&r.viewerSha256===c.viewerSha256&&r.viewerBytes===c.viewerBytes&&r.modelSha256===c.modelSha256&&r.glbSha256===c.glbSha256&&r.vertices===c.vertices&&r.triangles===c.triangles;
   const qa=q.pass===true&&q.viewerSha256===c.viewerSha256&&q.canonicalObjSha256===c.modelSha256&&q.geometryChanged===false&&q.desktop?.pass===true&&q.mobile?.pass===true&&q.desktop?.renderer==='WebGL2'&&q.mobile?.renderer==='WebGL2'&&q.review?.selfTests===q.review?.total&&q.review?.mainRoute?.collisionValidated===true;
-  const sourceSafe=m.sourceState?.geometryAuthorization===false&&m.sourceState?.level02Effect==='NONE'&&m.sourceState?.newerSourceSyncChangesCandidateGeometry===false;
-  const safe=identity&&qa&&sourceSafe&&c.geometryChanged===false;
+  const sourceProof=sourceHash===s.sourceArchitectHandoffSha256&&sh.artifact===s.sourceArchitectHandoffArtifact.replace(/\.json$/,'')&&sh.canonical_geometry_changed===false&&sh.geometry_authorization===false&&sh.run64_new_progress?.Level02_effect==='NONE.';
+  const sourceSafe=sourceProof&&s.geometryAuthorization===false&&s.level02Effect==='NONE'&&s.newerSourceSyncChangesCandidateGeometry===false;
+  const parts=r.transportParts||[];
+  const portable=pwa.start_url==='./'+c.loader&&pwa.id==='./'+c.loader&&sw.includes("fresnaye-v95-r2")&&parts.length===12&&parts.every(part=>sw.includes('./'+part))&&sw.includes('./'+c.loader)&&sw.includes('./'+c.readySentinel)&&sw.includes('./'+c.publicBrowserQaEvidence);
+  const safe=identity&&qa&&sourceSafe&&portable&&c.geometryChanged===false;
   const tests=q.review?.total ?? '?';
+
   $('candidate').textContent=c.viewerVersion+' · '+c.viewerBytes.toLocaleString()+' bytes · '+c.viewerSha256.slice(0,12)+'…';
   $('model').textContent=c.canonicalModel+' · '+c.vertices.toLocaleString()+' vertices / '+c.triangles.toLocaleString()+' triangles · '+c.modelSha256.slice(0,12)+'…';
   $('qa').innerHTML=qa?'<span class="ok">PASS</span> · desktop + mobile WebGL2 · '+tests+'/'+tests+' · collision route verified':'<span class="bad">BLOCKED</span> · published QA evidence mismatch';
-  $('source').innerHTML=sourceSafe?'<span class="ok">SYNCED '+m.sourceState.latestSourceArchitectObserved+'</span> · Level 02 effect NONE · no geometry authorization':'<span class="bad">BLOCKED</span> · source state changed or is incomplete';
+  $('portable').innerHTML=portable?'<span class="ok">PASS</span> · PWA manifest + service worker + 12/12 payload parts':'<span class="bad">BLOCKED</span> · portable-package assets mismatch';
+  $('source').innerHTML=sourceSafe?'<span class="ok">HASH-VERIFIED '+s.latestSourceArchitectObserved+'</span> · Level 02 effect NONE · no geometry authorization':'<span class="bad">BLOCKED</span> · latest source handoff mismatch or geometry state changed';
   $('acceptance').innerHTML='<span class="warn">'+m.acceptance.finalStatus+'</span> · genuine human '+m.acceptance.requiredSequence.replaceAll(' -> ',' → ')+' walk still required';
   $('gate').innerHTML=safe?'<span class="ok">VERIFIED REVIEW READY</span>':'<span class="bad">BLOCKED</span>';
-  $('detail').textContent='Latest source sync: '+m.sourceState.latestSourceArchitectObserved+'; browser evidence source: '+m.sourceState.publicBrowserEvidenceSourceArchitect+'; Level 02 effect: '+m.sourceState.level02Effect+'. Remaining source lock: '+m.sourceState.materialLevel02SourceBlocker;
+  $('detail').textContent='Latest source handoff SHA-256: '+sourceHash+'; browser evidence source: '+s.publicBrowserEvidenceSourceArchitect+'; Level 02 effect: '+s.level02Effect+'. Remaining source lock: '+s.materialLevel02SourceBlocker;
   if(safe){const a=$('open');a.href='./'+c.loader;a.classList.add('ready')}
  }catch(e){$('gate').innerHTML='<span class="bad">BLOCKED</span>';$('detail').textContent='Review gate error: '+(e?.message||e);console.error(e)}
 })();
