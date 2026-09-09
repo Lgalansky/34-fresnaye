@@ -27,34 +27,19 @@ jobs:
           B='https://lgalansky.github.io/34-fresnaye/'
           def get(path):
             p=pathlib.Path('/tmp')/path.replace('/','__')
-            subprocess.run(['curl','-fsSL','--retry','5','--retry-delay','2',B+path+'?diag=1','-o',str(p)],check=True)
-            b=p.read_bytes()
-            return b
-          m=json.loads(get('walkthrough-review.json'))
-          c=m['reviewCandidate'];s=m['sourceState'];g=m['geometryPipeline']
+            subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2',B+path+'?diag=2','-o',str(p)],check=True)
+            return p.read_bytes()
+          m=json.loads(get('walkthrough-review.json'));s=m['sourceState'];g=m['geometryPipeline']
           sb=get(s['sourceArchitectHandoffPublicPath']);pb=get(g['publicPath']);db=get(g['currentDeltaPlanPublicPath']);qb=get(g['plannerQaPublicPath'])
-          sh=json.loads(sb);pj=json.loads(pb);dp=json.loads(db);pqa=json.loads(qb)
-          src=hashlib.sha256(sb).hexdigest();pipe=hashlib.sha256(pb).hexdigest()
-          out={
-            'artifact':'34_Fresnaye_Walkthrough_v96_StableV69GateDiagnostic_v1',
-            'manifestArtifact':m['artifact'],
-            'sourceExpected':s['sourceArchitectHandoffSha256'],'sourceActual':src,'sourceHashPass':src==s['sourceArchitectHandoffSha256'],
-            'pipelineExpected':g['sha256'],'pipelineActual':pipe,'pipelineHashPass':pipe==g['sha256'],
-            'sourceArtifactPass':sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json'),
-            'sourceNoGeometryPass':sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and sh['level02_priority_state'].get('effect_of_v69')=='NONE',
-            'pipelineSourcePass':pj['sourceObserved']['sourceArchitect']=='v69' and pj['sourceObserved']['level02Effect']=='NONE' and pj['sourceObserved']['geometryAuthorization'] is False,
-            'deltaPlanPass':dp['sourceArchitect']=='v69' and dp['sourceHandoffSha256']==src and dp['pipelineSha256']==pipe and dp['decision']=='NO_OP_SHORT_CIRCUIT' and dp['geometryBuildRequired'] is False,
-            'plannerQaPass':pqa.get('pass') is True and pqa.get('geometryChanged') is False,
-          }
-          out['pass']=all(v for k,v in out.items() if k.endswith('Pass'))
-          pathlib.Path('stable-v69-gate-diagnostic-v1.json').write_text(json.dumps(out,indent=2)+'\n')
-          print(json.dumps(out,indent=2))
+          sh=json.loads(sb);pj=json.loads(pb);dp=json.loads(db);pqa=json.loads(qb);src=hashlib.sha256(sb).hexdigest();pipe=hashlib.sha256(pb).hexdigest()
+          out={'artifact':'34_Fresnaye_Walkthrough_v96_StableV69GateDiagnostic_v2','manifestArtifact':m['artifact'],'sourceExpected':s['sourceArchitectHandoffSha256'],'sourceActual':src,'sourceHashPass':src==s['sourceArchitectHandoffSha256'],'pipelineExpected':g['sha256'],'pipelineActual':pipe,'pipelineHashPass':pipe==g['sha256'],'sourceArtifactPass':sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json'),'sourceNoGeometryPass':sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and sh['level02_priority_state'].get('effect_of_v69')=='NONE','pipelineSourcePass':pj['sourceObserved']['sourceArchitect']=='v69' and pj['sourceObserved']['level02Effect']=='NONE' and pj['sourceObserved']['geometryAuthorization'] is False,'deltaPlanPass':dp['sourceArchitect']=='v69' and dp['sourceHandoffSha256']==src and dp['pipelineSha256']==pipe and dp['decision']=='NO_OP_SHORT_CIRCUIT' and dp['geometryBuildRequired'] is False,'plannerQaPass':pqa.get('pass') is True and pqa.get('geometryChanged') is False}
+          out['pass']=all(v for k,v in out.items() if k.endswith('Pass'));pathlib.Path('stable-v69-gate-diagnostic-v2.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,indent=2))
           PY
       - name: Persist diagnostic
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add stable-v69-gate-diagnostic-v1.json
-          git commit -m 'Record stable v69 gate diagnostic v1'
+          git add stable-v69-gate-diagnostic-v2.json
+          git commit -m 'Record stable v69 gate diagnostic v2'
           git push origin HEAD:gh-pages
