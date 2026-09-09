@@ -509,7 +509,7 @@ precision highp float;in vec3 N;out vec4 o;void main(){vec3 nn=normalize(N);vec3
   reviewQABtn.onclick=async()=>{diag.classList.add('show');diagText.textContent='Running review readiness QA…';await runReviewReadinessQA()};
   async function runSelfTest(){
     const result={viewer:VIEWER_VERSION,renderer:rendererType,modelHash:runtimeSha,tests:{}};
-    result.tests.richParityIdentityCurrent=document.querySelector('meta[name=fresnaye-viewer]')?.content==='v96'&&document.querySelector('meta[name=fresnaye-rich-parity]')?.content==='production'&&(document.querySelector('.card b')?.textContent||'').includes('Walkthrough v95 RICH PRODUCTION PARITY');
+    result.tests.richParityIdentityCurrent=document.querySelector('meta[name=fresnaye-viewer]')?.content==='v96'&&document.querySelector('meta[name=fresnaye-rich-parity]')?.content==='production'&&(document.querySelector('.card b')?.textContent||'').includes('Walkthrough v96 RICH PRODUCTION PARITY');
     result.tests.hashVerified=runtimeSha===MODEL_SHA256;result.tests.topology=parsed.vertexCount===5769&&triCount===8907;result.tests.rendererReady=(!!gl||!!ctx2d);result.tests.renderedGeometry=lastVisible>100;
     setStart('entrance');let floor0=floorZAt(pos[0],pos[1],footZ);result.tests.entranceFloor=typeof floor0==='number';
     const k0=keys.has('KeyW');dispatchEvent(new KeyboardEvent('keydown',{code:'KeyW'}));result.tests.keyboardEventPipeline=keys.has('KeyW')&&!k0;dispatchEvent(new KeyboardEvent('keyup',{code:'KeyW'}));
