@@ -1,4 +1,4 @@
-name: Run isolated stable r4 Source v77 QA v4
+name: Run isolated stable r4 Source v77 QA v5
 on:
   push:
     branches: [main]
@@ -18,35 +18,34 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Reconstruct QA source and verify public Source v77 pipeline
+      - name: Reconstruct QA source and verify live public v77 semantics
         run: |
           set -euo pipefail
           cat .github/qa/stable-r4-v76-liveqa-v3.b64.part* | base64 -d > /tmp/stable-v3.yml
           echo 'fd558ffa09c6f0824e29120070f60af5947d8ad544531b368a8cf34d1aba5990  /tmp/stable-v3.yml' | sha256sum -c -
           B='https://lgalansky.github.io/34-fresnaye'
-          ok=0
-          for i in $(seq 1 60); do
-            curl -fsSL "$B/source-state/34_Fresnaye_SourceArchitect_handoff_v77.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/source-v77.json || true
-            curl -fsSL "$B/engineering/incremental-geometry-pipeline-v2-v77.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/pipeline-v77.json || true
-            curl -fsSL "$B/engineering/geometry-delta-plan-source-v77-v1.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/delta-v77.json || true
-            curl -fsSL "$B/engineering/geometry-delta-planner-qa-v12.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/planner-qa-v12.json || true
-            if printf '%s\n' \
-              'cfa3cd0ce79272066bd8eff758b66db7ba9b1329429f92e42598d4deb9d7b6bf  /tmp/source-v77.json' \
-              '7eccfecef0afc57fc8e04bdb97ef167257236a5833d6eb59190eefcf91399805  /tmp/pipeline-v77.json' \
-              'e77a769a79e5cb02b30ba2f2ff19490844c8dc981c14cdaa5308b047aea662b8  /tmp/delta-v77.json' \
-              '6fbc37280e237f774889317c2107450a34fab83b3443ef3f61c6078c51fb20d9  /tmp/planner-qa-v12.json' | sha256sum -c - >/dev/null 2>&1; then
-              ok=1; break
-            fi
-            sleep 3
-          done
-          test "$ok" = 1
-          python3 - <<'PY'
-          import json,re,textwrap
-          s=json.load(open('/tmp/source-v77.json')); d=json.load(open('/tmp/delta-v77.json')); q=json.load(open('/tmp/planner-qa-v12.json'))
+          for i in $(seq 1 30); do
+            if curl -fsSL "$B/source-state/34_Fresnaye_SourceArchitect_handoff_v77.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/source-v77.json \
+              && curl -fsSL "$B/engineering/incremental-geometry-pipeline-v2-v77.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/pipeline-v77.json \
+              && curl -fsSL "$B/engineering/geometry-delta-plan-source-v77-v1.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/delta-v77.json \
+              && curl -fsSL "$B/engineering/geometry-delta-planner-qa-v12.json?isolated=$GITHUB_RUN_ID-$i" -o /tmp/planner-qa-v12.json; then
+              if python3 - <<'PY'
+          import json
+          s=json.load(open('/tmp/source-v77.json')); p=json.load(open('/tmp/pipeline-v77.json')); d=json.load(open('/tmp/delta-v77.json')); q=json.load(open('/tmp/planner-qa-v12.json'))
+          assert s['artifact']=='34_Fresnaye_SourceArchitect_handoff_v77'
           assert s['canonical_geometry_changed'] is False and s['geometry_authorization'] is False
           assert s['level02_priority_state']['effect_of_v77']=='NONE'
+          assert p['sourceObserved']['sourceArchitect']=='v77' and p['canonical']['level02']=='v23' and p['viewer']['version']=='v96'
           assert d['decision']=='NO_OP_SHORT_CIRCUIT' and d['canonicalParent']=='v23' and d['viewerReuseCandidate']=='v96'
           assert not d['geometryBuildRequired'] and not d['fullModelRegenerationRequired'] and q['pass'] is True
+          PY
+              then break; fi
+            fi
+            if [ "$i" = 30 ]; then echo 'public v77 evidence did not converge' >&2; exit 1; fi
+            sleep 3
+          done
+          python3 - <<'PY'
+          import re,textwrap
           t=open('/tmp/stable-v3.yml').read()
           m=re.search(r"cat > qa\.cjs <<'JS'\n(.*?)\n\s+JS\n\s+node qa\.cjs",t,re.S)
           assert m, 'qa.cjs block not found'
@@ -64,7 +63,7 @@ jobs:
           node qa.cjs
           status=$?
           if [ ! -s v96/portable-qa-v5.json ]; then
-            printf '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR4_SourceV77_LiveBrowserQA_v4","pass":false,"error":"QA process produced no diagnostic JSON"}\n' > v96/portable-qa-v5.json
+            printf '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR4_SourceV77_LiveBrowserQA_v5","pass":false,"error":"QA process produced no diagnostic JSON"}\n' > v96/portable-qa-v5.json
             status=1
           fi
           git fetch origin gh-pages
@@ -75,6 +74,6 @@ jobs:
           git config user.name 'Larry Galansky'
           git config user.email 'larry@bounceinteractive.co.uk'
           git add v96/portable-qa-v5-diagnostic.json
-          git commit -m 'Persist isolated portable r4 Source v77 QA diagnostic' || true
+          git commit -m 'Persist isolated portable r4 Source v77 QA diagnostic v5' || true
           git push origin HEAD:gh-pages
           exit $status
