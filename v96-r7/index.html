@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#151515"><meta name="fresnaye-loader" content="v96-portable-r7"><meta name="fresnaye-loader-mode" content="verified-cache-first-no-speculative-payload-direct-v8-network-aware-cancelable-hedged-parallel-fallback"><meta name="fresnaye-viewer-sha256" content="1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded"><meta name="fresnaye-model-sha256" content="c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5"><meta name="fresnaye-source-compatibility" content="source-version-agnostic-canonical-v23"><link rel="manifest" href="./manifest.webmanifest"><title>34 Fresnaye Walkthrough v96 — Portable Fast Start</title><style>html,body{margin:0;width:100%;height:100%;background:#111;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}#s{padding:24px;line-height:1.45}#p{opacity:.72;font-size:14px;margin-top:8px}</style></head><body><div id="s">Loading verified walkthrough…<div id="p">Checking local verified cache…</div></div><script>
+(async()=>{
+const DIRECT='../34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html';
+const PARTS=Array.from({length:12},(_,i)=>`../walkthrough-v96.final.part${String(i+1).padStart(2,'0')}.b64`);
+const EXPECTED='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+const MODEL='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+const BYTES=253348,CACHE='fresnaye-v96-portable-r5',S=document.getElementById('s'),Q=document.getElementById('p'),started=performance.now();
+const DIRECT_TIMEOUT_MS=6000,PART_TIMEOUT_MS=8000;
+const params=new URLSearchParams(location.search),forceFallback=params.get('qaFallback')==='1',conn=navigator.connection||navigator.mozConnection||navigator.webkitConnection,effectiveType=String(params.get('qaEffectiveType')||conn?.effectiveType||'unknown').toLowerCase(),saveData=params.get('qaSaveData')==='1'||conn?.saveData===true,hedgeDelayMs=saveData?null:(effectiveType==='slow-2g'||effectiveType==='2g'?4500:effectiveType==='3g'?3000:2000);
+const directUrl=new URL(DIRECT,location.href).href;
+const digest=async raw=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',raw))].map(x=>x.toString(16).padStart(2,'0')).join('');
+const verify=async(raw,label)=>{const bytes=raw instanceof Uint8Array?raw:new Uint8Array(raw);if(bytes.length!==BYTES)throw Error(`${label} bytes ${bytes.length}`);const dig=await digest(bytes);if(dig!==EXPECTED)throw Error(`${label} integrity mismatch`);return{raw:bytes,dig};};
+const fetchTimed=async(url,opts,ms,parentSignal)=>{const c=new AbortController(),onAbort=()=>c.abort(parentSignal?.reason||'parent-abort');if(parentSignal){if(parentSignal.aborted)onAbort();else parentSignal.addEventListener('abort',onAbort,{once:true})}const t=setTimeout(()=>c.abort('timeout'),ms);try{return await fetch(url,{...opts,signal:c.signal})}finally{clearTimeout(t);parentSignal?.removeEventListener?.('abort',onAbort)}};
+const fromCache=async()=>{if(forceFallback||!('caches'in window))return null;const t=performance.now(),c=await caches.open(CACHE),hit=await c.match(directUrl);if(!hit)return null;try{if(hit.headers.get('X-Fresnaye-Verified-SHA256')!==EXPECTED){await c.delete(directUrl);return null}const v=await verify(await hit.arrayBuffer(),'cache');return{...v,ms:Math.round(performance.now()-t)}}catch(e){try{await c.delete(directUrl)}catch{}return null}};
+const directAbort=new AbortController(),fallbackAbort=new AbortController();
+const direct=async()=>{const t=performance.now(),r=await fetchTimed(DIRECT,{cache:'no-store',priority:'high'},DIRECT_TIMEOUT_MS,directAbort.signal);if(!r.ok)throw Error(`direct ${r.status}`);const v=await verify(await r.arrayBuffer(),'direct');return{...v,ms:Math.round(performance.now()-t)}};
+let fallbackPromise=null;
+const fallback=()=>fallbackPromise||(fallbackPromise=(async()=>{if(Q)Q.textContent='Using verified parallel fallback…';let done=0;const load=async p=>{let last;for(let attempt=0;attempt<2;attempt++){try{const r=await fetchTimed(p,{cache:'no-store'},PART_TIMEOUT_MS,fallbackAbort.signal);if(!r.ok)throw Error(`${p} ${r.status}`);const x=(await r.text()).trim();done++;if(Q)Q.textContent=`Fallback ${done}/${PARTS.length} parts`;return x}catch(e){last=e;if(fallbackAbort.signal.aborted)throw e;if(attempt===0)await new Promise(r=>setTimeout(r,180))}}throw last};const t=performance.now(),joined=(await Promise.all(PARTS.map(load))).join(''),gz=Uint8Array.from(atob(joined),c=>c.charCodeAt(0)),ds=new DecompressionStream('gzip'),raw=new Uint8Array(await new Response(new Blob([gz]).stream().pipeThrough(ds)).arrayBuffer()),v=await verify(raw,'fallback');return{...v,ms:Math.round(performance.now()-t)}})());
+const storeVerified=async raw=>{if(!('caches'in window))return false;try{const c=await caches.open(CACHE);await c.put(directUrl,new Response(raw,{headers:{'Content-Type':'text/html; charset=utf-8','X-Fresnaye-Verified-SHA256':EXPECTED}}));return true}catch{return false}};
+try{
+  navigator.serviceWorker?.register('./sw.js',{scope:'./'}).catch(()=>{});
+  let r=await fromCache(),mode='verified-cache-direct-v2',fallbackReason=null,hedged=false,cancelledLoser=null;
+  if(!r){
+    if(forceFallback){r=await fallback();mode='parallel-fallback-v8-forced';directAbort.abort('forced-fallback');cancelledLoser='direct'}
+    else{
+      let hedgeTimer=null;
+      const d=direct().then(x=>({x,mode:'direct-v8',winner:'direct'})).catch(async e=>{fallbackReason=String(e?.message||e);return{x:await fallback(),mode:'parallel-fallback-v8',winner:'fallback'}});
+      const h=hedgeDelayMs==null?new Promise(()=>{}):new Promise((resolve,reject)=>{hedgeTimer=setTimeout(()=>{hedged=true;fallback().then(x=>resolve({x,mode:'parallel-fallback-v8-hedged',winner:'fallback'}),reject)},hedgeDelayMs)});
+      const win=await Promise.any([d,h]);if(hedgeTimer!=null)clearTimeout(hedgeTimer);r=win.x;mode=win.mode;
+      if(win.winner==='direct'&&fallbackPromise){fallbackAbort.abort('direct-won');cancelledLoser='fallback'}
+      if(win.winner==='fallback'){directAbort.abort('fallback-won');cancelledLoser='direct'}
+    }
+    storeVerified(r.raw);
+  }
+  window.__FRESNAYE_TRANSPORT_META={pass:true,loaderMode:mode,preferredMode:'verified-cache-direct-v2/direct-v8',viewerSha256:r.dig,viewerBytes:r.raw.length,modelSha256:MODEL,latestSourceCompatibility:'source-version-agnostic',canonicalCompatibility:'v23',geometryAuthorization:false,directTimeoutMs:DIRECT_TIMEOUT_MS,partTimeoutMs:PART_TIMEOUT_MS,hedgeMs:hedgeDelayMs,saveData,effectiveType,bandwidthPolicy:saveData?'direct-first-save-data-no-hedge':('hedged-'+effectiveType),hedged,cancelledLoser,fallbackReason,cacheName:CACHE,cachePolicy:'CLIENT_HASH_VERIFIED_DIRECT_ONLY__SW_NO_UNVERIFIED_PAYLOAD_WRITES',speculativePayloadPreload:false,transportLoadMs:r.ms,totalLoaderMs:Math.round(performance.now()-started)};
+  document.open();document.write(new TextDecoder().decode(r.raw));document.close();
+}catch(e){directAbort.abort('terminal');fallbackAbort.abort('terminal');window.__FRESNAYE_TRANSPORT_META={pass:false,loaderMode:'verified-cache-first-no-speculative-payload-direct-v8-network-aware-cancelable-hedged-parallel-fallback',error:String(e?.message||e),totalLoaderMs:Math.round(performance.now()-started)};S.textContent='Walkthrough blocked: '+(e?.message||e);console.error(e)}
+})();
+</script></body></html>
