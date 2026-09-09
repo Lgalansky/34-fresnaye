@@ -1,0 +1,39 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableReviewIdentityQA_v15",
+  "geometryChanged": false,
+  "checks": {
+    "manifest_v14_or_newer": true,
+    "source_version_shape": true,
+    "gate_hash": true,
+    "gate_source_version_agnostic": true,
+    "loader_hash": true,
+    "loader_identity_literals": true,
+    "portable_qa_hash": true,
+    "portable_qa_identity": true,
+    "service_worker_identity": true,
+    "ready_identity": true,
+    "direct_viewer_exact": true,
+    "source_hash": true,
+    "source_identity": true,
+    "source_effect_dynamic": true,
+    "pipeline_hash": false
+  },
+  "hashes": {
+    "gate": "de89bda4e7b643f2a24acd364a39586e7efd51fb5ccb98d0656847627dd69213",
+    "loader": "75ff9feb8e6c8e02cfcef37246bfece9523727c8315224a316928004557ef813",
+    "portableQa": "8495746b08a4a92ad5b8c0b9b5f31940c1f2d2cd59c5896d96f1dd75650911ef",
+    "viewer": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "source": "01ae5080e2353ec32357035be011641ff82bfa82de5643bacacf8b65d481b0ef",
+    "pipeline": "7e19bf69af2c25f24fb6f5ab1252932e51969a15892a3e64f97183e0118771d5",
+    "planner": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+    "plan": "481839b81ab2ef475a6da885b9bbce9d406c968c7736084a8cb343745b6c6b84",
+    "plannerQa": "e3e732a1441715a5ade855e548c6515ae0d60e38639324a14ccbf645e7316821",
+    "serviceWorker": "9139359dcbb484d6a3a37f433f51f6977f2944bf74ec5a59fd1b46b43f6ece0f"
+  },
+  "pass": false,
+  "sourceArchitect": "v74",
+  "viewerVersion": "v96",
+  "canonicalModel": "v23",
+  "error": "AssertionError: pipeline_hash",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 27, in <module>\n  File \"<stdin>\", line 4, in record\nAssertionError: pipeline_hash\n"
+}
