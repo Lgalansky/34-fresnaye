@@ -1,0 +1,93 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_R7_StartResetNavigation_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T19:41:41.751Z",
+  "geometryChanged": false,
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "starts": [
+    {
+      "key": "entrance",
+      "coords": "entrance · x 7.90 m · y 17.10 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "position": [
+        7.9,
+        17.1
+      ],
+      "renderer": "WebGL2",
+      "loaderMode": "direct-v8",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "living",
+      "coords": "living · x 3.60 m · y 13.00 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "position": [
+        3.6,
+        13
+      ],
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "kitchen",
+      "coords": "kitchen · x 8.00 m · y 8.20 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "position": [
+        8,
+        8.2
+      ],
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "bedroom",
+      "coords": "bedroom · x 3.50 m · y 26.70 m · floor 0.00 m · eye 1.65 m · collision · WebGL2 · review 1/6",
+      "position": [
+        3.5,
+        26.7
+      ],
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "second",
+      "coords": "second · x -15.40 m · y 5.20 m · floor 0.61 m · eye 2.26 m · collision · WebGL2 · review 1/6",
+      "position": [
+        -15.4,
+        5.2
+      ],
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "key": "service",
+      "coords": "service · x -5.08 m · y 2.11 m · floor -0.76 m · eye 0.89 m · collision · WebGL2 · review 1/6",
+      "position": [
+        -5.08,
+        2.11
+      ],
+      "renderer": "WebGL2",
+      "loaderMode": "verified-cache-direct-v2",
+      "pageErrors": [],
+      "pass": true
+    }
+  ],
+  "reset": {
+    "pass": true,
+    "control": "#reset",
+    "movementM": 0.82,
+    "returnErrorM": 0
+  },
+  "nextRoom": {
+    "pass": true,
+    "control": "#next",
+    "to": "kitchen"
+  },
+  "pass": true
+}

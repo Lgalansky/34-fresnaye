@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v20",
-  "schemaVersion": 20,
-  "updatedUtc": "2026-09-09T18:52:00Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v21",
+  "schemaVersion": 21,
+  "updatedUtc": "2026-09-09T19:41:54.313999Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -14,15 +14,15 @@
     "geometryChanged": false,
     "readySentinel": "walkthrough-v96-ready.json",
     "portableLoader": "v96/index.html",
-    "portableLoaderRevision": "r6",
-    "portableLoaderSha256": "f6eb584d456f4056ea1aae38275230afa844d1345467af089a5400f40a0e9431",
+    "portableLoaderRevision": "r7",
+    "portableLoaderSha256": "9240e13dff84bc8f13746636cb43840ed83a2ad2a4f1ed12796947a9b1b82712",
     "portableServiceWorker": "v96/sw.js",
     "portableServiceWorkerRevision": "r5",
     "portableServiceWorkerSha256": "d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e",
-    "portableQaEvidence": "v96/portable-r6-qa-v1.json",
-    "portableQaSha256": "889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f",
-    "startResetQaEvidence": "v96/start-reset-qa-v1.json",
-    "startResetQaSha256": "9a9b78823d528bcb81c46fd774de810557cfa7dfb28e55517c2025503e7564d6",
+    "portableQaEvidence": "v96/portable-r7-stable-qa-v1.json",
+    "portableQaSha256": "490d1f9e59bb187746f6539e53435a127772ad30412a2ec0e19206fb526d4871",
+    "startResetQaEvidence": "v96/r7-starts-qa-v1.json",
+    "startResetQaSha256": "0dd641a8c98692c16b9560ba9bce3436d2a1ed35c332204da9f1653afb758a0d",
     "preferredReviewUrl": "v96/#entrance",
     "startLinks": {
       "entrance": "v96/#entrance",
@@ -46,7 +46,7 @@
     "geometryAuthorization": false,
     "newerSourceSyncChangesCandidateGeometry": false,
     "browserQaCompatibilitySource": "v79",
-    "browserQaReuseReason": "Source v79 is a source-classification correction only. Exact viewer v96 and canonical v23 hashes are unchanged; fresh stable-gate public browser QA is required to verify the v79 provenance bridge and all six deep-link starts.",
+    "browserQaReuseReason": "Fresh r7 adaptive-network browser QA plus fresh all-six-start/reset/next-room QA executed against unchanged exact v96 viewer and canonical v23 model. No geometry authorization.",
     "materialLevel02SourceBlocker": "Three separate locks remain: named circular stepped toilet-cubicle bulkhead exact curve/step geometry is unwritten and its design-freeze status is not explicitly established; two architect-described vaulted conditions are design-not-frozen and their exact plan/tag mapping remains open."
   },
   "geometryPipeline": {
@@ -67,8 +67,8 @@
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "revision": "v18",
-    "sha256": "4a6002fafd5482933c266b608273b93b4591eba63944db20e835a69be3ae236c"
+    "revision": "v19",
+    "sha256": "052e30826a3dc4abd2c0e845b8435672fa8255a86c8530556d50cb1dceedce9e"
   },
   "acceptance": {
     "finalStatus": "OPEN",
