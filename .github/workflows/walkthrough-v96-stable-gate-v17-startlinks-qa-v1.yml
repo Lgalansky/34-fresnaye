@@ -25,11 +25,11 @@ jobs:
           B='https://lgalansky.github.io/34-fresnaye'
           declare -A H
           H[walkthrough-review.html]='18713fc54611bd825c8cc536dce713ab651894c06fa6003eb7ddc3a09e3d2c24'
-          H[walkthrough-review.json]='cb410ec3b360d3ccbc1cc50689851487b199dc4a092ad714e5efe57f0e53fb5d'
+          H[walkthrough-review.json]='9b41a74f7dfc24d1782aeab8847d6179c640205702e090a9a8e8c754aaa8acf0'
           H[v96/index.html]='f6eb584d456f4056ea1aae38275230afa844d1345467af089a5400f40a0e9431'
           H[v96/sw.js]='d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e'
           H[v96/portable-r6-qa-v1.json]='889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f'
-          H[v96/start-reset-qa-v1.json]='9bec39e1468f1b29ff5b6c33659c67e3de22c24696183b98d9b2aaa07e02a077'
+          H[v96/start-reset-qa-v1.json]='9a9b78823d528bcb81c46fd774de810557cfa7dfb28e55517c2025503e7564d6'
           H[source-state/34_Fresnaye_SourceArchitect_handoff_v78.json]='d24ef3580b9c254e42850c28dc48e7bc98ef36424fdda8b77860863c242e9ebc'
           H[engineering/incremental-geometry-pipeline-v2-v78.json]='2e63892f4d7bfc18381effea8a42885199e5ac08f407a4954dc9722ed801cfcb'
           H[engineering/geometry-delta-plan-source-v78-v1.json]='54239150f169c414d740bb6788508392f449d6873ebbfebb4046153e945ba23a'
