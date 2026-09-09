@@ -1,0 +1,79 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-09",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v96",
+    "sha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "bytes": 253348,
+    "policy": "REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v71",
+    "handoffSha256": "c40de8a58beb5f8b65d404f5f9b0d301e4dac7b4900d593b6581ca3e737354b6",
+    "level02Effect": "SOURCE_BOUNDARY_HARDENING_AND_LATEST_DIRECT_ANSWER_CROSSCHECK__NO_GEOMETRY_AUTHORIZATION",
+    "geometryAuthorization": false,
+    "canonicalGeometryChanged": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "sourceOnlyQaBridge": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_SOURCE_AUTHORIZATION_FALSE",
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"
+  ],
+  "currentAction": "SOURCE_BOUNDARY_HARDENING_V71__NO_GEOMETRY_PATCH__REUSE_V96_BROWSER_QA",
+  "currentDecision": "SOURCE_ONLY_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Lock": "Exact curve/step construction for the circular toilet-cubicle bulkhead and any other curved/unwitnessed ceiling transition lacking its own written radius/diameter/centre/tangent/chord/arc-length or equivalent complete construction witness.",
+  "sourceOnlyAdvance": {
+    "status": "PRIORITY_FIVE_RECONSOLIDATED__DIRECT_ANSWER_CROSSCHECK__EXACT_CURVE_STEP_GEOMETRY_STILL_OPEN",
+    "geometryAction": "NONE"
+  }
+}
