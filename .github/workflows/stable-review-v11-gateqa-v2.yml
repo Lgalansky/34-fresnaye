@@ -1,0 +1,47 @@
+name: Stable review v11 gate QA v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stable-review-v11-gateqa-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gateqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Exercise live stable gate and persist diagnostics
+        shell: bash
+        run: |
+          cat > /tmp/gate.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV11ReliableGateQA_v2',timestampUtc:new Date().toISOString(),url:'https://lgalansky.github.io/34-fresnaye/walkthrough-review.html',viewerVersion:'v96',sourceArchitect:'v70',geometryChanged:false,pass:false};const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{const p=await b.newPage({viewport:{width:1280,height:900}});const errors=[];p.on('pageerror',e=>errors.push(String(e)));await p.goto(out.url+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});try{await p.waitForFunction(()=>['VERIFIED REVIEW READY','BLOCKED'].some(x=>document.querySelector('#gate')?.textContent.includes(x)),null,{timeout:30000})}catch(e){out.waitError=String(e)}out.gate=await p.locator('#gate').textContent().catch(()=>null);out.href=await p.locator('#open').getAttribute('href').catch(()=>null);out.candidate=await p.locator('#candidate').textContent().catch(()=>null);out.qa=await p.locator('#qa').textContent().catch(()=>null);out.transport=await p.locator('#transport').textContent().catch(()=>null);out.portable=await p.locator('#portable').textContent().catch(()=>null);out.source=await p.locator('#source').textContent().catch(()=>null);out.pipeline=await p.locator('#pipeline').textContent().catch(()=>null);out.acceptance=await p.locator('#acceptance').textContent().catch(()=>null);out.detail=await p.locator('#detail').textContent().catch(()=>null);out.pageErrors=errors;out.pass=Boolean(out.gate?.includes('VERIFIED REVIEW READY')&&out.href==='./walkthrough-v96.html'&&errors.length===0)}catch(e){out.error=String(e.stack||e)}finally{await b.close();fs.writeFileSync('stable-v11-reliable-gate-qa-v2.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}})();
+          JS
+          node /tmp/gate.cjs
+      - name: Persist gate evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v11-reliable-gate-qa-v2.json
+          git commit -m 'Record stable v11 reliable gate QA v2' || true
+          git push origin HEAD:gh-pages
+      - name: Enforce gate ready
+        shell: bash
+        run: node -e "const q=require('./stable-v11-reliable-gate-qa-v2.json'); if(!q.pass){console.error(q); process.exit(1)}"
