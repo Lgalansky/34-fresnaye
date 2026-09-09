@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T06:32:03+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v64",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__LEVEL04_PARAPET_DATUM_COMPLETENESS_ADVANCED__370_CANDIDATE_QUARANTINED_BY_ENDPOINT_OWNERSHIP__NO_MODEL_EDIT",
+  "level02_state": "Retain Source Architect v50/discrepancy log v72 dimensional state. D09, corrected D22/former D21 physical instance 1, W11, iD05 and iD08 remain source-closed; later W09/G04/entrance allocation/ceiling-height and explicit horizontal witness closures remain intact.",
+  "current_material_level02_source_lock": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness.",
+  "run64_new_progress": {
+    "new_Archilab_source": "NONE after fresh Outlook check; latest remains 2026-09-08T13:49:17Z.",
+    "Level04_top_parapet": "FRE_WD_302 explicitly prints 88.750 TOP OF PARAPET; datum is now carried into RoofStorey SourcePreparationRegister v3.",
+    "Level04_370_candidate": "A written 370mm vertical occurs adjacent to that parapet condition. Native-vector endpoint ownership audit shows it does not terminate on the explicit 88.380 Domestic Quarters FFL datum line. 370 is therefore classified/quarantined as unowned rather than promoted by arithmetic coincidence.",
+    "Level04_existing_owned_datums": "Retain 88.380 FFL, 89.960 lower top-of-roof, 92.485 upper top-of-roof and written 1580/4105 relations from prior v2.",
+    "Level02_effect": "NONE."
+  },
+  "unresolved_ambiguities": [
+    "Level02 curved/unwitnessed ceiling/bulkhead footprint geometry.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where missing turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 FRE_WD_205 D11 brickwork tag drift and D11 masonry rough width.",
+    "Level03 D02 duplicate schedule ID/system ownership: 3000x2100 frameless versus 1500x2100 aluminium records.",
+    "Level03 D04 confirmed component/system schedule omission.",
+    "Level03 iD02 2100 brickwork head versus 2150 scheduled panel/leaf conflict.",
+    "Level03 skylight width/length/curb/upstand/rough-opening dimensions.",
+    "Level04 written 370mm parapet-adjacent vertical has unresolved opposite-end datum ownership; it is nonblocking source-preparation evidence and must not be used as an 88.380-to-88.750 height without clarification."
+  ],
+  "chief_of_staff_action": "Adopt v64 as additive later-level source evidence only. Keep the Level02 source/geometry state unchanged. Carry 88.750 m as an explicit top-of-parapet datum, but keep the nearby 370mm vertical quarantined from geometry because endpoint ownership to the 88.380 m Domestic Quarters FFL is not established. Retain all v63 unresolved component/ceiling/skylight locks.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level04_TopParapet370_OwnershipAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level04_TopParapet370_OwnershipEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level04_RoofStorey_SourcePreparationRegister_v3.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v47.json",
+    "34_Fresnaye_SourceArchitect_Run64_ArtifactManifest_v1.json"
+  ]
+}
