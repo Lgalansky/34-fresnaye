@@ -1,0 +1,27 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v11",
+  "date": "2026-09-09",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v5.py",
+  "plannerSha256": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+  "sourceV76HandoffSha256": "e4f58eb243a12f669f1f07278833f172b0b98b8d4c97785e12f2a831be2571b2",
+  "pipelineV76Sha256": "55794a5fcbe53e9ffc4754d158d4c16ad1540f6f53d78873efd7fb2ef1819cee",
+  "deltaPlanV76Sha256": "13eb7b643aea365202c5a164f66801a2bd53ff1588826c6ba40156bb4f996e3a",
+  "checks": {
+    "py_compile": true,
+    "normalized_v76_schema_read": true,
+    "v76_no_op_short_circuit": true,
+    "canonical_parent_v23": true,
+    "viewer_reuse_v96": true,
+    "no_geometry_build": true,
+    "no_full_model_regeneration": true,
+    "no_full_browser_regression": true,
+    "source_geometry_authorization_false": true,
+    "source_only_non_none_short_circuit": true,
+    "authorized_missing_changed_ids_fails_closed": true,
+    "authorized_changed_ids_patch_plan": true,
+    "deduplicates_changed_ids": true
+  },
+  "pass": true,
+  "geometryChanged": false,
+  "improvement": "v76 remains a true Level 02 no-op while the planner fail-closes any future authorized geometry change that lacks explicit changed-element IDs."
+}
