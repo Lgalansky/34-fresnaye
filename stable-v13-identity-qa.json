@@ -1,0 +1,29 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableReviewIdentityQA_v13",
+  "geometryChanged": false,
+  "checks": {
+    "manifest_v13": true,
+    "gate_hash": true,
+    "gate_source_version_agnostic": true,
+    "loader_hash": true,
+    "loader_identity_literals": true,
+    "portable_qa_hash": false
+  },
+  "hashes": {
+    "gate": "de89bda4e7b643f2a24acd364a39586e7efd51fb5ccb98d0656847627dd69213",
+    "loader": "ada6cf91fb1f95c57485746828478b6549d8c6175ed027c780182dbcad4578e6",
+    "portableQa": "5b9675ef5272ad6a41001cede3a3f43cd8d061708a66ea54907e22225c485cb6",
+    "viewer": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "source": "ee7727583d2a41fc35b6c40489e5c181af06e217a32ecfe7b4e1f86b63cde462",
+    "pipeline": "2a56a9664e50becd16a573688b0f8b80c7365a44035c71aa27c53fcb4912ffb8",
+    "planner": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+    "plan": "6f65df4ed019fbc0f7a419a8e262745566c4964224cbb73b8904878f41a0b31a",
+    "plannerQa": "ce8ca3f754a5391fe05fcf63ad00dc7a8753ce260e0956b63dca844d429e46b1"
+  },
+  "pass": false,
+  "sourceArchitect": "v72",
+  "viewerVersion": "v96",
+  "canonicalModel": "v23",
+  "error": "AssertionError: portable_qa_hash",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 18, in <module>\n  File \"<stdin>\", line 3, in record\nAssertionError: portable_qa_hash\n"
+}
