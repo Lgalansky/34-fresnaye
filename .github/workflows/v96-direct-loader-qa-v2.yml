@@ -1,0 +1,72 @@
+name: v96 direct loader public QA v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v96-direct-loader-qa-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      URL: https://lgalansky.github.io/34-fresnaye/walkthrough-v96-fast.html
+      DIRECT: https://lgalansky.github.io/34-fresnaye/34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html
+      VHASH: 1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded
+      CAN: c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Wait for direct-v2 loader publication and verify exact direct asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for i in $(seq 1 48); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q "$VHASH" && printf '%s' "$body" | grep -q 'direct-v2-parallel-fallback'; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+          curl -fsSL --retry 5 --retry-all-errors "$DIRECT?qa=$GITHUB_RUN_ID" -o /tmp/viewer.html
+          test "$(wc -c </tmp/viewer.html | tr -d ' ')" = '253348'
+          test "$(sha256sum /tmp/viewer.html | awk '{print $1}')" = "$VHASH"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run exact public desktop/mobile QA through direct-v2 loader
+        shell: bash
+        run: |
+          cat > direct-loader-qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright');const fs=require('fs');
+          const URL=process.env.URL,VHASH=process.env.VHASH,CAN=process.env.CAN;
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords');return[+m[1],+m[2]]};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p){await p.goto(URL+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});}
+          (async()=>{const out={artifact:'34_Fresnaye_Walkthrough_v96_DirectLoader_PublicBrowserQA_v2',timestampUtc:new Date().toISOString(),url:URL,viewerSha256:VHASH,canonicalObjSha256:CAN,geometryChanged:false,loaderMode:'direct-v2',desktop:{},mobile:{},review:{},pass:false};const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const rc=await b.newContext({viewport:{width:1365,height:768}}),r=await rc.newPage();await ready(r);const tr=await r.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(tr?.pass&&tr.loaderMode==='direct-v2'&&tr.preferredMode==='direct-v2'&&tr.viewerSha256===VHASH&&tr.viewerBytes===253348&&tr.fetchConcurrency===1&&tr.parts===0&&tr.modelSha256===CAN&&!tr.fallbackReason,'direct transport identity');await r.evaluate(()=>window.__FRESNAYE_QA.runSelfTest());const st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest),rq=await r.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());const keys=Object.keys(st.tests),bad=keys.filter(k=>!st.tests[k]);ok(st.pass&&keys.length===60&&bad.length===0,'self tests');ok(rq.corePass&&rq.pass&&rq.modelSha256===CAN&&rq.runtimeSha256===CAN&&rq.mainRoute.pass&&rq.mainRoute.collisionValidated,'review/collision');out.review={pass:true,selfTests:keys.length,renderer:rq.renderer,mainRoute:rq.mainRoute,directTransportLoadMs:tr.transportLoadMs,totalLoaderMs:tr.totalLoaderMs,directAsset:tr.directAsset};await rc.close();
+            const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let errors=[];p.on('pageerror',e=>errors.push(String(e)));await ready(p);const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(700);await p.keyboard.up('w');await p.waitForTimeout(100);const d=xy(await p.locator('#coords').textContent());ok(dist(a,d)>.2,'desktop keyboard');await p.locator('#enter').click();await p.waitForTimeout(180);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,movementY:0,bubbles:true})));await p.waitForTimeout(80);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');ok(errors.length===0,'desktop errors');out.desktop={pass:true,keyboardMovementM:+dist(a,d).toFixed(3),pointerLock:true,mouseLook:true,pageErrors:errors};await dc.close();
+            const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let me=[];m.on('pageerror',e=>me.push(String(e)));await ready(m);const ma=xy(await m.locator('#coords').textContent()),sb=await m.locator('#stick').boundingBox();ok(sb,'mobile stick');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(700);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(100);const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.18,'mobile joystick');const lb=await m.locator('#look').boundingBox();ok(lb,'mobile look');const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,cy0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-8,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-8,isPrimary:true,bubbles:true});await m.waitForTimeout(80);const cy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(cy1-cy0)>.05,'mobile look');await m.locator('#mobileReset').click();await m.waitForTimeout(80);ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.1,'mobile reset');ok(me.length===0,'mobile errors');out.mobile={pass:true,joystickMovementM:+dist(ma,mb).toFixed(3),touchLook:true,reset:true,pageErrors:me};await mc.close();out.pass=true;
+          }finally{await b.close()}fs.writeFileSync('v96-direct-public-browser-qa-v2.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));})().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node direct-loader-qa.cjs
+      - name: Persist direct-loader QA evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v96-direct-public-browser-qa-v2.json
+          git commit -m 'Record v96 direct loader public browser QA v2'
+          git push origin HEAD:gh-pages
