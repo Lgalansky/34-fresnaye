@@ -1,6 +1,6 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v4",
-  "updatedUtc": "2026-09-09T04:29:26Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v5",
+  "updatedUtc": "2026-09-09T05:38:57Z",
   "reviewCandidate": {
     "viewerVersion": "v95",
     "loader": "walkthrough-v95.html",
@@ -19,11 +19,11 @@
     "automatedPublicCandidateReviewReady": true
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v64",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v64.json",
-    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v64.json",
-    "sourceArchitectHandoffSha256": "c4ed6f3cd39e102b3dc66a6c1d815201618e0564ea3277c7a0cd5cf618bc3e0f",
-    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__LEVEL04_PARAPET_DATUM_COMPLETENESS_ADVANCED__370_CANDIDATE_QUARANTINED_BY_ENDPOINT_OWNERSHIP__NO_MODEL_EDIT",
+    "latestSourceArchitectObserved": "v65",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v65.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v65.json",
+    "sourceArchitectHandoffSha256": "2f3da55ca1161fc515828fba9eec94fff68ea45d790bc134d246dd1f64be83f1",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S03_COUNT_FUNCTION_IDENTITY_CLOSED_AND_FALSE_DIMENSION_CANDIDATES_EXCLUDED__OVERALL_GRILLE_SIZE_STILL_OPEN__NO_MODEL_EDIT",
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
     "level02Effect": "NONE",
@@ -31,7 +31,18 @@
     "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
     "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness. No scaling or inference.",
-    "laterLevelProgress": "Source Architect v64 adds Level 04 parapet datum/source-preparation evidence only. Explicit 88.750 m top-of-parapet is carried; adjacent written 370 mm remains quarantined because endpoint ownership to the 88.380 m FFL is not established. Level 02 effect NONE."
+    "laterLevelProgress": "Source Architect v65 closes Level 03 S03 grille identity/count=3/function and excludes misleading nearby dimensions; exact S03 overall width/height remains open. Level 02 effect NONE."
+  },
+  "geometryPipeline": {
+    "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+    "publicPath": "engineering/incremental-geometry-pipeline-v2.json",
+    "sha256": "cc609fd6be7da6aa313ea4f8193d1f7026a8929186e8da2342914a298021a571",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v1.json",
+    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v65-v1.json",
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "currentDecision": "NO_OP_SHORT_CIRCUIT",
+    "fullModelRegenerationRequired": false,
+    "geometryBuildRequired": false
   },
   "acceptance": {
     "finalStatus": "OPEN",
