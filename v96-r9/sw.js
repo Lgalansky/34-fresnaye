@@ -1,4 +1,6 @@
-const CACHE='fresnaye-v96-portable-r9';
+const CACHE='fresnaye-v96-portable-r9-v2';
+const OWN_PREFIX='fresnaye-v96-portable-r9-';
+const LEGACY_OWNED=new Set(['fresnaye-v96-portable-r9']);
 const EXPECTED='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
 const SHELL=['./','./index.html','./manifest.webmanifest'];
 const DIRECT='./viewer.html';
@@ -8,7 +10,7 @@ const SHELL_URLS=new Set(SHELL.map(clean));
 const DIRECT_URL=clean(DIRECT);
 const PART_URLS=new Set(PARTS.map(clean));
 self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);await c.addAll(SHELL);await self.skipWaiting()})()));
-self.addEventListener('activate',e=>e.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('fresnaye-v96-portable-')&&k!==CACHE).map(k=>caches.delete(k)));if(self.registration.navigationPreload)await self.registration.navigationPreload.enable();await self.clients.claim()})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>(LEGACY_OWNED.has(k)||k.startsWith(OWN_PREFIX))&&k!==CACHE).map(k=>caches.delete(k)));if(self.registration.navigationPreload)await self.registration.navigationPreload.enable();await self.clients.claim()})()));
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const u=clean(e.request.url);if(!SHELL_URLS.has(u)&&u!==DIRECT_URL&&!PART_URLS.has(u))return;
