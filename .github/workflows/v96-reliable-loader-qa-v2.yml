@@ -1,0 +1,71 @@
+name: v96 reliable loader public browser QA v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v96-reliable-loader-qa-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Verify public canary bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v96-reliable.html'
+          EXPECT='629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49'
+          for i in $(seq 1 60); do
+            curl -fsSL --connect-timeout 10 --max-time 30 "$URL?qa=$GITHUB_RUN_ID-$i" -o /tmp/loader.html 2>/dev/null || true
+            got=$(sha256sum /tmp/loader.html 2>/dev/null | awk '{print $1}' || true)
+            [ "$got" = "$EXPECT" ] && exit 0
+            sleep 5
+          done
+          exit 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Execute public browser QA
+        shell: bash
+        run: |
+          cat > /tmp/qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v96-reliable.html',V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',OBJ='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',GLB='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49',LH='629a5371c63144806f4db27b351eb5c7863b9ea66a24b007b642d1fe10956d49',DIRECT='34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html';
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_ReliableLoader_PublicBrowserQA_v2',timestampUtc:new Date().toISOString(),url:URL,loaderSha256:LH,viewerSha256:V,canonicalObjSha256:OBJ,canonicalGlbSha256:GLB,geometryChanged:false,sourceCompatibilityObserved:'v70',desktop:{},mobile:{},forcedFallback:{},review:{},pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)},xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]},d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p){await p.goto(URL+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000})}
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const c0=await b.newContext({viewport:{width:1365,height:768}}),r=await c0.newPage();await ready(r);const tm=await r.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(tm?.pass&&tm.loaderMode==='direct-v3'&&tm.preferredMode==='direct-v3'&&tm.viewerSha256===V&&tm.viewerBytes===253348&&tm.modelSha256===OBJ&&tm.latestSourceCompatibility==='v70'&&tm.geometryAuthorization===false&&tm.directTimeoutMs===6000&&tm.partTimeoutMs===8000,'direct transport');await r.evaluate(()=>window.__FRESNAYE_QA.runSelfTest());const st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest),rq=await r.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(st.pass&&Object.keys(st.tests).length===60&&Object.values(st.tests).every(Boolean),'60/60');ok(rq.corePass&&rq.modelSha256===OBJ&&rq.triangles===8907&&rq.vertices===5769&&rq.mainRoute?.collisionValidated===true&&rq.mainRoute?.pass===true,'review core/route');out.review={pass:true,renderer:rq.renderer,selfTests:60,total:60,hostTier:rq.hostTier,mainRoute:rq.mainRoute,transportLoadMs:tm.transportLoadMs,totalLoaderMs:tm.totalLoaderMs};await c0.close();
+            const c1=await b.newContext({viewport:{width:1365,height:768}}),p=await c1.newPage();let pe=[];p.on('pageerror',e=>pe.push(String(e)));await ready(p);const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(720);await p.keyboard.up('w');await p.waitForTimeout(140);const z=xy(await p.locator('#coords').textContent());ok(d(a,z)>.2,'keyboard');await p.locator('#enter').click();await p.waitForTimeout(200);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointerlock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.mouse.move(700,390);await p.mouse.move(820,390,{steps:2});await p.waitForTimeout(120);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&!pe.length,'mouse/errors');out.desktop={pass:true,renderer:await p.evaluate(()=>window.__FRESNAYE_LIVE_META.renderer),keyboardMovementM:+d(a,z).toFixed(3),pointerLock:true,mouseLook:true,pageErrors:pe};await c1.close();
+            const c2=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await c2.newPage();let me=[];m.on('pageerror',e=>me.push(String(e)));await ready(m);const ma=xy(await m.locator('#coords').textContent()),sb=await m.locator('#stick').boundingBox();ok(sb,'stick');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(720);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(140);const mb=xy(await m.locator('#coords').textContent());ok(d(ma,mb)>.18,'joystick');const lb=await m.locator('#look').boundingBox(),lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,q0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+70,clientY:ly-8,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+70,clientY:ly-8,isPrimary:true,bubbles:true});await m.waitForTimeout(120);const q1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(q1-q0)>.05,'touchlook');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok(d(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.1&&!me.length,'reset/errors');out.mobile={pass:true,renderer:await m.evaluate(()=>window.__FRESNAYE_LIVE_META.renderer),joystickMovementM:+d(ma,mb).toFixed(3),touchLook:true,reset:true,pageErrors:me};await c2.close();
+            const c3=await b.newContext({viewport:{width:1280,height:720}});let n=0;await c3.route('**/'+DIRECT,r=>r.abort());await c3.route('**/walkthrough-v96.final.part01.b64*',r=>{n++;return n===1?r.abort():r.continue()});const f=await c3.newPage();let fe=[];f.on('pageerror',e=>fe.push(String(e)));await ready(f);const ft=await f.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(ft?.pass&&ft.loaderMode==='parallel-fallback-v3'&&ft.viewerSha256===V&&ft.modelSha256===OBJ&&ft.parts===12&&ft.fetchConcurrency===12&&n>=2&&ft.fallbackReason&&!fe.length,'fallback/retry');await f.evaluate(()=>window.__FRESNAYE_QA.runSelfTest());const fst=await f.evaluate(()=>window.__FRESNAYE_QA.selfTest);ok(fst.pass&&Object.keys(fst.tests).length===60,'fallback selftest');out.forcedFallback={pass:true,mode:ft.loaderMode,directFailureCaptured:true,part01Requests:n,retryVerified:true,viewerHashVerified:true,selfTests:60,pageErrors:fe,transportLoadMs:ft.transportLoadMs,totalLoaderMs:ft.totalLoaderMs};await c3.close();out.pass=true;
+          }catch(e){out.error=String(e.stack||e)}finally{await b.close();fs.writeFileSync('v96-reliable-loader-qa-v2.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}})();
+          JS
+          node /tmp/qa.cjs
+      - name: Persist QA evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          test -f v96-reliable-loader-qa-v2.json || echo '{"pass":false,"error":"QA output missing"}' > v96-reliable-loader-qa-v2.json
+          git add v96-reliable-loader-qa-v2.json
+          git commit -m 'Record v96 reliable loader public QA v2' || true
+          git push origin HEAD:gh-pages
+      - name: Enforce QA pass
+        shell: bash
+        run: node -e "const q=require('./v96-reliable-loader-qa-v2.json'); if(!q.pass){console.error(q.error||q); process.exit(1)}"
