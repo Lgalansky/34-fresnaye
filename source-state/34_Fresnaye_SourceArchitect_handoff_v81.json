@@ -1,0 +1,53 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v81",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T23:41:48+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume written dimensions/IDs/FFLs/sections/elevations/brickwork/schedules only. No visual scaling, vector/pixel conversion, geometric fitting or invented dimensions.",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L03_S03_FALSE_SIZE_CANDIDATES_EXCLUDED__S03_OVERALL_SIZE_REMAINS_OPEN__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "closed_values": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22": "rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / 25mm side clearances; leaf thickness approximate only",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / 20mm side clearances; leaf thickness approximate only"
+    },
+    "remaining_material_lock": "Exact curve/step construction for the separately named circular stepped toilet-cubicle bulkhead plus final exact geometry of architect-described vaulted conditions/other unwitnessed transitions. The two verbally described vaults are design-not-frozen; mapping is not to be inferred.",
+    "effect_of_v81": "NONE__LATER_LEVEL_SOURCE_SAFETY_HARDENING_ONLY"
+  },
+  "v81_material_advance": {
+    "level": "L03",
+    "subject": "L03_S03 x3 roof-void louvered-grille overall-size false-candidate ownership exclusion",
+    "finding": "FRE_WD_302/303/304 and FRE_WD_402 consistently identify L03_S03 x3 as aluminium weather-proof louvered grilles into the roof void. A cross-sheet audit finds no S03-owned written width/height and explicitly excludes nearby 1000mm handrail height, 1000mm purlin spacing, 10000mm MPBL restriction, 22/38x38/200/135 roof build-up values, and adjacent S01/S02 1500x2100 schedule values.",
+    "impact": "S03 overall size remains OPEN, but the exception is hardened against several plausible false closures. Build may consume only S03 identity/count/function until Archilab issues owned overall dimensions."
+  },
+  "later_stage_state": {
+    "L01": "Complex curved/stepped ceiling topology, stair soffit, D11 masonry rough width/tag drift, W06 rough width, W08 head and W04/W05/W06 25mm interfaces remain open.",
+    "L03_openings": "D02 duplicate schedule/system ownership; D04 schedule omission; iD02 2100 brickwork head vs 2150 scheduled panel/leaf remain open.",
+    "L03_skylights": "Three drawn symbol envelopes closed at A600x1200, B600x1200, C600x1955; IDs/curb/upstand/structural rough opening/frame-flashing interfaces remain open.",
+    "L03_shutters": "S01/S02 rough widths1500 each and component1500x2100 source-closed; masonry heads remain open. S03 count/function closed; overall width/height open with false candidates excluded by v81.",
+    "L04": "3 degrees closed only for explicitly annotated lean-to roof; main Mazista pitch/eaves/ridge extents and 370mm parapet-adjacent ownership remain open."
+  },
+  "source_watch": "No Archilab source newer than 2026-09-09T16:41:59Z RE: Render in fresh filtered Outlook search.",
+  "chief_of_staff_action": "Adopt v81 as later-Level03 source-safety hardening only. Do not size L03_S03 from neighbouring 1500x2100 shutters, roof/handrail/statutory notes, or drawing scale. Keep all Level02 priority closures and geometry locks unchanged; no canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_S03_OverallSizeOwnershipExclusionAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_S03_GrilleEvidenceRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_ShutterExceptionRegister_v4.json",
+    "34_Fresnaye_SourceArchitect_Level03_S03_OverallSizeOwnershipExclusionEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v64.json",
+    "34_Fresnaye_SourceArchitect_Run81_ArtifactManifest_v1.json"
+  ]
+}
