@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T00:26:10+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume written Archilab dimensions, IDs, FFLs, sections, elevations, brickwork drawings and schedules only. No visual scaling, pixel/vector conversion, geometric fitting or invented dimensions.",
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v82",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__MAIN_MAZISTA_ROOF_WRITTEN_ASSEMBLY_CONFLICT_HARDENED__RECTANGULAR_SIMPLIFICATION_INTENT_REGISTERED__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "closed_values": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22": "rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / 25mm side clearances; leaf thickness approximate only",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / 20mm side clearances; leaf thickness approximate only"
+    },
+    "remaining_material_lock": "Exact curve/step construction for separately named circular stepped toilet-cubicle bulkhead plus final exact geometry of architect-described vaulted conditions/other unwitnessed transitions. Two verbal vaults remain design-not-frozen and mapping is not inferred.",
+    "effect_of_v82": "NONE__LATER_LEVEL_SOURCE_CONFLICT_CORRECTION_ONLY"
+  },
+  "v82_material_advance": {
+    "level": "L04",
+    "subject": "Main Mazista roof written covering/build-up conflict and rectangular-simplification intent",
+    "finding": "The tender issue itself carries two incompatible written main-Mazista instructions: (A) simplify the existing tiled roof to a rectangle and replace slate with Klip-Lok Zincalume sheets on new 75x50 purlins @ min1000 centres; and (B) replace with new Mazista slate tiles in Peter Louw/Malthoid build-up on 22mm shutterboard and existing 38x38 battens @200. The 2026-09-08 Archilab elevation repeats Variant A but does not explicitly cancel Variant B.",
+    "impact": "Previous RoofStorey SourcePreparationRegister v4 is superseded. Qualitative rectangular-simplification intent is source-registered, but exact main-roof geometry and the governing covering/build-up are locked pending explicit Archilab clarification. Separate 3-degree lean-to closure is unaffected."
+  },
+  "later_stage_state": {
+    "L01": "Complex curved/stepped ceiling topology, stair soffit, D11 masonry rough width/tag drift, W06 rough width, W08 head and W04/W05/W06 25mm interfaces remain open.",
+    "L03_openings": "D02 duplicate schedule/system ownership; D04 schedule omission; iD02 2100 brickwork head vs 2150 scheduled panel/leaf remain open.",
+    "L03_skylights": "Three drawn symbol envelopes closed at A600x1200, B600x1200, C600x1955; IDs/curb/upstand/structural rough opening/frame-flashing interfaces remain open.",
+    "L03_shutters": "S01/S02 rough widths1500 each and component1500x2100 source-closed; masonry heads remain open. S03 count/function closed; overall width/height open.",
+    "L04": "Main Mazista assembly now OPEN_WRITTEN_SOURCE_CONFLICT; rectangular simplification is qualitative intent only; numeric pitch/eaves/ridge remain open; 3 degrees remains closed only for separate lean-to; 370 parapet-adjacent ownership quarantined."
+  },
+  "source_watch": "No Archilab source newer than 2026-09-09T16:41:59Z RE: Render in fresh filtered Outlook search.",
+  "chief_of_staff_action": "Adopt v82 over v81 for Level04 source semantics. Do not let the build consume the previously staged new-Mazista-slate roof build-up as settled: the authoritative tender contains a conflicting Klip-Lok/rectangular-simplification instruction, later repeated by the 2026-09-08 elevation. Keep main-roof assembly and exact geometry locked until Archilab resolves the written conflict. Preserve all Level02 closures and locks. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level04_MainMazistaRoof_WrittenSourceConflictEvidence_v1.json",
+    "34_Fresnaye_SourceArchitect_Level04_MainMazistaRoof_WrittenSourceConflictRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level04_RoofStorey_SourcePreparationRegister_v5.json",
+    "34_Fresnaye_SourceArchitect_Level04_RoofPitchRemainingExceptions_v2.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v65.json",
+    "34_Fresnaye_SourceArchitect_Run82_ArtifactManifest_v1.json"
+  ]
+}
