@@ -1,1 +1,77 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><title>34 Fresnaye — Verified Walkthrough Review</title><style>:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#101010;color:#f5f5f5;min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(800px,100%);background:#181818;border:1px solid #333;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0008}h1{margin:0 0 8px;font-size:clamp(24px,5vw,38px)}.sub{color:#bbb;margin:0 0 18px}.row{padding:11px 0;border-top:1px solid #2d2d2d;display:flex;gap:16px;justify-content:space-between}.row b{min-width:180px}.ok{color:#81d99b}.warn{color:#ffd27a}.bad{color:#ff8d8d}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}a.btn{padding:12px 16px;border-radius:10px;background:#f2f2f2;color:#111;text-decoration:none;font-weight:700;pointer-events:none;opacity:.45}a.ready{pointer-events:auto;opacity:1}a.secondary{background:#2a2a2a;color:#fff}.small{font-size:13px;color:#aaa;line-height:1.45;margin-top:16px;word-break:break-word}@media(max-width:560px){.row{display:block}.row b{display:block;margin-bottom:4px}}</style></head><body><main class="card"><h1>34 Fresnaye walkthrough</h1><p class="sub">Stable gate v12. Source-only updates no longer force a redundant full browser regression when the exact viewer and canonical model hashes are unchanged.</p><div class="row"><b>Gate</b><span id="gate">Checking…</span></div><div class="row"><b>Fast-start package</b><span id="fast">—</span></div><div class="row"><b>Canonical model</b><span id="model">—</span></div><div class="row"><b>Desktop/mobile QA</b><span id="qa">—</span></div><div class="row"><b>Source state</b><span id="source">—</span></div><div class="row"><b>Delta pipeline</b><span id="pipe">—</span></div><div class="row"><b>Final acceptance</b><span id="accept">—</span></div><div class="actions"><a id="open" class="btn" href="#">Open fast walkthrough</a><a id="exact" class="btn secondary" href="#">Exact v96 candidate</a><a class="btn secondary ready" href="./">Production root</a></div><div id="detail" class="small">No architectural geometry is modified by this gate.</div></main><script>(async()=>{const $=x=>document.getElementById(x),hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''),sha=async b=>hex(await crypto.subtle.digest('SHA-256',b)),norm=v=>String(v??'').trim().replace(/\.$/,'').toUpperCase(),stamp=Date.now();const get=async p=>{const r=await fetch('./'+p+'?v='+stamp,{cache:'no-store'});if(!r.ok)throw Error(p+' HTTP '+r.status);return r};try{const m=await get('walkthrough-review.json').then(r=>r.json());if(m.artifact!=='34_Fresnaye_Walkthrough_StableReviewManifest_v12')throw Error('manifest v12 not published');const c=m.reviewCandidate,s=m.sourceState,g=m.geometryPipeline;const lr=await get(c.portableLoader),lb=await lr.arrayBuffer(),lh=await sha(lb),lt=new TextDecoder().decode(lb);const loaderOk=lh===c.portableLoaderSha256&&lt.includes(c.viewerSha256)&&lt.includes(c.modelSha256)&&lt.includes('cache-first-direct-v4-hedged-parallel-fallback');const qr=await get(c.portableQaEvidence),qb=await qr.arrayBuffer(),qh=await sha(qb),q=JSON.parse(new TextDecoder().decode(qb));const qaOk=qh===c.portableQaSha256&&q.pass===true&&q.viewerSha256===c.viewerSha256&&q.canonicalObjSha256===c.modelSha256&&q.desktop?.renderer==='WebGL2'&&q.desktop?.keyboardMovementM>0.1&&q.desktop?.pointerLock===true&&q.desktop?.mouseLookYawRad>0.05&&q.desktop?.collisionValidated===true&&q.mobile?.renderer==='WebGL2'&&q.mobile?.joystickMovementM>0.1&&q.mobile?.touchLookYawRad>0.05&&q.mobile?.reset===true&&q.mobile?.collisionValidated===true&&q.offline?.pass===true&&q.forcedFallback?.pass===true;const r=await get(c.readySentinel).then(x=>x.json());const identity=r.stageComplete===true&&r.geometryChanged===false&&r.viewerVersion===c.viewerVersion&&r.viewerSha256===c.viewerSha256&&r.viewerBytes===c.viewerBytes&&r.modelSha256===c.modelSha256&&r.glbSha256===c.glbSha256&&r.vertices===c.vertices&&r.triangles===c.triangles;const sr=await get(s.sourceArchitectHandoffPublicPath),sb=await sr.arrayBuffer(),shash=await sha(sb),sj=JSON.parse(new TextDecoder().decode(sb));const eff=norm(sj.level02_priority_state?.effect_of_v71);const sourceOk=shash===s.sourceArchitectHandoffSha256&&sj.artifact==='34_Fresnaye_SourceArchitect_handoff_v71'&&sj.canonical_geometry_changed===false&&sj.geometry_authorization===false&&eff===norm(s.level02Effect)&&s.newerSourceSyncChangesCandidateGeometry===false;const pr=await get(g.publicPath),pb=await pr.arrayBuffer(),ph=await sha(pb),pj=JSON.parse(new TextDecoder().decode(pb));const dr=await get(g.currentDeltaPlanPublicPath),db=await dr.arrayBuffer(),dh=await sha(db),dp=JSON.parse(new TextDecoder().decode(db));const ar=await get(g.plannerQaPublicPath),ab=await ar.arrayBuffer(),ah=await sha(ab),aq=JSON.parse(new TextDecoder().decode(ab));const pipeOk=ph===g.sha256&&dh===g.currentDeltaPlanSha256&&ah===g.plannerQaSha256&&pj.artifact===g.artifact&&pj.sourceObserved?.sourceArchitect==='v71'&&pj.canonical?.level02===c.canonicalModel&&pj.geometryBuildRequired===false&&pj.fullModelRegenerationRequired===false&&pj.fullBrowserRegressionRequired===false&&dp.sourceArchitect==='v71'&&dp.decision===g.currentDecision&&dp.geometryBuildRequired===false&&dp.fullModelRegenerationRequired===false&&dp.fullBrowserRegressionRequired===false&&aq.pass===true&&aq.geometryChanged===false;const safe=loaderOk&&qaOk&&identity&&sourceOk&&pipeOk&&c.geometryChanged===false&&c.automatedPublicCandidateReviewReady===true;$('fast').innerHTML=loaderOk?'<span class="ok">HASH-VERIFIED</span> · cache-first direct + hedged parallel fallback + offline':'<span class="bad">BLOCKED</span>';$('model').textContent=c.canonicalModel+' · '+c.vertices.toLocaleString()+' vertices / '+c.triangles.toLocaleString()+' triangles · '+c.modelSha256.slice(0,12)+'…';$('qa').innerHTML=qaOk?'<span class="ok">PASS</span> · desktop WebGL2 keyboard/mouse · mobile touch/reset · collision · offline/fallback':'<span class="bad">BLOCKED</span>';$('source').innerHTML=sourceOk?'<span class="ok">HASH-VERIFIED v71</span> · source-only · no geometry authorization':'<span class="bad">BLOCKED</span>';$('pipe').innerHTML=pipeOk?'<span class="ok">SOURCE-ONLY SHORT CIRCUIT</span> · browser QA safely reused because viewer/model hashes are unchanged':'<span class="bad">BLOCKED</span>';$('accept').innerHTML='<span class="warn">OPEN</span> · genuine human '+m.acceptance.requiredSequence.replaceAll(' -> ',' → ')+' walk still required';$('gate').innerHTML=safe?'<span class="ok">VERIFIED REVIEW READY</span>':'<span class="bad">BLOCKED</span>';$('detail').textContent='Portable loader SHA-256: '+lh+'; Source SHA-256: '+shash+'; Pipeline SHA-256: '+ph+'. Remaining source lock: '+s.materialLevel02SourceBlocker;const ex=$('exact');ex.href='./'+c.exactCandidateUrl;ex.classList.add('ready');if(safe){const o=$('open');o.href='./'+c.preferredReviewUrl;o.classList.add('ready')}}catch(e){$('gate').innerHTML='<span class="bad">BLOCKED</span>';$('detail').textContent='Review gate error: '+(e?.message||e);console.error(e)}})();</script></body></html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex"><title>34 Fresnaye — Verified Walkthrough Review</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;background:#101010;color:#f5f5f5;min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{width:min(800px,100%);background:#181818;border:1px solid #333;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0008}
+h1{margin:0 0 8px;font-size:clamp(24px,5vw,38px)}.sub{color:#bbb;margin:0 0 18px}.row{padding:11px 0;border-top:1px solid #2d2d2d;display:flex;gap:16px;justify-content:space-between}.row b{min-width:180px}
+.ok{color:#81d99b}.warn{color:#ffd27a}.bad{color:#ff8d8d}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+a.btn{padding:12px 16px;border-radius:10px;background:#f2f2f2;color:#111;text-decoration:none;font-weight:700;pointer-events:none;opacity:.45}
+a.ready{pointer-events:auto;opacity:1}a.secondary{background:#2a2a2a;color:#fff}.small{font-size:13px;color:#aaa;line-height:1.45;margin-top:16px;word-break:break-word}
+@media(max-width:560px){.row{display:block}.row b{display:block;margin-bottom:4px}}
+</style></head><body><main class="card">
+<h1>34 Fresnaye walkthrough</h1>
+<p class="sub">Stable gate v13. Source-version agnostic: source-only updates can advance by manifest without rewriting this gate.</p>
+<div class="row"><b>Gate</b><span id="gate">Checking…</span></div>
+<div class="row"><b>Fast-start package</b><span id="fast">—</span></div>
+<div class="row"><b>Canonical model</b><span id="model">—</span></div>
+<div class="row"><b>Desktop/mobile QA</b><span id="qa">—</span></div>
+<div class="row"><b>Source state</b><span id="source">—</span></div>
+<div class="row"><b>Delta pipeline</b><span id="pipe">—</span></div>
+<div class="row"><b>Final acceptance</b><span id="accept">—</span></div>
+<div class="actions"><a id="open" class="btn" href="#">Open fast walkthrough</a><a id="exact" class="btn secondary" href="#">Exact v96 candidate</a><a class="btn secondary ready" href="./">Production root</a></div>
+<div id="detail" class="small">No architectural geometry is modified by this gate.</div></main>
+<script>
+(async()=>{
+const $=x=>document.getElementById(x),hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''),
+sha=async b=>hex(await crypto.subtle.digest('SHA-256',b)),norm=v=>String(v??'').trim().replace(/\.$/,'').toUpperCase(),stamp=Date.now();
+const get=async p=>{const r=await fetch('./'+p+'?v='+stamp,{cache:'no-store'});if(!r.ok)throw Error(p+' HTTP '+r.status);return r};
+const sourceEffect=(h,v)=>{
+  const p=h?.level02_priority_state||{}, k='effect_of_'+v;
+  if(p[k]!=null)return norm(p[k]);
+  const run=h?.['run'+v.slice(1)+'_new_progress'];
+  if(run?.Level02_effect!=null)return norm(run.Level02_effect);
+  if(h?.level02_effect!=null)return norm(h.level02_effect);
+  throw Error('source handoff missing explicit Level02 effect for '+v);
+};
+try{
+  const m=await get('walkthrough-review.json').then(r=>r.json());
+  if(m.schemaVersion!==13||m.artifact!=='34_Fresnaye_Walkthrough_StableReviewManifest_v13')throw Error('manifest v13 not published');
+  const c=m.reviewCandidate,s=m.sourceState,g=m.geometryPipeline,sv=s.latestSourceArchitectObserved;
+  if(!/^v\d+$/.test(sv))throw Error('invalid Source Architect version');
+  const lr=await get(c.portableLoader),lb=await lr.arrayBuffer(),lh=await sha(lb),lt=new TextDecoder().decode(lb);
+  const loaderOk=lh===c.portableLoaderSha256&&lt.includes(c.viewerSha256)&&lt.includes(c.modelSha256)&&lt.includes('cache-first-direct-v4-hedged-parallel-fallback');
+  const qr=await get(c.portableQaEvidence),qb=await qr.arrayBuffer(),qh=await sha(qb),q=JSON.parse(new TextDecoder().decode(qb));
+  const qaOk=qh===c.portableQaSha256&&q.pass===true&&q.viewerSha256===c.viewerSha256&&q.canonicalObjSha256===c.modelSha256&&
+    q.desktop?.renderer==='WebGL2'&&q.desktop?.keyboardMovementM>0.1&&q.desktop?.pointerLock===true&&q.desktop?.mouseLookYawRad>0.05&&q.desktop?.collisionValidated===true&&
+    q.mobile?.renderer==='WebGL2'&&q.mobile?.joystickMovementM>0.1&&q.mobile?.touchLookYawRad>0.05&&q.mobile?.reset===true&&q.mobile?.collisionValidated===true&&
+    q.offline?.pass===true&&q.forcedFallback?.pass===true;
+  const r=await get(c.readySentinel).then(x=>x.json());
+  const identity=r.stageComplete===true&&r.geometryChanged===false&&r.viewerVersion===c.viewerVersion&&r.viewerSha256===c.viewerSha256&&r.viewerBytes===c.viewerBytes&&r.modelSha256===c.modelSha256&&r.glbSha256===c.glbSha256&&r.vertices===c.vertices&&r.triangles===c.triangles;
+  const sr=await get(s.sourceArchitectHandoffPublicPath),sb=await sr.arrayBuffer(),shash=await sha(sb),sj=JSON.parse(new TextDecoder().decode(sb)),eff=sourceEffect(sj,sv);
+  const sourceOk=shash===s.sourceArchitectHandoffSha256&&sj.artifact==='34_Fresnaye_SourceArchitect_handoff_'+sv&&sj.canonical_geometry_changed===false&&sj.geometry_authorization===s.geometryAuthorization&&eff===norm(s.level02Effect)&&s.newerSourceSyncChangesCandidateGeometry===false;
+  const pr=await get(g.publicPath),pb=await pr.arrayBuffer(),ph=await sha(pb),pj=JSON.parse(new TextDecoder().decode(pb));
+  const gr=await get(g.plannerPublicPath),gb=await gr.arrayBuffer(),gh=await sha(gb);
+  const dr=await get(g.currentDeltaPlanPublicPath),db=await dr.arrayBuffer(),dh=await sha(db),dp=JSON.parse(new TextDecoder().decode(db));
+  const ar=await get(g.plannerQaPublicPath),ab=await ar.arrayBuffer(),ah=await sha(ab),aq=JSON.parse(new TextDecoder().decode(ab));
+  const pipeOk=ph===g.sha256&&gh===g.plannerSha256&&dh===g.currentDeltaPlanSha256&&ah===g.plannerQaSha256&&
+    pj.artifact===g.artifact&&pj.sourceObserved?.sourceArchitect===sv&&pj.canonical?.level02===c.canonicalModel&&
+    pj.geometryBuildRequired===g.geometryBuildRequired&&pj.fullModelRegenerationRequired===g.fullModelRegenerationRequired&&pj.fullBrowserRegressionRequired===g.fullBrowserRegressionRequired&&
+    dp.sourceArchitect===sv&&dp.planner===g.planner&&dp.decision===g.currentDecision&&dp.geometryBuildRequired===g.geometryBuildRequired&&dp.fullModelRegenerationRequired===g.fullModelRegenerationRequired&&dp.fullBrowserRegressionRequired===g.fullBrowserRegressionRequired&&
+    aq.pass===true&&aq.geometryChanged===false&&aq.plannerSha256===g.plannerSha256;
+  const safe=loaderOk&&qaOk&&identity&&sourceOk&&pipeOk&&c.geometryChanged===false&&c.automatedPublicCandidateReviewReady===true;
+  $('fast').innerHTML=loaderOk?'<span class="ok">HASH-VERIFIED</span> · cache-first direct + hedged parallel fallback + offline':'<span class="bad">BLOCKED</span>';
+  $('model').textContent=c.canonicalModel+' · '+c.vertices.toLocaleString()+' vertices / '+c.triangles.toLocaleString()+' triangles · '+c.modelSha256.slice(0,12)+'…';
+  $('qa').innerHTML=qaOk?'<span class="ok">PASS</span> · desktop WebGL2 keyboard/mouse · mobile touch/reset · collision · offline/fallback':'<span class="bad">BLOCKED</span>';
+  $('source').innerHTML=sourceOk?'<span class="ok">HASH-VERIFIED '+sv+'</span> · '+eff+' · no geometry authorization':'<span class="bad">BLOCKED</span>';
+  $('pipe').innerHTML=pipeOk?'<span class="ok">'+g.currentDecision.replaceAll('_',' ')+'</span> · exact viewer/model QA reused by hash':'<span class="bad">BLOCKED</span>';
+  $('accept').innerHTML='<span class="warn">OPEN</span> · genuine human '+m.acceptance.requiredSequence.replaceAll(' -> ',' → ')+' walk still required';
+  $('gate').innerHTML=safe?'<span class="ok">VERIFIED REVIEW READY</span>':'<span class="bad">BLOCKED</span>';
+  $('detail').textContent='Portable loader SHA-256: '+lh+'; Source SHA-256: '+shash+'; Pipeline SHA-256: '+ph+'; Planner SHA-256: '+gh+'. Remaining source lock: '+s.materialLevel02SourceBlocker;
+  const ex=$('exact');ex.href='./'+c.exactCandidateUrl;ex.classList.add('ready');
+  if(safe){const o=$('open');o.href='./'+c.preferredReviewUrl;o.classList.add('ready')}
+}catch(e){$('gate').innerHTML='<span class="bad">BLOCKED</span>';$('detail').textContent='Review gate error: '+(e?.message||e);console.error(e)}
+})();
+</script></body></html>
