@@ -1,0 +1,59 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v72",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T14:27:38+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L01_W09_MASONRY_ROUGH_WIDTH_550_SOURCE_CLOSED_BY_NATIVE_DIMENSION_TERMINAL_OWNERSHIP__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "remaining_material_lock": "Exact curve/step construction for the circular toilet-cubicle bulkhead and any other curved/unwitnessed ceiling transition lacking its own written radius/diameter/centre/tangent/chord/arc-length or equivalent complete construction witness.",
+    "effect_of_v72": "NONE__LATER_LEVEL_SOURCE_PREPARATION_ONLY"
+  },
+  "v72_material_advance": {
+    "level": "L01",
+    "subject": "L01_W09 masonry rough-opening width",
+    "finding": "FRE_WD_205_REV_A directly prints 550 in the W09 brickwork dimension chain. Native PDF dimension-arrow terminal centrelines at the two ends exactly share the W09 opening endpoint ordinates, closing rough width at 550mm without scaling. Existing direct SILL1440 and U/S WINDOW OPENING2040 remain closed. FRE_WD_401 independently schedules W09 at width550, height600, sill1440.",
+    "boundary": "Native PDF coordinates are ownership metadata only; no PDF/vector/pixel distance is converted into an architectural dimension. Equality to the schedule does not define frame tolerance, reveal or packing."
+  },
+  "later_stage_source_state": {
+    "L01_windows": "W01/W02/W03/W04/W05/W07/W09 structural width+head/vertical source fields are now closed; W06 rough width remains open; W08 brickwork head remains open; W04/W05/W06 retain unassigned 25mm head-interface conditions where applicable.",
+    "L01_D11": "OPEN masonry rough width/tag drift; physical D11 and schedule5100x2100 remain explicit.",
+    "L03_D02": "OPEN duplicate authoritative schedule ID/system ownership: 3000x2100 frameless and 1500x2100 aluminium records.",
+    "L03_D04": "OPEN schedule component/system omission despite 1500/U-S2100 structural evidence.",
+    "L03_iD02": "OPEN 815 width with brickwork head2100 vs scheduled panel/leaf2150.",
+    "L03_skylights": "Two audited new-skylight symbol envelopes 600x1200 each; ID/additional-instance and curb/upstand/rough-opening/frame-flashing interfaces remain open.",
+    "L03_S01_S02": "Rough widths1500 each and components1500x2100 source-closed; masonry heads remain open.",
+    "L03_S03": "Count x3/function source-closed; overall width/height open.",
+    "L04_parapet_370": "Written370mm parapet-adjacent vertical remains quarantined for endpoint-datum ownership."
+  },
+  "unresolved_ambiguities": [
+    "Level02 exact circular/other curved or unwitnessed ceiling/bulkhead footprint construction.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 D11 brickwork tag drift and masonry rough width.",
+    "Level01 W06 masonry rough width and W08 brickwork head; W04/W05/W06 25mm head-interface allocation remains unspecified.",
+    "Level03 D02 duplicate schedule-system ownership; D04 schedule omission; iD02 2100-vs-2150 conflict.",
+    "Level03 remaining skylight interfaces/identity mapping; S01/S02 masonry heads; S03 overall grille size.",
+    "Level04 370mm parapet-adjacent endpoint ownership exception."
+  ],
+  "source_watch": "Fresh Outlook search found no Archilab message on 2026-09-09; latest known remains 2026-09-08T13:49:17Z.",
+  "chief_of_staff_action": "Adopt v72 for later Level01 W09 opening geometry evidence: masonry rough width550, sill1440 and U/S2040 are source-closed. Do not infer frame/reveal/tolerance from schedule equality. Keep all Level02 geometry locks and remaining Level01/03/04 exceptions. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level01_W09_RoughWidthOwnershipAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level01_W09_BrickworkRoughWidth550_OwnershipEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level01_WindowBrickworkOpeningEvidenceRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level01_WindowRemainingExceptions_v2.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v55.json",
+    "34_Fresnaye_SourceArchitect_Run72_ArtifactManifest_v1.json"
+  ]
+}
