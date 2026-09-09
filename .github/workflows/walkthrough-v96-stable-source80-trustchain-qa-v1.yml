@@ -78,15 +78,14 @@ jobs:
           with open('/tmp/trust/refs.tsv','w') as f:
             for path,sha,out in refs:f.write(f'{path}\t{sha}\t{out}\n')
           PY
+          FAIL=0
           while IFS=$'\t' read -r P H O; do
-            OK=0
-            for N in $(seq 1 60); do
-              curl -fsSL --retry 2 --retry-delay 1 "$B/$P?trust=$GITHUB_RUN_ID-$N" -o "/tmp/trust/$O" || true
-              if echo "$H  /tmp/trust/$O" | sha256sum -c - >/dev/null 2>&1; then OK=1; break; fi
-              sleep 2
-            done
-            test "$OK" = 1
+            curl -fsSL --retry 3 --retry-delay 1 "$B/$P?trust=$GITHUB_RUN_ID" -o "/tmp/trust/$O"
+            A=$(sha256sum "/tmp/trust/$O" | awk '{print $1}')
+            echo "TRUST_REF path=$P expected=$H actual=$A"
+            if [ "$A" != "$H" ]; then FAIL=1; fi
           done < /tmp/trust/refs.tsv
+          test "$FAIL" = 0
       - name: Reproduce Source v80 no-op delta and verify viewer readiness identity
         run: |
           set -euo pipefail
