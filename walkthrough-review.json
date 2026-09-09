@@ -30,7 +30,7 @@
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
     "level02Effect": "SOURCE_EXCEPTION_NARROWED__NO_GEOMETRY_AUTHORIZATION",
-    "publicBrowserEvidenceSourceArchitect": "v70",
+    "publicBrowserEvidenceSourceArchitect": "v69",
     "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
     "materialLevel02SourceBlocker": "Exact circular/stepped toilet-cubicle bulkhead curve/step construction and other curved/unwitnessed ceiling transitions lacking written radius/diameter/centre/tangent/chord/arc-length or owned horizontal witness. No scaling or inference.",
