@@ -1,7 +1,7 @@
 {
   "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v14",
   "schemaVersion": 14,
-  "updatedUtc": "2026-09-09T14:42:25Z",
+  "updatedUtc": "2026-09-09T14:53:30Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -63,7 +63,8 @@
   },
   "stableGate": {
     "publicPath": "walkthrough-review.html",
-    "sha256": "de89bda4e7b643f2a24acd364a39586e7efd51fb5ccb98d0656847627dd69213",
-    "sourceVersionAgnostic": true
+    "sha256": "dacda9182e49e259c46595387939d2b7594c5d80e931ee9549b875b67d00f09b",
+    "sourceVersionAgnostic": true,
+    "manifestVersionForwardCompatible": true
   }
 }
