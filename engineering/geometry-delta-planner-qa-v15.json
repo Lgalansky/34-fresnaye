@@ -1,0 +1,37 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v15",
+  "date": "2026-09-09",
+  "geometryChanged": false,
+  "sourceArchitect": "v80",
+  "sourceHandoffSha256": "90682214a7d4f18372fd5ec1dab75945067f83b4a23938e37e0e55b760151c94",
+  "classificationSha256": "aef7f81e7cbd497bbe3d2f86cee3667fb58dba27bd41a176aec5d6691f6b5caf",
+  "pipelineSha256": "427f9058fed95c945fdd59d367bc7c20d6926296e570d6191c6e7e9a42d04c90",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v6",
+  "plannerSha256": "74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db",
+  "deltaPlanSha256": "75e9c0726826b9bed037b05114a05456cb2404427efda69474cf1ef5686bf6a3",
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "cases": [
+    {
+      "name": "v80_classification_bridge_noop",
+      "pass": true,
+      "rc": 0
+    },
+    {
+      "name": "missing_effect_without_bridge_fails_closed",
+      "pass": true,
+      "rc": 2
+    },
+    {
+      "name": "authorization_without_changed_ids_fails_closed",
+      "pass": true,
+      "rc": 2,
+      "stderr": "BLOCKED: classification bridge source identity mismatch"
+    },
+    {
+      "name": "unpromoted_canonical_mutation_fails_closed",
+      "pass": true,
+      "rc": 2
+    }
+  ],
+  "pass": true
+}
