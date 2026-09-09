@@ -1,0 +1,63 @@
+name: v96 optimized public loader QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v96-parallel-loader-qa-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Wait for optimized v96 loader
+        shell: bash
+        run: |
+          URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v96.html'
+          VHASH='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+          ok=0
+          for i in $(seq 1 48); do
+            body=$(curl -fsSL --connect-timeout 10 --max-time 30 "$URL?bust=$GITHUB_RUN_ID-$i" 2>/dev/null || true)
+            if printf '%s' "$body" | grep -q "$VHASH" && printf '%s' "$body" | grep -q "parallel-v1"; then ok=1; break; fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify exact viewer, model, controls and navigation
+        shell: bash
+        run: |
+          cat > v96-parallel-qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright');const fs=require('fs');
+          const URL='https://lgalansky.github.io/34-fresnaye/walkthrough-v96.html',VHASH='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',CAN='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const ok=(v,m)=>{if(!v)throw Error(m)},xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords');return[+m[1],+m[2]]},dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p){await p.goto(URL+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_QA?.status==='READY',null,{timeout:90000});}
+          (async()=>{const out={artifact:'34_Fresnaye_Walkthrough_v96_ParallelLoader_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),url:URL,viewerSha256:VHASH,canonicalObjSha256:CAN,geometryChanged:false,loaderMode:'parallel-v1',desktop:{},mobile:{},review:{},pass:false};const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const rc=await b.newContext({viewport:{width:1365,height:768}}),r=await rc.newPage();await ready(r);const tr=await r.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(tr?.pass&&tr.loaderMode==='parallel-v1'&&tr.viewerSha256===VHASH&&tr.viewerBytes===253348&&tr.parts===12&&tr.fetchConcurrency===12&&tr.modelSha256===CAN,'transport identity');await r.evaluate(()=>window.__FRESNAYE_QA.runSelfTest());const st=await r.evaluate(()=>window.__FRESNAYE_QA.selfTest),rq=await r.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());const keys=Object.keys(st.tests);ok(st.pass&&keys.length===60&&keys.every(k=>st.tests[k]),'60 self tests');ok(rq.pass&&rq.corePass&&rq.modelSha256===CAN&&rq.runtimeSha256===CAN&&rq.mainRoute.pass&&rq.mainRoute.collisionValidated,'model/navigation');out.review={pass:true,selfTests:keys.length,renderer:rq.renderer,mainRoute:rq.mainRoute,transportLoadMs:tr.transportLoadMs};await rc.close();
+            const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let de=[];p.on('pageerror',e=>de.push(String(e)));await ready(p);const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(700);await p.keyboard.up('w');await p.waitForTimeout(100);const d=xy(await p.locator('#coords').textContent());ok(dist(a,d)>.2,'desktop keyboard');await p.locator('#enter').click();await p.waitForTimeout(180);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,movementY:0,bubbles:true})));await p.waitForTimeout(80);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&de.length===0,'mouse look/errors');out.desktop={pass:true,keyboardMovementM:+dist(a,d).toFixed(3),pointerLock:true,mouseLook:true,pageErrors:de};await dc.close();
+            const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let me=[];m.on('pageerror',e=>me.push(String(e)));await ready(m);const ma=xy(await m.locator('#coords').textContent()),sb=await m.locator('#stick').boundingBox();ok(sb,'mobile stick');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(700);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(100);const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.18,'mobile joystick');const lb=await m.locator('#look').boundingBox();ok(lb,'mobile look');const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,cy0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-8,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-8,isPrimary:true,bubbles:true});await m.waitForTimeout(80);const cy1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(cy1-cy0)>.05,'mobile look');await m.locator('#mobileReset').click();await m.waitForTimeout(80);ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.1&&me.length===0,'mobile reset/errors');out.mobile={pass:true,joystickMovementM:+dist(ma,mb).toFixed(3),touchLook:true,reset:true,pageErrors:me};await mc.close();out.pass=true;
+          }finally{await b.close()}fs.writeFileSync('v96-parallel-public-browser-qa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));})().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node v96-parallel-qa.cjs
+      - name: Persist optimized loader QA
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v96-parallel-public-browser-qa-v1.json
+          git commit -m 'Record v96 parallel loader public browser QA v1'
+          git push origin HEAD:gh-pages
