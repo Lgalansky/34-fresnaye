@@ -1,0 +1,47 @@
+name: Fresnaye Stable Source82 R8 Live QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-source82-r8-liveqa-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for Source v82 Pages deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          u="https://lgalansky.github.io/34-fresnaye/walkthrough-review.json?qa=$(date +%s)"
+          for i in $(seq 1 60); do
+            body="$(curl -fsSL --retry 2 --retry-delay 1 "$u" || true)"
+            if printf '%s' "$body" | grep -q '"latestSourceArchitectObserved": "v82"'; then
+              echo "Source v82 manifest is public"
+              exit 0
+            fi
+            sleep 5
+            u="https://lgalansky.github.io/34-fresnaye/walkthrough-review.json?qa=$(date +%s)-$i"
+          done
+          echo "Source v82 manifest did not become public" >&2
+          exit 1
+      - name: Install Playwright Chromium
+        run: |
+          mkdir -p /tmp/pw
+          cd /tmp/pw
+          npm init -y
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          ln -s /tmp/pw/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Verify public stable gate, model, starts, desktop and mobile controls
+        run: node engineering/walkthrough-v96-stable-source82-r8-publicqa-v1.cjs
+      - name: Upload QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-source82-r8-publicbrowserqa-v1
+          path: /tmp/stable-source82-r8-publicbrowserqa-v1.json
+          if-no-files-found: error
