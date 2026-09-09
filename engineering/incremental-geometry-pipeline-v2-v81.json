@@ -1,0 +1,90 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-10",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v96",
+    "sha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "bytes": 253348,
+    "policy": "REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v81",
+    "handoffSha256": "1f738e562a38019808c6b5c2d452817c33d48a85ad6efeaa9a036cce1f3ab7a5",
+    "classificationSha256": "92b6c9f6fa03d46f300fd1d566e061a3cce7b265f1e7bfd9f661d360a536cdc7",
+    "level02Effect": "NONE__LATER_LEVEL_SOURCE_SAFETY_HARDENING_ONLY",
+    "geometryAuthorization": false,
+    "canonicalGeometryChanged": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "sourceOnlyQaBridge": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_GEOMETRY_AUTHORIZATION_FALSE",
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "source_effect_classification_bridge",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE",
+    "NO_STATUS_TRANSFER_BETWEEN_SEPARATE_CONDITIONS",
+    "NO_IMPLICIT_SOURCE_EFFECT_WHEN_HANDOFF_OMITS_EFFECT"
+  ],
+  "currentAction": "SOURCE_V81_L03_S03_FALSE_SIZE_CANDIDATE_EXCLUSIONS_ONLY__NO_LEVEL02_GEOMETRY_PATCH__REUSE_EXACT_V96_BY_HASH",
+  "currentDecision": "NO_OP_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Locks": [
+    "Named circular stepped toilet-cubicle bulkhead: exact written curve/step construction.",
+    "Two architect-described vaulted-ceiling conditions: design not frozen and exact plan/tag mapping not explicit.",
+    "Any other curved/unwitnessed Level02 ceiling transition lacking its own complete written construction witness."
+  ],
+  "sourceOnlyAdvance": {
+    "status": "LATER_LEVEL_SOURCE_SAFETY_HARDENING_ONLY",
+    "level": "L03",
+    "subject": "L03_S03 roof-void louvered-grille false size candidate exclusions",
+    "finding": "S03 identity/count/function remain source-closed but no S03-owned written overall width/height exists. Nearby handrail, purlin, MPBL, roof build-up and adjacent S01/S02 dimensions are explicitly excluded from S03 ownership.",
+    "geometryAction": "NONE"
+  }
+}
