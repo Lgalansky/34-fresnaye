@@ -19,7 +19,8 @@
     "portableQaSha256": "3bf4e91d01dc65a19ad3121122bc19548287a69a4621af83c2c6df1bd1e95414",
     "preferredReviewUrl": "v96/",
     "exactCandidateUrl": "walkthrough-v96.html",
-    "automatedPublicCandidateReviewReady": true
+    "automatedPublicCandidateReviewReady": true,
+    "directViewerAsset": "34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html"
   },
   "sourceState": {
     "latestSourceArchitectObserved": "v72",
@@ -59,5 +60,10 @@
     "minimumDurationSec": 12,
     "staticRendersDoNotCount": true,
     "productionRootPromoted": false
+  },
+  "stableGate": {
+    "publicPath": "walkthrough-review.html",
+    "sha256": "de89bda4e7b643f2a24acd364a39586e7efd51fb5ccb98d0656847627dd69213",
+    "sourceVersionAgnostic": true
   }
 }
