@@ -1,0 +1,111 @@
+name: Walkthrough v96 portable r6 public QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-portable-r6-qa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Wait for public r6 loader and verify code identity
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          ok=0
+          for i in $(seq 1 60); do
+            curl -fsSL "$B/v96/?r6prop=$GITHUB_RUN_ID-$i" -o /tmp/index.html || true
+            curl -fsSL "$B/v96/sw.js?r6prop=$GITHUB_RUN_ID-$i" -o /tmp/sw.js || true
+            if printf '%s\n' \
+              'f6eb584d456f4056ea1aae38275230afa844d1345467af089a5400f40a0e9431  /tmp/index.html' \
+              'd24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e  /tmp/sw.js' | sha256sum -c - >/dev/null 2>&1; then
+              ok=1; break
+            fi
+            sleep 3
+          done
+          test "$ok" = 1
+          grep -q 'v96-portable-r6' /tmp/index.html
+          grep -q 'speculativePayloadPreload:false' /tmp/index.html
+          ! grep -q 'rel="preload"' /tmp/index.html
+          grep -q 'fresnaye-v96-portable-r5' /tmp/sw.js
+          grep -q 'navigationPreload.enable' /tmp/sw.js
+          node --check /tmp/sw.js
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/index.html').read(); m=re.search(r'<script>\n([\s\S]*?)\n</script>',t); assert m
+          open('/tmp/loader.js','w').write(m.group(1))
+          PY
+          node --check /tmp/loader.js
+      - name: Install Playwright Chromium
+        run: |
+          mkdir -p /tmp/pw
+          cd /tmp/pw
+          npm init -y
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify r6 cache-first transport desktop mobile fallback and warm-load network behavior
+        run: |
+          cat > /tmp/qa.cjs <<'JS'
+          const { chromium, devices } = require('playwright');
+          const fs = require('fs');
+          const B='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const CACHE='fresnaye-v96-portable-r5';
+          const DIRECT='34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html';
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_PortableR6_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,loaderRevision:'r6',serviceWorkerRevision:'r5',warmCache:{},desktop:{},mobile:{},forcedFallback:{},offline:{},pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords parse: '+t);return[+m[1],+m[2]]};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p,u){await p.goto(u,{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:90000});}
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const dc=await browser.newContext({viewport:{width:1365,height:768}});
+              const p=await dc.newPage(); const de=[]; p.on('pageerror',e=>de.push(String(e)));
+              let directRequests=0; p.on('request',r=>{if(r.url().includes(DIRECT))directRequests++});
+              await ready(p,B+'v96/?r6cold='+Date.now());
+              const t=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META), lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META), readiness=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());
+              ok(t.viewerSha256===V&&t.modelSha256===M&&t.cacheName===CACHE,'desktop identity/cache');
+              ok(t.speculativePayloadPreload===false,'r6 speculative preload flag');
+              ok(lm.modelSha256===M&&readiness.pass&&readiness.mainRoute.collisionValidated,'desktop model/readiness');
+              ok(directRequests===1,'cold load expected exactly one direct payload request, got '+directRequests);
+              const before=xy(await p.locator('#coords').textContent()); await p.keyboard.down('w'); await p.waitForTimeout(650); await p.keyboard.up('w'); await p.waitForTimeout(100); const after=xy(await p.locator('#coords').textContent()); ok(dist(before,after)>.15,'desktop keyboard movement');
+              await p.locator('#enter').click(); await p.waitForTimeout(150); ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'desktop pointer lock');
+              const yaw0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,bubbles:true}))); await p.waitForTimeout(80); const yaw1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; ok(Math.abs(yaw1-yaw0)>.02,'desktop mouse look');
+              out.desktop={pass:true,renderer:lm.renderer,keyboardMovementM:+dist(before,after).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(yaw1-yaw0).toFixed(3),collisionValidated:readiness.mainRoute.collisionValidated,pageErrors:de}; ok(de.length===0,'desktop page errors');
+              await p.waitForFunction(async({cacheName,direct})=>{const c=await caches.open(cacheName),u=new URL(direct,location.href).href,r=await c.match(u);return r?.headers.get('X-Fresnaye-Verified-SHA256')==='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'}, {cacheName:CACHE,direct:'../'+DIRECT},{timeout:10000});
+              directRequests=0; await ready(p,B+'v96/?r6warm='+Date.now()); const wt=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META); ok(wt.loaderMode==='verified-cache-direct-v2','warm loader mode'); ok(directRequests===0,'warm cache emitted payload request(s): '+directRequests); out.warmCache={pass:true,directPayloadRequests:directRequests,mode:wt.loaderMode,transportLoadMs:wt.transportLoadMs,speculativePayloadPreload:wt.speculativePayloadPreload};
+              await dc.setOffline(true); await ready(p,B+'v96/?r6offline='+Date.now()); const off=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META), offReady=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA()); ok(off.loaderMode==='verified-cache-direct-v2'&&off.viewerSha256===V&&offReady.pass&&offReady.mainRoute.collisionValidated,'offline verified cache'); out.offline={pass:true,mode:off.loaderMode,collisionValidated:offReady.mainRoute.collisionValidated}; await dc.setOffline(false); await dc.close();
+              const fc=await browser.newContext({viewport:{width:1280,height:720}}), f=await fc.newPage(); const fe=[]; f.on('pageerror',e=>fe.push(String(e))); await ready(f,B+'v96/?qaFallback=1&r6forced='+Date.now()); const ft=await f.evaluate(()=>window.__FRESNAYE_TRANSPORT_META), fr=await f.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA()); ok(ft.loaderMode==='parallel-fallback-v7-forced'&&ft.viewerSha256===V&&fr.pass&&fr.mainRoute.collisionValidated&&!fe.length,'forced fallback'); out.forcedFallback={pass:true,mode:ft.loaderMode,transportLoadMs:ft.transportLoadMs,collisionValidated:fr.mainRoute.collisionValidated,pageErrors:fe}; await fc.close();
+              const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}), m=await mc.newPage(); const me=[]; m.on('pageerror',e=>me.push(String(e))); await ready(m,B+'v96/?r6mobile='+Date.now()); const mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META), mlm=await m.evaluate(()=>window.__FRESNAYE_LIVE_META); ok(mt.viewerSha256===V&&mt.modelSha256===M&&mt.speculativePayloadPreload===false,'mobile identity/r6'); await m.evaluate(()=>document.querySelector('[data-start=entrance]').click()); const ma=xy(await m.locator('#coords').textContent()), sb=await m.locator('#stick').boundingBox(); ok(sb&&sb.width>20&&sb.height>20,'mobile stick bounds'); const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2; await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true}); await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true}); await m.waitForTimeout(650); await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true}); const mb=xy(await m.locator('#coords').textContent()); ok(dist(ma,mb)>.15,'mobile joystick movement'); const lb=await m.locator('#look').boundingBox(); ok(lb&&lb.width>50&&lb.height>50,'mobile look bounds'); const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,my0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true}); await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true}); await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true}); const my1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw; ok(Math.abs(my1-my0)>.04,'mobile touch look'); await m.locator('#mobileReset').click(); await m.waitForTimeout(80); ok(dist(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.12,'mobile reset'); const mr=await m.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA()); ok(mr.mainRoute.collisionValidated&&!me.length,'mobile collision/errors'); out.mobile={pass:true,renderer:mlm.renderer,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(my1-my0).toFixed(3),reset:true,collisionValidated:mr.mainRoute.collisionValidated,pageErrors:me}; await mc.close();
+              out.pass=out.warmCache.pass&&out.desktop.pass&&out.mobile.pass&&out.forcedFallback.pass&&out.offline.pass;
+            }catch(e){out.error=String(e?.stack||e)} finally {await browser.close();fs.writeFileSync('/tmp/portable-r6-qa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))} if(!out.pass)process.exit(1);
+          })();
+          JS
+          NODE_PATH=/tmp/pw/node_modules node --check /tmp/qa.cjs
+          NODE_PATH=/tmp/pw/node_modules node /tmp/qa.cjs
+      - name: Persist r6 QA evidence to gh-pages
+        if: always()
+        run: |
+          if [ ! -s /tmp/portable-r6-qa-v1.json ]; then printf '{"artifact":"34_Fresnaye_Walkthrough_v96_PortableR6_PublicBrowserQA_v1","pass":false,"error":"QA process produced no diagnostic JSON"}\n' > /tmp/portable-r6-qa-v1.json; fi
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/portable-r6-qa-v1.json /tmp/pages/v96/portable-r6-qa-v1.json
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add v96/portable-r6-qa-v1.json
+          git commit -m 'Persist v96 portable r6 public browser QA v1' || true
+          git push origin HEAD:gh-pages
