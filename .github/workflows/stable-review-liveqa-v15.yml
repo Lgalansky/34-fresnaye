@@ -36,7 +36,7 @@ jobs:
           export TMPQA="$tmp"
           for i in $(seq 1 30); do
             if curl -fsSL --retry 3 --retry-delay 1 --retry-all-errors "$BASE/walkthrough-review.json?qa=v15-${GITHUB_RUN_ID}-$i" -o "$tmp/m.json" \
-              && grep -q '"schemaVersion": 14' "$tmp/m.json"; then break; fi
+              && grep -q '"schemaVersion"' "$tmp/m.json"; then break; fi
             sleep 3
           done
           python3 - "$tmp" "$BASE" <<'PY'
