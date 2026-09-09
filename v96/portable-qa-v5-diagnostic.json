@@ -1,0 +1,130 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR4_SourceV77_LiveBrowserQA_v3",
+  "timestampUtc": "2026-09-09T16:55:25.583Z",
+  "sourceArchitect": "v77",
+  "geometryChanged": false,
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "selfTests": 60,
+    "keyboardMovementM": 0.325,
+    "livingStart": true,
+    "pointerLock": true,
+    "mouseLookYawRad": 1.455,
+    "collisionValidated": true,
+    "route": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    },
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.502,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "cacheTrust": {
+    "pass": true,
+    "verifiedCacheMode": "verified-cache-direct-v2",
+    "seed": {
+      "present": true,
+      "marker": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "bytes": 253348,
+      "digest": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "valid": true
+    },
+    "wrongMarkerRecoveredMode": "direct-v6",
+    "wrongMarkerPostState": {
+      "present": true,
+      "marker": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "bytes": 253348,
+      "digest": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "valid": true
+    },
+    "correctMarkerCorruptRecoveredMode": "direct-v6",
+    "correctMarkerCorruptPostState": {
+      "present": true,
+      "marker": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "bytes": 253348,
+      "digest": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "valid": true
+    }
+  },
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v6-forced",
+    "cancelledLoser": "direct",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded"
+  },
+  "hedge": {
+    "pass": true,
+    "mode": "parallel-fallback-v6-hedged",
+    "cancelledLoser": "direct",
+    "hedged": true
+  },
+  "offline": {
+    "pass": true,
+    "queryStringShell": true,
+    "mode": "verified-cache-direct-v2",
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
