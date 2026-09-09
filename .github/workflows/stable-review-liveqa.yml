@@ -16,7 +16,7 @@ jobs:
     env:
       BASE: https://lgalansky.github.io/34-fresnaye
     steps:
-      - name: Wait for v65 delta-pipeline publication
+      - name: Wait for v66 delta-pipeline publication
         shell: bash
         run: |
           set -euo pipefail
@@ -24,8 +24,8 @@ jobs:
           for attempt in $(seq 1 24); do
             h=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.html?qa=${GITHUB_RUN_ID}-${attempt}")
             m=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=${GITHUB_RUN_ID}-${attempt}")
-            if grep -q 'Geometry pipeline' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v65"' <<<"$m" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v5' <<<"$m"; then
-              echo "Fresh v65 delta-pipeline state observed on attempt $attempt"
+            if grep -q 'Geometry pipeline' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v66"' <<<"$m" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v6' <<<"$m"; then
+              echo "Fresh v66 delta-pipeline state observed on attempt $attempt"
               fresh=1; break
             fi
             sleep 10
@@ -48,10 +48,10 @@ jobs:
           pb=(p/'pipeline.json').read_bytes(); pipeline=json.loads(pb); pipeline_hash=hashlib.sha256(pb).hexdigest()
           plan=json.loads((p/'plan.json').read_text()); plannerqa=json.loads((p/'plannerqa.json').read_text())
           observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); effect=str(sh[f'run{digits}_new_progress']['Level02_effect']).strip().rstrip('.').upper()
-          assert source_hash==s['sourceArchitectHandoffSha256']=='2f3da55ca1161fc515828fba9eec94fff68ea45d790bc134d246dd1f64be83f1'
+          assert source_hash==s['sourceArchitectHandoffSha256']=='f8f9a9d9be4188f868ba442357066d3b071e78b8c5f4f67a1ac11a502238677c'
           assert sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json') and sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and effect=='NONE'
           assert s['level02Effect']=='NONE' and s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
-          assert pipeline_hash==gp['sha256']=='cc609fd6be7da6aa313ea4f8193d1f7026a8929186e8da2342914a298021a571'
+          assert pipeline_hash==gp['sha256']=='fc84a2fdfa02bf09a588d541b54bbdcfe33f61390c700faa3549a7f780da5ee7'
           assert pipeline['artifact']==gp['artifact'] and pipeline['geometryChanged'] is False and pipeline['canonical']['level02']==c['canonicalModel'] and pipeline['viewer']['version']==c['viewerVersion']
           assert pipeline['sourceObserved']['sourceArchitect']==observed and pipeline['optimization']['strategy']==gp['strategy']=='CONTENT_ADDRESSED_DELTA_BUILD'
           assert pipeline['optimization']['noOpShortCircuit'] is True and pipeline['optimization']['fullModelRegenerationDefault'] is False
