@@ -10,11 +10,11 @@
     "policy": "READ_ONLY_UNTIL_PROMOTION"
   },
   "viewer": {
-    "version": "v95",
+    "version": "v96",
     "policy": "REUSE_VIEWER_WHEN_ONLY_MODEL_BYTES_CHANGE"
   },
   "sourceObserved": {
-    "sourceArchitect": "v67",
+    "sourceArchitect": "v68",
     "level02Effect": "NONE",
     "geometryAuthorization": false
   },
@@ -91,6 +91,6 @@
     "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
     "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"
   ],
-  "currentAction": "NO_LEVEL02_PATCH_REQUIRED_FOR_SOURCE_V67",
+  "currentAction": "NO_LEVEL02_PATCH_REQUIRED_FOR_SOURCE_V68",
   "remainingLevel02Lock": "exact curved/transition ceiling-bulkhead footprint without written radius/centre/tangent/horizontal witness"
 }
