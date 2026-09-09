@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           B='https://lgalansky.github.io/34-fresnaye/v96-r9'
-          H='12ac5b7ce368c33c0a8de052d0ecda24f1d8a802a87f4d912356d150abce4425'
+          H='aca845c6d7dfd58ba2205044a992359da5ee45afec7739b2eeeb4cb785a0e421'
           SW='df2c1daf6f4727da42a3c709165df182a739a43e9050d9baae0f88cf91adcd88'
           MF='14d5c127f62ac57c8216ab3aa7d8654bd42a8c8e4ee8438ef509b6af53ffa83d'
           V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
