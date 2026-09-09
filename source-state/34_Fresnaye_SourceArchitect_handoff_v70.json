@@ -1,0 +1,49 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v70",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T12:27:12+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "remaining_material_lock": "Exact curved/unwitnessed ceiling-bulkhead footprint geometry lacking written radius/centre/tangent/chord/arc-length or owned horizontal witness.",
+    "effect_of_v70": "SOURCE_EXCEPTION_NARROWED__NO_GEOMETRY_AUTHORIZATION"
+  },
+  "v70_material_advance": {
+    "level": "L02",
+    "subject": "Circular stepped ceiling bulkhead over toilet cubicle",
+    "finding": "FRE_WD_202_REV_B in the authoritative tender explicitly labels the condition CIRCULAR CEILING STEPPED BULKHEAD OVER TOILET CUBICLE. This closes identity and zone ownership for this named curved condition. A focused native-text audit of FRE_WD_202/FRE_WD_212 finds no written curve-construction radius/diameter/centre/tangent/chord/arc-length tied to it, so exact geometry remains locked.",
+    "impact": "The Level02 blocker is narrowed: this condition is not semantically ambiguous; only its exact curve/step construction is unsourced. No curve is released to geometry."
+  },
+  "unresolved_ambiguities": [
+    "Level02 exact curve/step construction for the circular toilet-cubicle bulkhead and other curved/unwitnessed ceiling transitions.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 FRE_WD_205 D11 brickwork tag drift and D11 masonry rough width.",
+    "Level03 D02 duplicate authoritative schedule ID/system ownership.",
+    "Level03 D04 confirmed component/system schedule omission.",
+    "Level03 iD02 2100 brickwork head versus 2150 scheduled panel/leaf conflict.",
+    "Level03 skylight identity/extra-instance mapping and curb/upstand/rough-opening/frame-flashing interface.",
+    "Level03 S01/S02 instance-specific masonry U/S/head ownership — nearby 2100 candidates excluded.",
+    "Level03 S03 overall grille width/height.",
+    "Level04 written 370mm parapet-adjacent vertical endpoint ownership remains quarantined."
+  ],
+  "source_watch": "No new Archilab mail from info@archilab.co.za on 2026-09-09; latest known remains 2026-09-08T13:49:17Z same-scale package.",
+  "chief_of_staff_action": "Adopt v70 as source-safety narrowing only. Treat the Level02 toilet-cubicle bulkhead as explicitly CIRCULAR + STEPPED and zone-owned, but keep exact curve/step geometry locked until Archilab supplies explicit construction dimensions. Retain all prior Level01/Level03/Level04 exceptions. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level02_CeilingBulkheadEvidenceRegister_v8.json",
+    "34_Fresnaye_SourceArchitect_Level02_CircularSteppedToiletBulkhead_GeometryException_v1.json",
+    "34_Fresnaye_SourceArchitect_Level02_CircularSteppedToiletBulkhead_Evidence_v1.png",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v53.json",
+    "34_Fresnaye_SourceArchitect_Run70_ArtifactManifest_v1.json"
+  ]
+}
