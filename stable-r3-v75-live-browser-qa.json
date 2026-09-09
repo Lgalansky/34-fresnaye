@@ -1,0 +1,94 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR3_SourceV75_LiveBrowserQA_v1",
+  "timestampUtc": "2026-09-09T15:24:02.844Z",
+  "sourceArchitect": "v75",
+  "geometryChanged": false,
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.573,
+    "livingStart": true,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "route": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    },
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.467,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "pageErrors": []
+  },
+  "fallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v5-forced",
+    "cancelledLoser": "direct"
+  },
+  "hedge": {
+    "pass": true,
+    "mode": "parallel-fallback-v5-hedged",
+    "cancelledLoser": "direct"
+  },
+  "gate": {
+    "pass": true,
+    "text": "VERIFIED REVIEW READY",
+    "source": "HASH-VERIFIED v75 · NONE · no geometry authorization",
+    "href": "./v96/",
+    "errors": []
+  },
+  "pass": true
+}
