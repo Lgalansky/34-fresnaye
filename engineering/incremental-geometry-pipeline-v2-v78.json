@@ -1,0 +1,20 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-09",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {"level02":"v23","vertices":5769,"triangles":8907,"policy":"READ_ONLY_UNTIL_PROMOTION"},
+  "viewer": {"version":"v96","sha256":"1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded","bytes":253348,"policy":"REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"},
+  "sourceObserved": {"sourceArchitect":"v78","handoffSha256":"d24ef3580b9c254e42850c28dc48e7bc98ef36424fdda8b77860863c242e9ebc","level02Effect":"SOURCE_EXCEPTION_RECLASSIFIED__DESIGN_NOT_FROZEN__NO_GEOMETRY_AUTHORIZATION","geometryAuthorization":false,"canonicalGeometryChanged":false},
+  "optimization": {"strategy":"CONTENT_ADDRESSED_DELTA_BUILD","noOpShortCircuit":true,"sourceOnlyQaBridge":true,"parallelIndependentZones":true,"fullModelRegenerationDefault":false,"fullBrowserRegressionDefault":false,"browserQaReuseRule":"ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_GEOMETRY_AUTHORIZATION_FALSE","cacheKeys":["authoritative_source_sha256","source_version","element_id","zone","layer","canonical_parent_hash"]},
+  "pipeline": ["source_delta_fingerprint","dependency_graph_resolution","source_only_short_circuit","changed_element_set","parallel_zone_layer_patch_build","targeted_patch_QA","promotion_candidate_assembly","full_regression_if_triggered","canonical_promotion_gate","viewer_model_rebind","deployment_identity_QA"],
+  "layers": {"A":"architectural_shell","B":"openings_architectural_details","C":"ceilings_bulkheads","D":"presentation_materials_lighting_furniture"},
+  "failClosedRules": ["NO_MISSING_DIMENSION_INFERENCE","NO_CANONICAL_IN_PLACE_EDIT","NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION","NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS","NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA","NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE","NO_PREWORKSHOP_DESIGN_INTENT_PROMOTION"],
+  "currentAction": "L02_CURVED_CEILING_LOCK_RECLASSIFIED_DESIGN_NOT_FROZEN__NO_GEOMETRY_PATCH__REUSE_EXACT_V96_BY_HASH",
+  "currentDecision": "SOURCE_ONLY_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Lock": "Exact vaulted/curved/stepped ceiling geometry opposite the guest toilet and on the opposite side is not design-frozen by Archilab.",
+  "sourceOnlyAdvance": {"status":"ARCHITECT_DESIGN_NOT_FROZEN","level":"L02","subject":"Remaining vaulted/curved ceiling design status","finding":"Direct Archilab email received 2026-09-09T16:41:59Z states that the vaulted ceilings opposite the guest toilet and on the opposite side are still in the design process. Michael and Laura have a workshop next week. Staff are to prepare a quick section the next day, but Michael explicitly says it is subject to change depending on the workshop outcome.","boundary":"The outstanding Level02 ceiling lock is reclassified from missing exact dimensional construction to ARCHITECT_DESIGN_NOT_FROZEN. A pre-workshop section is evidence of design intent only and cannot freeze canonical exact geometry unless Archilab explicitly marks it final/current.","geometryAction":"NONE"}
+}
