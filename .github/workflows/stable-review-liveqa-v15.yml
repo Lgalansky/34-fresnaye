@@ -1,0 +1,152 @@
+name: Stable review live QA v15
+# Source-version-agnostic identity verification plus fresh desktop/mobile interaction smoke against the public preferred walkthrough.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stable-review-liveqa-v15.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BASE: https://lgalansky.github.io/34-fresnaye
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify published identities and current source delta state
+        id: identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          export TMPQA="$tmp"
+          for i in $(seq 1 30); do
+            if curl -fsSL --retry 3 --retry-delay 1 --retry-all-errors "$BASE/walkthrough-review.json?qa=v15-${GITHUB_RUN_ID}-$i" -o "$tmp/m.json" \
+              && grep -q '"schemaVersion": 14' "$tmp/m.json"; then break; fi
+            sleep 3
+          done
+          python3 - "$tmp" "$BASE" <<'PY'
+          import hashlib,json,pathlib,re,subprocess,sys,traceback
+          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]
+          result={'artifact':'34_Fresnaye_Walkthrough_v96_StableReviewIdentityQA_v15','geometryChanged':False,'checks':{},'hashes':{},'pass':False}
+          def record(name,value=True): result['checks'][name]=bool(value); assert value,name
+          def get(path,name):
+              out=p/name
+              subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa=v15-{name}','-o',str(out)],check=True)
+              return out
+          def h(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          try:
+              m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; s=m['sourceState']; g=m['geometryPipeline']; gate=m['stableGate']; a=m['acceptance']
+              sv=s['latestSourceArchitectObserved']; result.update(sourceArchitect=sv,viewerVersion=c['viewerVersion'],canonicalModel=c['canonicalModel'])
+              record('manifest_v14_or_newer',m['schemaVersion']>=14 and m['artifact'].startswith('34_Fresnaye_Walkthrough_StableReviewManifest_v'))
+              record('source_version_shape',bool(re.fullmatch(r'v\d+',sv)))
+              gatep=get(gate['publicPath'],'gate.html'); loader=get(c['portableLoader'],'loader.html'); qap=get(c['portableQaEvidence'],'portable-qa.json'); ready=get(c['readySentinel'],'ready.json'); viewer=get(c['directViewerAsset'],'viewer.html')
+              source=get(s['sourceArchitectHandoffPublicPath'],'source.json'); pipe=get(g['publicPath'],'pipeline.json'); planner=get(g['plannerPublicPath'],'planner.py'); plan=get(g['currentDeltaPlanPublicPath'],'plan.json'); plannerqa=get(g['plannerQaPublicPath'],'plannerqa.json'); sw=get('v96/sw.js','sw.js')
+              result['hashes']={k:h(v) for k,v in {'gate':gatep,'loader':loader,'portableQa':qap,'viewer':viewer,'source':source,'pipeline':pipe,'planner':planner,'plan':plan,'plannerQa':plannerqa,'serviceWorker':sw}.items()}
+              record('gate_hash',h(gatep)==gate['sha256']); record('gate_source_version_agnostic',gate.get('sourceVersionAgnostic') is True)
+              record('loader_hash',h(loader)==c['portableLoaderSha256']); lt=loader.read_text(); record('loader_identity_literals',c['viewerSha256'] in lt and c['modelSha256'] in lt)
+              qa=json.loads(qap.read_text()); record('portable_qa_hash',h(qap)==c['portableQaSha256']); record('portable_qa_identity',qa['pass'] is True and qa['viewerSha256']==c['viewerSha256'] and qa['canonicalObjSha256']==c['modelSha256'] and qa['canonicalGlbSha256']==c['glbSha256'])
+              record('service_worker_identity',qa.get('serviceWorkerSha256')==h(sw) and qa.get('cacheName') in sw.read_text())
+              r=json.loads(ready.read_text()); record('ready_identity',r['stageComplete'] is True and r['geometryChanged'] is False and r['viewerVersion']==c['viewerVersion'] and r['viewerSha256']==c['viewerSha256'] and r['viewerBytes']==c['viewerBytes'] and r['modelSha256']==c['modelSha256'] and r['glbSha256']==c['glbSha256'] and r['vertices']==c['vertices'] and r['triangles']==c['triangles'])
+              record('direct_viewer_exact',len(viewer.read_bytes())==c['viewerBytes'] and h(viewer)==c['viewerSha256'])
+              sj=json.loads(source.read_text()); record('source_hash',h(source)==s['sourceArchitectHandoffSha256']); record('source_identity',sj['artifact']=='34_Fresnaye_SourceArchitect_handoff_'+sv and sj['canonical_geometry_changed'] is False and sj['geometry_authorization'] is s['geometryAuthorization'] is False)
+              key='effect_of_'+sv; eff=(sj.get('level02_priority_state') or {}).get(key); record('source_effect_dynamic',str(eff).strip().rstrip('.').upper()==str(s['level02Effect']).strip().rstrip('.').upper())
+              pj=json.loads(pipe.read_text()); dp=json.loads(plan.read_text()); aq=json.loads(plannerqa.read_text())
+              record('pipeline_hash',h(pipe)==g['sha256']); record('planner_hash',h(planner)==g['plannerSha256']); record('plan_hash',h(plan)==g['currentDeltaPlanSha256']); record('planner_qa_hash',h(plannerqa)==g['plannerQaSha256'])
+              record('pipeline_identity',pj['artifact']==g['artifact'] and pj['sourceObserved']['sourceArchitect']==sv and pj['canonical']['level02']==c['canonicalModel'] and pj['geometryChanged'] is False)
+              record('delta_decision',dp['sourceArchitect']==sv and dp['planner']==g['planner'] and dp['decision']==g['currentDecision'] and dp['geometryBuildRequired'] is g['geometryBuildRequired'] is False and dp['fullModelRegenerationRequired'] is g['fullModelRegenerationRequired'] is False and dp['fullBrowserRegressionRequired'] is g['fullBrowserRegressionRequired'] is False)
+              record('planner_fail_closed',aq['pass'] is True and aq['geometryChanged'] is False and aq['plannerSha256']==g['plannerSha256'] and aq['checks']['authorized_missing_changed_ids_fails_closed'] is True and aq['checks']['authorized_changed_ids_patch_plan'] is True)
+              record('acceptance_hold',a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False and a['minimumDistanceM']==40 and a['minimumDurationSec']==12)
+              result['pass']=True
+          except Exception as e:
+              result['error']=f'{type(e).__name__}: {e}'; result['traceback']=traceback.format_exc(limit=6)
+          pathlib.Path('stable-v15-identity-qa.json').write_text(json.dumps(result,indent=2)+'\n')
+          print(json.dumps(result,indent=2))
+          if not result['pass']: raise SystemExit(1)
+          PY
+
+      - name: Install Chromium QA runtime
+        if: steps.identity.outcome == 'success'
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Fresh public desktop and mobile control smoke
+        if: steps.identity.outcome == 'success'
+        shell: bash
+        run: |
+          cat > stable-v15.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const base='https://lgalansky.github.io/34-fresnaye/';
+          const manifest=JSON.parse(fs.readFileSync('walkthrough-review.json','utf8'));
+          const expected=manifest.reviewCandidate, sourceVersion=manifest.sourceState.latestSourceArchitectObserved;
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function waitReady(p){await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY'&&window.__FRESNAYE_LIVE_META?.modelSha256,null,{timeout:90000});}
+          (async()=>{
+            const out={artifact:'34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v15',timestampUtc:new Date().toISOString(),sourceArchitect:sourceVersion,geometryChanged:false,desktop:{},mobile:{},review:{},pass:false};
+            const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const gate=await b.newPage({viewport:{width:1280,height:800}});let gateErr=[];gate.on('pageerror',e=>gateErr.push(String(e)));
+              await gate.goto(base+'walkthrough-review.html?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+              await gate.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),null,{timeout:90000});
+              out.review.gate=await gate.locator('#gate').textContent();out.review.source=await gate.locator('#source').textContent();out.review.href=await gate.locator('#open').getAttribute('href');out.review.gatePageErrors=gateErr;
+              ok(out.review.source.includes(sourceVersion)&&out.review.href==='./v96/'&&!gateErr.length,'stable gate mismatch');await gate.close();
+
+              const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage();let derr=[];p.on('pageerror',e=>derr.push(String(e)));
+              await p.goto(base+'v96/?qa=desktop-'+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await waitReady(p);
+              const t=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(t.viewerSha256===expected.viewerSha256&&t.modelSha256===expected.modelSha256&&lm.modelSha256===expected.modelSha256&&lm.canonicalModel==='v23','desktop identity');
+              const rq=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(rq.pass&&rq.modelSha256===expected.modelSha256&&/^WebGL[12]$/.test(rq.renderer),'fresh review readiness');
+              const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(650);await p.keyboard.up('w');await p.waitForTimeout(120);const c=xy(await p.locator('#coords').textContent());ok(dist(a,c)>.15,'fresh desktop keyboard movement');
+              await p.locator('#reset').click();await p.waitForTimeout(100);const er=xy(await p.locator('#coords').textContent());ok(dist(er,[7.9,17.1])<.12,'desktop reset start');
+              await p.locator('[data-start="living"]').click();await p.waitForTimeout(100);const lr=xy(await p.locator('#coords').textContent());ok(dist(lr,[3.6,13])<.12,'desktop living start');
+              await p.locator('#enter').click();await p.waitForTimeout(180);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:110,movementY:0,bubbles:true})));await p.waitForTimeout(100);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02,'mouse look');ok(derr.length===0,'desktop page errors');
+              out.desktop={pass:true,renderer:lm.renderer,keyboardMovementM:+dist(a,c).toFixed(3),resetStart:true,livingStart:true,pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),mainRoute:rq.mainRoute,pageErrors:derr};await dc.close();
+
+              const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage();let merr=[];m.on('pageerror',e=>merr.push(String(e)));
+              await m.goto(base+'v96/?qa=mobile-'+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await waitReady(m);
+              const mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),mlm=await m.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(mt.viewerSha256===expected.viewerSha256&&mlm.modelSha256===expected.modelSha256,'mobile identity');
+              await m.evaluate(()=>document.querySelector('[data-start=entrance]').click());await m.waitForTimeout(90);const ma=xy(await m.locator('#coords').textContent());const sb=await m.locator('#stick').boundingBox();ok(sb,'mobile joystick missing');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;
+              await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(650);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(120);const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.15,'fresh mobile joystick movement');
+              const lb=await m.locator('#look').boundingBox();ok(lb,'mobile look missing');const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,my0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-6,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+65,clientY:ly-6,isPrimary:true,bubbles:true});await m.waitForTimeout(100);const my1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(my1-my0)>.04,'fresh mobile touch look');
+              await m.locator('#mobileReset').click();await m.waitForTimeout(100);const mr=xy(await m.locator('#coords').textContent());ok(dist(mr,[7.9,17.1])<.12,'mobile reset');ok(merr.length===0,'mobile page errors');
+              out.mobile={pass:true,renderer:mlm.renderer,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(my1-my0).toFixed(3),reset:true,pageErrors:merr};await mc.close();out.pass=true;
+            }catch(e){out.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('stable-v15-live-browser-qa.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));}
+            if(!out.pass)process.exit(1);
+          })();
+          JS
+          node stable-v15.cjs
+
+      - name: Persist QA evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          files=()
+          test -f stable-v15-identity-qa.json && files+=(stable-v15-identity-qa.json)
+          test -f stable-v15-live-browser-qa.json && files+=(stable-v15-live-browser-qa.json)
+          if ((${#files[@]})); then
+            git add "${files[@]}"
+            if ! git diff --cached --quiet; then
+              git commit -m 'Record stable v15 live QA evidence'
+              git push origin HEAD:gh-pages
+            fi
+          fi
