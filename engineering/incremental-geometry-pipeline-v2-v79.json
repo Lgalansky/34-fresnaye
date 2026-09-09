@@ -1,0 +1,88 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-09",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v96",
+    "sha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "bytes": 253348,
+    "policy": "REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v79",
+    "handoffSha256": "9bdedbd046407d806806863d2e730481f0cffa3ce981b6bd1d5b859a8ed15643",
+    "level02Effect": "NONE__SOURCE_CLASSIFICATION_CORRECTION_ONLY",
+    "geometryAuthorization": false,
+    "canonicalGeometryChanged": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "sourceOnlyQaBridge": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_GEOMETRY_AUTHORIZATION_FALSE",
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE",
+    "NO_STATUS_TRANSFER_BETWEEN_SEPARATE_CONDITIONS"
+  ],
+  "currentAction": "SOURCE_V79_SCOPE_CORRECTION_ONLY__NO_GEOMETRY_PATCH__REUSE_EXACT_V96_BY_HASH",
+  "currentDecision": "SOURCE_ONLY_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Locks": [
+    "Named CIRCULAR CEILING STEPPED BULKHEAD OVER TOILET CUBICLE: exact curve/step construction remains unwritten; design-freeze status is not explicitly established for this named condition.",
+    "Architect-described vaulted ceiling opposite guest toilet: design not frozen; exact plan/tag mapping remains open.",
+    "Architect-described vaulted ceiling on opposite side: design not frozen; exact plan/tag mapping remains open."
+  ],
+  "sourceOnlyAdvance": {
+    "status": "SOURCE_CLASSIFICATION_CORRECTION_ONLY",
+    "level": "L02",
+    "subject": "Architect correspondence ownership-scope correction",
+    "finding": "Source Architect v79 corrects v78 semantics: Michael's design-not-frozen statement applies only to two verbally described vaulted ceilings. It does not explicitly own the separately named circular stepped toilet-cubicle bulkhead.",
+    "boundary": "Do not transfer design-freeze status by adjacency, count or assumed equivalence. The named circular stepped toilet-cubicle bulkhead remains exact-geometry-open until explicitly owned evidence is supplied.",
+    "geometryAction": "NONE"
+  }
+}
