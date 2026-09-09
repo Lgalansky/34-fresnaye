@@ -1,0 +1,48 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableFastStart_PublicBrowserQA_v3",
+  "timestampUtc": "2026-09-09T10:39:48.749Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/v96/",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "geometryChanged": false,
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "initialTransportMode": "direct-v4",
+    "keyboardMovementM": 0.537,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.3,
+    "selfTests": 60,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.502,
+    "touchLookYawRad": 0.35,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "cache": {
+    "pass": true,
+    "mode": "cache-direct-v1",
+    "transportLoadMs": 7,
+    "cacheName": "fresnaye-v96-portable-r1",
+    "serviceWorkerScope": "https://lgalansky.github.io/34-fresnaye/v96/"
+  },
+  "offline": {
+    "pass": true,
+    "mode": "cache-direct-v1",
+    "renderer": "WebGL2",
+    "collisionValidated": true
+  },
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v4-forced",
+    "transportLoadMs": 128,
+    "collisionValidated": true
+  },
+  "pass": true
+}
