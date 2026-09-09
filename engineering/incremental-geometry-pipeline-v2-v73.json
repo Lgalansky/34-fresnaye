@@ -30,11 +30,42 @@
     "fullModelRegenerationDefault": false,
     "fullBrowserRegressionDefault": false,
     "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_SOURCE_AUTHORIZATION_FALSE",
-    "cacheKeys": ["authoritative_source_sha256","source_version","element_id","zone","layer","canonical_parent_hash"]
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
   },
-  "pipeline": ["source_delta_fingerprint","dependency_graph_resolution","source_only_short_circuit","changed_element_set","parallel_zone_layer_patch_build","targeted_patch_QA","promotion_candidate_assembly","full_regression_if_triggered","canonical_promotion_gate","viewer_model_rebind","deployment_identity_QA"],
-  "layers": {"A":"architectural_shell","B":"openings_architectural_details","C":"ceilings_bulkheads","D":"presentation_materials_lighting_furniture"},
-  "failClosedRules": ["NO_MISSING_DIMENSION_INFERENCE","NO_CANONICAL_IN_PLACE_EDIT","NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION","NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS","NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA","NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"],
+  "pipeline": [
+    "source_delta_fingerprint",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"
+  ],
   "currentAction": "L03_THIRD_NEW_SKYLIGHT_SYMBOL_ENVELOPE_600X1955_SOURCE_CLOSED__LEVEL02_UNCHANGED__NO_GEOMETRY_PATCH__REUSE_V96_BROWSER_QA",
   "currentDecision": "NO_OP_SHORT_CIRCUIT",
   "geometryBuildRequired": false,
@@ -46,7 +77,10 @@
     "level": "L03",
     "subject": "Third audited NEW SKYLIGHT symbol envelope on FRE_WD_203_REV_B",
     "sourceClosed": true,
-    "explicitEnvelopeMm": {"shortSide":600,"longSide":1955},
+    "explicitEnvelopeMm": {
+      "shortSide": 600,
+      "longSide": 1955
+    },
     "boundary": "Symbol envelope only; unique ID, curb/upstand, structural rough-opening, manufacturer/model and frame/flashing interfaces remain locked.",
     "geometryAction": "NONE"
   }
