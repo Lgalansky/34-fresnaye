@@ -1,0 +1,91 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-09",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v96",
+    "sha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "bytes": 253348,
+    "policy": "REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v76",
+    "handoffSha256": "e4f58eb243a12f669f1f07278833f172b0b98b8d4c97785e12f2a831be2571b2",
+    "level02Effect": "NONE",
+    "geometryAuthorization": false,
+    "canonicalGeometryChanged": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "sourceOnlyQaBridge": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_SOURCE_AUTHORIZATION_FALSE",
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"
+  ],
+  "currentAction": "L01_W08_FALSE_MASONRY_HEAD_CANDIDATES_EXCLUDED__LEVEL02_UNCHANGED__NO_GEOMETRY_PATCH__REUSE_V96_BROWSER_QA",
+  "currentDecision": "NO_OP_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Lock": "Exact curve/step construction for the circular toilet-cubicle bulkhead and any other curved/unwitnessed ceiling transition lacking its own written radius/diameter/centre/tangent/chord/arc-length or equivalent complete construction witness.",
+  "sourceOnlyAdvance": {
+    "status": "L01_W08_MASONRY_HEAD_FALSE_CANDIDATES_EXCLUDED__HEAD_OPEN",
+    "level": "L01",
+    "subject": "L01_W08 masonry-head ownership exclusion",
+    "sourceClosed": false,
+    "roughWidthMm": 600,
+    "excludedAdjacentUnderSideOpeningCandidatesMm": [2100,2100],
+    "componentOnlySchedule": {
+      "widthMm": 600,
+      "heightMm": 1000,
+      "sillReferenceMm": 1100,
+      "frameTopDerivedMm": 2100
+    },
+    "boundary": "W08 brickwork U/S opening/head remains open; adjacent D08/D07 2100 annotations and schedule-derived 2100 frame top are not W08 masonry-head evidence.",
+    "geometryAction": "NONE"
+  }
+}
