@@ -1,0 +1,61 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v73",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T15:38:00+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L03_THIRD_NEW_SKYLIGHT_SYMBOL_SOURCE_CLOSED_AT_600X1955__ALL_THREE_AUDITED_NEW_SKYLIGHT_SYMBOL_ENVELOPES_NOW_DIMENSIONED__ROOF_INTERFACE_REMAINS_LOCKED__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "remaining_material_lock": "Exact curve/step construction for the circular toilet-cubicle bulkhead and any other curved/unwitnessed ceiling transition lacking its own written radius/diameter/centre/tangent/chord/arc-length or equivalent complete construction witness.",
+    "effect_of_v73": "NONE__LATER_LEVEL_SOURCE_PREPARATION_ONLY"
+  },
+  "v73_material_advance": {
+    "level": "L03",
+    "subject": "Third audited NEW SKYLIGHT symbol envelope on FRE_WD_203_REV_B",
+    "finding": "The third drawn NEW SKYLIGHT symbol is directly dimensioned 600 x 1955 mm. Native dimension extension/tick ownership aligns the printed 1955 dimension to the symbol long-side endpoints and the printed 600 dimension to its short-side endpoints. 1955 is therefore source-owned to the skylight symbol and is not a general roof offset.",
+    "boundary": "Only printed values are consumed. Native PDF coordinates prove endpoint ownership only; no vector/pixel/plan-scale distance is converted into millimetres. These are symbol-envelope dimensions, not curb or structural rough-opening dimensions."
+  },
+  "later_stage_source_state": {
+    "L01_windows": "W01/W02/W03/W04/W05/W07/W09 structural width+head/vertical source fields are closed; W06 rough width remains open; W08 brickwork head remains open; W04/W05/W06 retain unassigned 25mm head-interface conditions where applicable.",
+    "L01_D11": "OPEN masonry rough width/tag drift; physical D11 and schedule5100x2100 remain explicit.",
+    "L03_D02": "OPEN duplicate authoritative schedule ID/system ownership: 3000x2100 frameless and 1500x2100 aluminium records.",
+    "L03_D04": "OPEN schedule component/system omission despite 1500/U-S2100 structural evidence.",
+    "L03_iD02": "OPEN 815 width with brickwork head2100 vs scheduled panel/leaf2150.",
+    "L03_skylights": "Three audited drawn NEW SKYLIGHT symbol envelopes are dimension-source-closed: A=600x1200, B=600x1200, C=600x1955. Unique IDs, curb/upstand, structural rough-opening, manufacturer/model and frame/flashing interface dimensions remain open.",
+    "L03_S01_S02": "Rough widths1500 each and components1500x2100 source-closed; masonry heads remain open.",
+    "L03_S03": "Count x3/function source-closed; overall width/height open.",
+    "L04_parapet_370": "Written370mm parapet-adjacent vertical remains quarantined for endpoint-datum ownership."
+  },
+  "unresolved_ambiguities": [
+    "Level02 exact circular/other curved or unwitnessed ceiling/bulkhead footprint construction.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 D11 brickwork tag drift and masonry rough width.",
+    "Level01 W06 masonry rough width and W08 brickwork head; W04/W05/W06 25mm head-interface allocation remains unspecified.",
+    "Level03 D02 duplicate schedule-system ownership; D04 schedule omission; iD02 2100-vs-2150 conflict.",
+    "Level03 skylight unique IDs plus curb/upstand/structural rough-opening/frame-flashing/manufacturer interfaces.",
+    "Level03 S01/S02 masonry heads; S03 overall grille size.",
+    "Level04 370mm parapet-adjacent endpoint ownership exception."
+  ],
+  "source_watch": "Fresh Outlook search found no Archilab message on 2026-09-09; latest known remains 2026-09-08T13:49:17Z.",
+  "chief_of_staff_action": "Adopt v73 as additive later-Level03 source evidence. The third new-skylight drawn envelope may consume only explicit 600 x 1955 dimensions; retain A/B at 600 x 1200. Keep unique IDs and all curb/rough-opening/frame/flashing interfaces locked. Preserve all Level02 and remaining L01/L03/L04 exceptions. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_ThirdSkylight_1955x600_OwnershipAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_ThirdSkylight_1955x600_OwnershipEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level03_SkylightSymbol_DimensionalOwnershipRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level03_SkylightDimensionExceptionRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level03_SkylightRoofInterface_ExceptionRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v56.json",
+    "34_Fresnaye_SourceArchitect_Run73_ArtifactManifest_v1.json"
+  ]
+}
