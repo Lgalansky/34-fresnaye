@@ -1,0 +1,64 @@
+name: Walkthrough v96 portable r8 offline-guard QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-portable-r8-offlineguard-qa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Wait for deployed r8 loader and verify exact code
+        run: |
+          set -euo pipefail
+          U='https://lgalansky.github.io/34-fresnaye/v96-r8/index.html'
+          H='6657e7c9cef43c3a4b1f647bc9e9fef3488fbbc730c5445faf788296a3e669f4'
+          OK=0
+          for I in $(seq 1 120); do
+            curl -fsSL --retry 2 --retry-delay 1 "$U?run=$GITHUB_RUN_ID-$I" -o /tmp/r8-index.html || true
+            if echo "$H  /tmp/r8-index.html" | sha256sum -c - >/dev/null 2>&1; then OK=1; break; fi
+            sleep 3
+          done
+          test "$OK" = 1
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/r8-index.html').read()
+          m=re.search(r'<script>\n([\s\S]*?)\n</script>',t)
+          assert m
+          open('/tmp/r8-loader.js','w').write(m.group(1))
+          assert 'v96-portable-r8' in t
+          assert 'offline-cold-start-guard-r8' in t
+          assert '1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded' in t
+          assert 'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' in t
+          PY
+          node --check /tmp/r8-loader.js
+          node --check engineering/walkthrough-v96-portable-r8-offlineguard-publicqa-v1.cjs
+      - name: Fresh public Chromium desktop mobile and offline QA
+        run: NODE_PATH="$GITHUB_WORKSPACE/node_modules" node engineering/walkthrough-v96-portable-r8-offlineguard-publicqa-v1.cjs
+      - name: Persist r8 public QA evidence
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/portable-r8-offlineguard-qa-v1.json /tmp/pages/v96-r8/portable-r8-offlineguard-qa-v1.json
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add v96-r8/portable-r8-offlineguard-qa-v1.json
+          git commit -m 'Persist portable r8 offline-guard public browser QA v1'
+          git push origin HEAD:gh-pages
