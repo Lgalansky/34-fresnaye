@@ -1,0 +1,70 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR9_1_CacheIsolation_PublicBrowserQA_v3",
+  "timestampUtc": "2026-09-09T23:47:09.575Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v84",
+  "sourceEffect": "NONE__LATER_LEVEL_REGISTER_CONSISTENCY_CORRECTION_ONLY",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "loaderRevision": "r9.1",
+  "packageMode": "self-contained-static-host-r9.1-cache-isolated",
+  "cacheCommit": {
+    "pass": true,
+    "cacheName": "fresnaye-v96-portable-r9-v2",
+    "verifiedViewerCachedBeforeReady": true,
+    "bytes": 253348,
+    "hashHeader": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded"
+  },
+  "cacheIsolation": {
+    "pass": true,
+    "foreignCachePreserved": true,
+    "legacyOwnCacheCleaned": true,
+    "ownedCachePresent": true,
+    "keys": [
+      "fresnaye-v96-portable-r8-sentinel",
+      "fresnaye-v96-portable-r9-v2"
+    ]
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.325,
+    "pointerLock": true,
+    "mouseLookYawRad": 1.455,
+    "allSixStarts": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.645,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v9.1-forced",
+    "cacheCommitted": true,
+    "partRequests": 12,
+    "pageErrors": []
+  },
+  "offlineImmediate": {
+    "pass": true,
+    "initialCommit": true,
+    "mode": "verified-cache-direct-v2",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded"
+  },
+  "offlineColdStart": {
+    "pass": true,
+    "recoverable": true,
+    "viewerPayloadRequests": 0,
+    "mode": "offline-cold-start-guard-r9.1",
+    "pageErrors": []
+  },
+  "pass": true
+}
