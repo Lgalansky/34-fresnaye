@@ -1,0 +1,76 @@
+name: Walkthrough v96 stable Source v80 QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-source80-qa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Wait for Source v80 public bytes and verify identities
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          mkdir -p /tmp/v80
+          fetch_hash(){ P="$1"; H="$2"; O="$3"; OK=0; for I in $(seq 1 120); do curl -fsSL --retry 2 --retry-delay 1 "$B/$P?v80=$GITHUB_RUN_ID-$I" -o "$O" || true; if echo "$H  $O" | sha256sum -c - >/dev/null 2>&1; then OK=1; break; fi; sleep 3; done; test "$OK" = 1; }
+          fetch_hash source-state/34_Fresnaye_SourceArchitect_handoff_v80.json 90682214a7d4f18372fd5ec1dab75945067f83b4a23938e37e0e55b760151c94 /tmp/v80/source.json
+          fetch_hash engineering/source-v80-walkthrough-classification-v1.json aef7f81e7cbd497bbe3d2f86cee3667fb58dba27bd41a176aec5d6691f6b5caf /tmp/v80/classification.json
+          fetch_hash engineering/incremental-geometry-pipeline-v2-v80.json 427f9058fed95c945fdd59d367bc7c20d6926296e570d6191c6e7e9a42d04c90 /tmp/v80/pipeline.json
+          fetch_hash engineering/geometry-delta-planner-v6.py 74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db /tmp/v80/planner.py
+          fetch_hash engineering/geometry-delta-plan-source-v80-v1.json 75e9c0726826b9bed037b05114a05456cb2404427efda69474cf1ef5686bf6a3 /tmp/v80/delta.json
+          fetch_hash engineering/geometry-delta-planner-qa-v15.json 9992983557f4057bb65d8c8d8fc555e7afe0904da4e8159640765e266fb4c09c /tmp/v80/plannerqa.json
+          fetch_hash walkthrough-review.html dbc03013f069ef58e16d56078bd3872669c3a9100bcd9d0db2eeef8b0e7df060 /tmp/v80/gate.html
+          fetch_hash walkthrough-review.json f63c263a91fa5f7a4739a1786827a172ff1a9c515c3591fd1e2ae2fa9755fa1b /tmp/v80/manifest.json
+      - name: Verify planner v6 reproduces Source v80 no-op plan
+        run: |
+          set -euo pipefail
+          python3 -m py_compile engineering/geometry-delta-planner-v6.py
+          echo '74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db  engineering/geometry-delta-planner-v6.py' | sha256sum -c -
+          python3 engineering/geometry-delta-planner-v6.py --handoff /tmp/v80/source.json --pipeline /tmp/v80/pipeline.json --classification /tmp/v80/classification.json --out /tmp/v80/rebuilt-delta.json
+          echo '75e9c0726826b9bed037b05114a05456cb2404427efda69474cf1ef5686bf6a3  /tmp/v80/rebuilt-delta.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          s=json.load(open('/tmp/v80/source.json'));m=json.load(open('/tmp/v80/manifest.json'));q=json.load(open('/tmp/v80/plannerqa.json'));d=json.load(open('/tmp/v80/rebuilt-delta.json'))
+          assert s['artifact']=='34_Fresnaye_SourceArchitect_handoff_v80' and s['canonical_geometry_changed'] is False and s['geometry_authorization'] is False
+          assert m['sourceState']['latestSourceArchitectObserved']=='v80' and m['reviewCandidate']['canonicalModel']=='v23' and m['reviewCandidate']['viewerVersion']=='v96'
+          assert d['decision']=='NO_OP_SHORT_CIRCUIT' and d['geometryBuildRequired'] is False and d['fullModelRegenerationRequired'] is False and d['fullBrowserRegressionRequired'] is False
+          assert q['pass'] is True and q['planner']=='34_Fresnaye_GeometryDeltaPlanner_v6'
+          PY
+      - name: Verify gate JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/v80/gate.html').read();m=re.search(r'<script>\n([\s\S]*?)\n</script>',t);assert m;open('/tmp/v80/gate.js','w').write(m.group(1))
+          PY
+          node --check /tmp/v80/gate.js
+          node --check engineering/walkthrough-v96-stable-source80-publicqa-v1.cjs
+      - name: Fresh public Source v80 stable browser QA
+        run: NODE_PATH="$GITHUB_WORKSPACE/node_modules" node engineering/walkthrough-v96-stable-source80-publicqa-v1.cjs
+      - name: Persist Source v80 stable public QA evidence
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/stable-v80-r7-publicbrowserqa-v1.json /tmp/pages/stable-v80-r7-publicbrowserqa-v1.json
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add stable-v80-r7-publicbrowserqa-v1.json
+          git commit -m 'Persist stable Source v80 r7 public browser QA v1' || true
+          git push origin HEAD:gh-pages
