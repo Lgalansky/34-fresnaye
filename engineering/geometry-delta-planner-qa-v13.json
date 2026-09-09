@@ -1,28 +1,24 @@
 {
   "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v13",
-  "date": "2026-09-09",
-  "planner": "34_Fresnaye_GeometryDeltaPlanner_v5",
-  "plannerSha256": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+  "timestampUtc": "2026-09-09T17:43:00.715437Z",
+  "geometryChanged": false,
   "sourceArchitect": "v78",
   "sourceHandoffSha256": "d24ef3580b9c254e42850c28dc48e7bc98ef36424fdda8b77860863c242e9ebc",
   "pipelineSha256": "2e63892f4d7bfc18381effea8a42885199e5ac08f407a4954dc9722ed801cfcb",
-  "deltaPlanSha256": "54239150f169c414d740bb6788508392f449d6873ebbfebb4046153e945ba23a",
-  "geometryChanged": false,
-  "plannerExitCode": 0,
+  "plannerSha256": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+  "planSha256": "54239150f169c414d740bb6788508392f449d6873ebbfebb4046153e945ba23a",
   "checks": {
     "source_identity": true,
-    "level02_effect_detected": true,
-    "effect_path_is_v78_priority_state": true,
+    "source_effect_explicit": true,
     "geometry_authorization_false": true,
-    "canonical_geometry_changed_false": true,
     "decision_source_only_short_circuit": true,
-    "changed_element_ids_empty": true,
-    "geometry_build_not_required": true,
-    "full_model_regeneration_not_required": true,
-    "full_browser_regression_not_required": true,
+    "geometry_build_false": true,
+    "full_regeneration_false": true,
+    "full_browser_regression_false": true,
     "canonical_parent_v23": true,
-    "viewer_reuse_v96": true
+    "viewer_reuse_v96": true,
+    "no_changed_element_ids": true
   },
-  "pass": true,
-  "note": "v78 is a source/design-freeze reclassification only. The fail-closed planner preserves canonical v23 and exact v96 viewer; no architectural geometry is edited."
+  "designFreezeBoundary": "Archilab states the remaining vaulted/curved ceiling design is still in process and subject to workshop outcome; pre-workshop section is intent-only unless explicitly final/current.",
+  "pass": true
 }
