@@ -1,0 +1,129 @@
+name: Stable r4 Source v76 live QA
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/stable-r4-v76-liveqa.yml']
+  workflow_dispatch:
+permissions: {contents: write}
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: gh-pages, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Wait for r4 Source v76 public state
+        run: |
+          set -euo pipefail
+          B=https://lgalansky.github.io/34-fresnaye
+          for i in $(seq 1 60); do
+            curl -fsSL "$B/v96/?r=$GITHUB_RUN_ID-$i" -o /tmp/l.html || true
+            curl -fsSL "$B/v96/sw.js?r=$GITHUB_RUN_ID-$i" -o /tmp/sw.js || true
+            curl -fsSL "$B/source-state/34_Fresnaye_SourceArchitect_handoff_v76.json?r=$GITHUB_RUN_ID-$i" -o /tmp/s.json || true
+            curl -fsSL "$B/engineering/incremental-geometry-pipeline-v2-v76.json?r=$GITHUB_RUN_ID-$i" -o /tmp/p.json || true
+            curl -fsSL "$B/engineering/geometry-delta-plan-source-v76-v1.json?r=$GITHUB_RUN_ID-$i" -o /tmp/d.json || true
+            curl -fsSL "$B/engineering/geometry-delta-planner-qa-v11.json?r=$GITHUB_RUN_ID-$i" -o /tmp/q.json || true
+            if python3 - <<'PY'
+          import json,hashlib
+          try:
+            l=open('/tmp/l.html','rb').read(); sw=open('/tmp/sw.js','rb').read(); s=open('/tmp/s.json','rb').read(); p=open('/tmp/p.json','rb').read(); d=open('/tmp/d.json','rb').read(); q=open('/tmp/q.json','rb').read()
+            assert hashlib.sha256(l).hexdigest()=='53a56b59f6a75cacb4ecadae4f28486f04719efce171ec5ef560342f43f9dbdf'
+            assert hashlib.sha256(sw).hexdigest()=='b261ada1a86f6a16b501d3c7c50481c7404aa507b52838830c52fc85fb594374'
+            assert hashlib.sha256(s).hexdigest()=='e4f58eb243a12f669f1f07278833f172b0b98b8d4c97785e12f2a831be2571b2'
+            assert hashlib.sha256(p).hexdigest()=='55794a5fcbe53e9ffc4754d158d4c16ad1540f6f53d78873efd7fb2ef1819cee'
+            assert hashlib.sha256(d).hexdigest()=='13eb7b643aea365202c5a164f66801a2bd53ff1588826c6ba40156bb4f996e3a'
+            assert hashlib.sha256(q).hexdigest()=='de63a2a030ce80711b3ea2dcd31d4ea1fbcc219bd1aa839512238a751fcace9f'
+            sj=json.loads(s); dj=json.loads(d); qj=json.loads(q)
+            assert sj['artifact'].endswith('_v76') and sj['level02_priority_state']['effect_of_v76']=='NONE' and sj['geometry_authorization'] is False
+            assert dj['decision']=='NO_OP_SHORT_CIRCUIT' and dj['canonicalParent']=='v23' and not dj['geometryBuildRequired']
+            assert qj['pass'] is True
+          except Exception: raise SystemExit(1)
+          PY
+            then break; fi
+            sleep 3
+          done
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/l.html').read(); s=re.search(r'<script>([\s\S]*?)</script>',t); assert s
+          assert 'v96-portable-r4' in t and 'CLIENT_HASH_VERIFIED_DIRECT_ONLY' in t and "cache:'no-store'" in t
+          open('/tmp/l.js','w').write(s.group(1))
+          PY
+          node --check /tmp/l.js
+          node --check /tmp/sw.js
+      - name: Install Chromium
+        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Live r4 desktop mobile cache fallback hedge offline QA
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const B='https://lgalansky.github.io/34-fresnaye/',V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',CACHE='fresnaye-v96-portable-r4';
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_PortableR4_SourceV76_LiveBrowserQA_v1',timestampUtc:new Date().toISOString(),sourceArchitect:'v76',geometryChanged:false,viewerSha256:V,canonicalObjSha256:M,desktop:{},mobile:{},verifiedCache:{},poisonWrongMarker:{},poisonCorrectMarker:{},forcedFallback:{},hedge:{},offline:{},pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)},xy=t=>{let x=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!x)throw Error('coords');return[+x[1],+x[2]]},d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p,u){await p.goto(u,{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass&&window.__FRESNAYE_QA?.status==='READY',{},{timeout:90000})}
+          (async()=>{let b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            let c=await b.newContext({viewport:{width:1365,height:768}}),p=await c.newPage(),pe=[];p.on('pageerror',e=>pe.push(String(e)));await ready(p,B+'v96/?r4d='+Date.now());let t=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META),r=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(t.viewerSha256===V&&t.modelSha256===M&&t.cacheName===CACHE&&t.cachePolicy.includes('CLIENT_HASH_VERIFIED_DIRECT_ONLY')&&lm.modelSha256===M&&r.pass&&r.mainRoute.collisionValidated,'desktop identity');let a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(650);await p.keyboard.up('w');await p.waitForTimeout(100);let z=xy(await p.locator('#coords').textContent());ok(d(a,z)>.15,'keyboard');await p.locator('#reset').click();await p.locator('[data-start="living"]').click();await p.waitForTimeout(100);ok(d(xy(await p.locator('#coords').textContent()),[3.6,13])<.12,'living');await p.locator('#enter').click();await p.waitForTimeout(150);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer');let y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,bubbles:true})));await p.waitForTimeout(80);let y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&!pe.length,'mouse');out.desktop={pass:true,renderer:lm.renderer,keyboardMovementM:+d(a,z).toFixed(3),livingStart:true,pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),collisionValidated:r.mainRoute.collisionValidated,route:r.mainRoute,pageErrors:pe};
+            await p.waitForFunction(()=>navigator.serviceWorker?.controller,{},{timeout:30000});
+            let vcache=await c.newPage();await ready(vcache,B+'v96/');let vt=await vcache.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(vt.loaderMode==='verified-cache-direct-v2'&&vt.viewerSha256===V,'verified cache');out.verifiedCache={pass:true,mode:vt.loaderMode,cacheName:vt.cacheName};await vcache.close();
+            const direct=B+'34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html';
+            await p.evaluate(async({CACHE,direct})=>{const c=await caches.open(CACHE);await c.put(direct,new Response('poison',{headers:{'X-Fresnaye-Verified-SHA256':'WRONG'}}))},{CACHE,direct});let pw=await c.newPage();await ready(pw,B+'v96/?poisonWrong='+Date.now());let pwt=await pw.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(pwt.viewerSha256===V&&pwt.loaderMode!=='verified-cache-direct-v2','wrong marker recovery');out.poisonWrongMarker={pass:true,recoveredMode:pwt.loaderMode};await pw.close();
+            await p.evaluate(async({CACHE,direct,V})=>{const c=await caches.open(CACHE);await c.put(direct,new Response('poison',{headers:{'X-Fresnaye-Verified-SHA256':V}}))},{CACHE,direct,V});let pc=await c.newPage();await ready(pc,B+'v96/?poisonCorrect='+Date.now());let pct=await pc.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(pct.viewerSha256===V&&pct.loaderMode!=='verified-cache-direct-v2','correct marker corrupt recovery');out.poisonCorrectMarker={pass:true,recoveredMode:pct.loaderMode};await pc.close();
+            let f=await c.newPage();await ready(f,B+'v96/?qaFallback=1');let ft=await f.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(ft.loaderMode==='parallel-fallback-v6-forced'&&ft.cancelledLoser==='direct'&&ft.viewerSha256===V,'fallback');out.forcedFallback={pass:true,mode:ft.loaderMode,cancelledLoser:ft.cancelledLoser};await f.close();
+            let h=await c.newPage();await h.route('**/34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html*',async route=>{await new Promise(x=>setTimeout(x,3500));try{await route.continue()}catch{}});await h.evaluateOnNewDocument(async()=>{try{await caches.delete('fresnaye-v96-portable-r4')}catch{}});await ready(h,B+'v96/?hedge='+Date.now());let ht=await h.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(ht.hedged&&ht.cancelledLoser==='direct'&&ht.loaderMode==='parallel-fallback-v6-hedged','hedge');out.hedge={pass:true,mode:ht.loaderMode,cancelledLoser:ht.cancelledLoser};await h.close();
+            let seed=await c.newPage();await ready(seed,B+'v96/');await seed.waitForFunction(()=>navigator.serviceWorker?.controller,{},{timeout:30000});await seed.close();await c.setOffline(true);let off=await c.newPage(),oe=[];off.on('pageerror',e=>oe.push(String(e)));await ready(off,B+'v96/?offlineQuery=1');let ot=await off.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(ot.loaderMode==='verified-cache-direct-v2'&&ot.viewerSha256===V&&!oe.length,'offline query');out.offline={pass:true,queryStringShell:true,mode:ot.loaderMode,pageErrors:oe};await off.close();await c.setOffline(false);await c.close();
+            let mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await ready(m,B+'v96/?r4m='+Date.now());await m.evaluate(()=>document.querySelector('[data-start=entrance]').click());let ma=xy(await m.locator('#coords').textContent()),sb=await m.locator('#stick').boundingBox(),sx=sb.x+sb.width/2,sy=sb.y+sb.height/2;await m.dispatchEvent('#stick','pointerdown',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-35,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});await m.waitForTimeout(650);await m.dispatchEvent('#stick','pointerup',{pointerId:11,pointerType:'touch',clientX:sx,clientY:sy-45,isPrimary:true,bubbles:true});let mb=xy(await m.locator('#coords').textContent());ok(d(ma,mb)>.15,'joystick');let lb=await m.locator('#look').boundingBox(),lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,my0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:12,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:12,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:12,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});let my1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(my1-my0)>.04,'look');await m.locator('#mobileReset').click();await m.waitForTimeout(80);ok(d(xy(await m.locator('#coords').textContent()),[7.9,17.1])<.12&&!me.length,'mreset');out.mobile={pass:true,renderer:(await m.evaluate(()=>window.__FRESNAYE_LIVE_META.renderer)),joystickMovementM:+d(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(my1-my0).toFixed(3),reset:true,collisionValidated:(await m.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA())).mainRoute.collisionValidated,pageErrors:me};await mc.close();
+            out.forcedFallback.pass&&out.offline.pass&&out.desktop.pass&&out.mobile.pass&&out.poisonWrongMarker.pass&&out.poisonCorrectMarker.pass&&out.hedge.pass&&out.verifiedCache.pass&&(out.pass=true);
+          }catch(e){out.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('v96/portable-qa-v5.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
+          JS
+          node qa.cjs
+      - name: Update stable review manifest to Source v76 and r4
+        run: |
+          python3 - <<'PY'
+          import json,hashlib,datetime
+          h=lambda p:hashlib.sha256(open(p,'rb').read()).hexdigest()
+          m=json.load(open('walkthrough-review.json'))
+          m['artifact']='34_Fresnaye_Walkthrough_StableReviewManifest_v16';m['schemaVersion']=16;m['updatedUtc']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          c=m['reviewCandidate'];c['portableLoader']='v96/index.html';c['portableLoaderSha256']=h('v96/index.html');c['portableQaEvidence']='v96/portable-qa-v5.json';c['portableQaSha256']=h('v96/portable-qa-v5.json')
+          s=m['sourceState'];s.update({'latestSourceArchitectObserved':'v76','sourceArchitectHandoffArtifact':'34_Fresnaye_SourceArchitect_handoff_v76.json','sourceArchitectHandoffPublicPath':'source-state/34_Fresnaye_SourceArchitect_handoff_v76.json','sourceArchitectHandoffSha256':h('source-state/34_Fresnaye_SourceArchitect_handoff_v76.json'),'sourceArchitectChiefOfStaffStatus':'LEVEL02_PASS_UNCHANGED__L01_W08_FALSE_HEAD_CANDIDATES_EXCLUDED__NO_MODEL_EDIT','level02Effect':'NONE','geometryAuthorization':False,'newerSourceSyncChangesCandidateGeometry':False,'browserQaCompatibilitySource':'v76','browserQaReuseReason':'v76 has Level 02 effect NONE and geometry authorization false; canonical v23 and exact v96 viewer bytes are unchanged. r4 portable transport is freshly browser-tested including verified-cache trust boundary, poison recovery, desktop/mobile controls, collision, forced fallback, hedge and offline query-shell recovery.'})
+          g=m['geometryPipeline'];g.update({'publicPath':'engineering/incremental-geometry-pipeline-v2-v76.json','sha256':h('engineering/incremental-geometry-pipeline-v2-v76.json'),'planner':'34_Fresnaye_GeometryDeltaPlanner_v5','plannerPublicPath':'engineering/geometry-delta-planner-v5.py','plannerSha256':h('engineering/geometry-delta-planner-v5.py'),'plannerQaPublicPath':'engineering/geometry-delta-planner-qa-v11.json','plannerQaSha256':h('engineering/geometry-delta-planner-qa-v11.json'),'currentDeltaPlanPublicPath':'engineering/geometry-delta-plan-source-v76-v1.json','currentDeltaPlanSha256':h('engineering/geometry-delta-plan-source-v76-v1.json'),'currentDecision':'NO_OP_SHORT_CIRCUIT','fullModelRegenerationRequired':False,'geometryBuildRequired':False,'fullBrowserRegressionRequired':False})
+          m['stableGate']['sha256']=h('walkthrough-review.html')
+          open('walkthrough-review.json','w').write(json.dumps(m,indent=2)+'\n')
+          print('manifest',h('walkthrough-review.json'),'qa',c['portableQaSha256'])
+          PY
+      - name: Publish QA and manifest
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v96/portable-qa-v5.json walkthrough-review.json
+          git commit -m 'Verify portable r4 and sync stable review to Source v76'
+          git pull --rebase origin gh-pages
+          git push origin HEAD:gh-pages
+      - name: Verify public stable gate after manifest publication
+        run: |
+          set -euo pipefail
+          B=https://lgalansky.github.io/34-fresnaye
+          for i in $(seq 1 60); do
+            curl -fsSL "$B/walkthrough-review.json?g=$GITHUB_RUN_ID-$i" -o /tmp/m16.json || true
+            if python3 - <<'PY'
+          import json
+          try:
+            m=json.load(open('/tmp/m16.json'));assert m['schemaVersion']>=16 and m['sourceState']['latestSourceArchitectObserved']=='v76' and m['reviewCandidate']['portableQaEvidence']=='v96/portable-qa-v5.json'
+          except: raise SystemExit(1)
+          PY
+            then break; fi
+            sleep 3
+          done
+          cat > gate.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');(async()=>{const o={artifact:'34_Fresnaye_Walkthrough_v96_StableR4_SourceV76_LiveGateQA_v1',timestampUtc:new Date().toISOString(),pass:false};let b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{let p=await b.newPage(),e=[];p.on('pageerror',x=>e.push(String(x)));await p.goto('https://lgalansky.github.io/34-fresnaye/walkthrough-review.html?g='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),{},{timeout:90000});o.gate=await p.locator('#gate').textContent();o.source=await p.locator('#source').textContent();o.qa=await p.locator('#qa').textContent();o.href=await p.locator('#open').getAttribute('href');o.errors=e;if(!o.source.includes('v76')||o.href!=='./v96/'||e.length)throw Error('stable gate identity');o.pass=true}catch(e){o.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('stable-r4-v76-gate-qa.json',JSON.stringify(o,null,2)+'\n');console.log(JSON.stringify(o,null,2))}if(!o.pass)process.exit(1)})();
+          JS
+          node gate.cjs
+      - name: Persist stable gate QA
+        if: always()
+        run: |
+          set -euo pipefail
+          git add stable-r4-v76-gate-qa.json 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record stable r4 Source v76 gate QA'
+          git pull --rebase origin gh-pages
+          git push origin HEAD:gh-pages
