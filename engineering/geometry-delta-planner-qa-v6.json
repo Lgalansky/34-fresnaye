@@ -1,0 +1,25 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v6",
+  "date": "2026-09-09",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v3.py",
+  "plannerGitHubCommit": "ef7fb1edfd772c2351706c8d14be33f89f337497",
+  "plannerGitBlob": "2fdb25f69e8c8cddac420ee206824090a36ab7de",
+  "sourceV70HandoffSha256": "0db7ba8755617d86c293783c5e073b69177c1794a692d1b9ced887f97f522f29",
+  "pipelineV70Sha256": "63ffe733dcfa3a29d9e8bc25d87c08aea5266c802be881eb630b63a2e09710ef",
+  "deltaPlanV70Sha256": "bab4ad60d9a7ebe066664f7bc6e4af798375e081c3e3cad91642ab46ae0b0916",
+  "checks": {
+    "py_compile": true,
+    "normalized_v70_schema_read": true,
+    "v70_source_only_short_circuit": true,
+    "canonical_parent_v23": true,
+    "viewer_reuse_v96": true,
+    "no_geometry_build": true,
+    "no_full_model_regeneration": true,
+    "source_geometry_authorization_false": true,
+    "authorized_missing_changed_ids_fails_closed": true,
+    "authorized_changed_ids_patch_plan": true,
+    "deduplicates_changed_ids": true
+  },
+  "pass": true,
+  "geometryChanged": false
+}
