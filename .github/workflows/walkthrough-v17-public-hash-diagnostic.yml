@@ -1,0 +1,29 @@
+name: Walkthrough v17 public hash diagnostic
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v17-public-hash-diagnostic.yml'
+
+jobs:
+  hashes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hash current public dependencies
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          for p in \
+            walkthrough-review.html \
+            walkthrough-review.json \
+            v96/index.html \
+            v96/sw.js \
+            v96/portable-r6-qa-v1.json \
+            v96/start-reset-qa-v1.json \
+            source-state/34_Fresnaye_SourceArchitect_handoff_v78.json \
+            engineering/incremental-geometry-pipeline-v2-v78.json \
+            engineering/geometry-delta-plan-source-v78-v1.json \
+            engineering/geometry-delta-planner-qa-v13.json; do
+            curl -fsSL "$B/$p?diag=$GITHUB_RUN_ID" -o /tmp/x
+            printf '%s  %s\n' "$(sha256sum /tmp/x | cut -d' ' -f1)" "$p"
+          done
