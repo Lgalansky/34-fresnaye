@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   liveqa:
@@ -17,6 +17,15 @@ jobs:
     env:
       BASE: https://lgalansky.github.io/34-fresnaye
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Wait for stable gate v13 publication
         shell: bash
         run: |
@@ -31,39 +40,51 @@ jobs:
           test "$fresh" = 1
 
       - name: Verify published identities, Source state and delta pipeline
+        id: identity
         shell: bash
         run: |
           set -euo pipefail
           tmp=$(mktemp -d)
+          export TMPQA="$tmp"
           curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=identity-${GITHUB_RUN_ID}" -o "$tmp/m.json"
           python3 - "$tmp" "$BASE" <<'PY'
-          import hashlib,json,pathlib,re,subprocess,sys
-          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; s=m['sourceState']; g=m['geometryPipeline']; gate=m['stableGate']; a=m['acceptance']
+          import hashlib,json,pathlib,re,subprocess,sys,traceback
+          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; result={'artifact':'34_Fresnaye_Walkthrough_v96_StableReviewIdentityQA_v13','geometryChanged':False,'checks':{},'hashes':{},'pass':False}
+          def record(name,value=True): result['checks'][name]=bool(value); assert value,name
           def get(path,name):
               out=p/name
-              subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa={name}','-o',str(out)],check=True)
+              subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa={name}-{id(out)}','-o',str(out)],check=True)
               return out
           def h(path): return hashlib.sha256(path.read_bytes()).hexdigest()
-          gatep=get(gate['publicPath'],'gate.html'); loader=get(c['portableLoader'],'loader.html'); qap=get(c['portableQaEvidence'],'portable-qa.json'); ready=get(c['readySentinel'],'ready.json'); viewer=get(c['directViewerAsset'],'viewer.html')
-          source=get(s['sourceArchitectHandoffPublicPath'],'source.json'); pipe=get(g['publicPath'],'pipeline.json'); planner=get(g['plannerPublicPath'],'planner.py'); plan=get(g['currentDeltaPlanPublicPath'],'plan.json'); plannerqa=get(g['plannerQaPublicPath'],'plannerqa.json')
-          assert m['artifact']=='34_Fresnaye_Walkthrough_StableReviewManifest_v13' and m['schemaVersion']==13
-          assert gate['sourceVersionAgnostic'] is True and h(gatep)==gate['sha256']
-          gt=gatep.read_text(); assert 'Stable gate v13' in gt and "'effect_of_'+v" in gt
-          assert h(loader)==c['portableLoaderSha256'] and c['viewerSha256'] in loader.read_text() and c['modelSha256'] in loader.read_text()
-          qa=json.loads(qap.read_text()); assert h(qap)==c['portableQaSha256'] and qa['pass'] is True and qa['viewerSha256']==c['viewerSha256'] and qa['canonicalObjSha256']==c['modelSha256']
-          assert qa['desktop']['pass'] and qa['desktop']['renderer']=='WebGL2' and qa['desktop']['keyboardMovementM']>0.1 and qa['desktop']['pointerLock'] is True and qa['desktop']['mouseLookYawRad']>0.05 and qa['desktop']['collisionValidated'] is True
-          assert qa['mobile']['pass'] and qa['mobile']['renderer']=='WebGL2' and qa['mobile']['joystickMovementM']>0.1 and qa['mobile']['touchLookYawRad']>0.05 and qa['mobile']['reset'] is True and qa['mobile']['collisionValidated'] is True and qa['offline']['pass'] and qa['forcedFallback']['pass']
-          r=json.loads(ready.read_text()); assert r['stageComplete'] is True and r['geometryChanged'] is False and r['viewerVersion']==c['viewerVersion'] and r['viewerSha256']==c['viewerSha256'] and r['viewerBytes']==c['viewerBytes'] and r['modelSha256']==c['modelSha256'] and r['glbSha256']==c['glbSha256'] and r['vertices']==c['vertices'] and r['triangles']==c['triangles']
-          assert len(viewer.read_bytes())==c['viewerBytes'] and h(viewer)==c['viewerSha256']
-          sj=json.loads(source.read_text()); sv=s['latestSourceArchitectObserved']; assert re.fullmatch(r'v\d+',sv) and h(source)==s['sourceArchitectHandoffSha256'] and sj['artifact']=='34_Fresnaye_SourceArchitect_handoff_'+sv and sj['canonical_geometry_changed'] is False and sj['geometry_authorization'] is s['geometryAuthorization'] is False
-          key='effect_of_'+sv; eff=(sj.get('level02_priority_state') or {}).get(key); assert str(eff).strip().rstrip('.').upper()==str(s['level02Effect']).strip().rstrip('.').upper()
-          pj=json.loads(pipe.read_text()); dp=json.loads(plan.read_text()); aq=json.loads(plannerqa.read_text())
-          assert h(pipe)==g['sha256'] and h(planner)==g['plannerSha256'] and h(plan)==g['currentDeltaPlanSha256'] and h(plannerqa)==g['plannerQaSha256']
-          assert pj['artifact']==g['artifact'] and pj['sourceObserved']['sourceArchitect']==sv and pj['canonical']['level02']==c['canonicalModel'] and pj['geometryChanged'] is False
-          assert dp['sourceArchitect']==sv and dp['planner']==g['planner'] and dp['decision']==g['currentDecision'] and dp['geometryBuildRequired'] is g['geometryBuildRequired'] is False and dp['fullModelRegenerationRequired'] is g['fullModelRegenerationRequired'] is False and dp['fullBrowserRegressionRequired'] is g['fullBrowserRegressionRequired'] is False
-          assert aq['pass'] is True and aq['geometryChanged'] is False and aq['plannerSha256']==g['plannerSha256'] and aq['checks']['authorized_missing_changed_ids_fails_closed'] is True and aq['checks']['authorized_changed_ids_patch_plan'] is True
-          assert a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False and a['minimumDistanceM']==40 and a['minimumDurationSec']==12
-          print('IDENTITY PASS',sv,g['currentDecision'],c['viewerVersion'],c['canonicalModel'])
+          try:
+              m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; s=m['sourceState']; g=m['geometryPipeline']; gate=m['stableGate']; a=m['acceptance']
+              result.update(sourceArchitect=s['latestSourceArchitectObserved'],viewerVersion=c['viewerVersion'],canonicalModel=c['canonicalModel'])
+              record('manifest_v13',m['artifact']=='34_Fresnaye_Walkthrough_StableReviewManifest_v13' and m['schemaVersion']==13)
+              gatep=get(gate['publicPath'],'gate.html'); loader=get(c['portableLoader'],'loader.html'); qap=get(c['portableQaEvidence'],'portable-qa.json'); ready=get(c['readySentinel'],'ready.json'); viewer=get(c['directViewerAsset'],'viewer.html')
+              source=get(s['sourceArchitectHandoffPublicPath'],'source.json'); pipe=get(g['publicPath'],'pipeline.json'); planner=get(g['plannerPublicPath'],'planner.py'); plan=get(g['currentDeltaPlanPublicPath'],'plan.json'); plannerqa=get(g['plannerQaPublicPath'],'plannerqa.json')
+              result['hashes']={k:h(v) for k,v in {'gate':gatep,'loader':loader,'portableQa':qap,'viewer':viewer,'source':source,'pipeline':pipe,'planner':planner,'plan':plan,'plannerQa':plannerqa}.items()}
+              record('gate_hash',h(gatep)==gate['sha256']); gt=gatep.read_text(); record('gate_source_version_agnostic',gate['sourceVersionAgnostic'] is True and 'Stable gate v13' in gt and "'effect_of_'+v" in gt)
+              record('loader_hash',h(loader)==c['portableLoaderSha256']); record('loader_identity_literals',c['viewerSha256'] in loader.read_text() and c['modelSha256'] in loader.read_text())
+              qa=json.loads(qap.read_text()); record('portable_qa_hash',h(qap)==c['portableQaSha256']); record('portable_qa_identity',qa['pass'] is True and qa['viewerSha256']==c['viewerSha256'] and qa['canonicalObjSha256']==c['modelSha256'])
+              record('desktop_controls',qa['desktop']['pass'] and qa['desktop']['renderer']=='WebGL2' and qa['desktop']['keyboardMovementM']>0.1 and qa['desktop']['pointerLock'] is True and qa['desktop']['mouseLookYawRad']>0.05 and qa['desktop']['collisionValidated'] is True)
+              record('mobile_controls',qa['mobile']['pass'] and qa['mobile']['renderer']=='WebGL2' and qa['mobile']['joystickMovementM']>0.1 and qa['mobile']['touchLookYawRad']>0.05 and qa['mobile']['reset'] is True and qa['mobile']['collisionValidated'] is True)
+              record('offline_fallback',qa['offline']['pass'] and qa['forcedFallback']['pass'])
+              r=json.loads(ready.read_text()); record('ready_identity',r['stageComplete'] is True and r['geometryChanged'] is False and r['viewerVersion']==c['viewerVersion'] and r['viewerSha256']==c['viewerSha256'] and r['viewerBytes']==c['viewerBytes'] and r['modelSha256']==c['modelSha256'] and r['glbSha256']==c['glbSha256'] and r['vertices']==c['vertices'] and r['triangles']==c['triangles'])
+              record('direct_viewer_exact',len(viewer.read_bytes())==c['viewerBytes'] and h(viewer)==c['viewerSha256'])
+              sj=json.loads(source.read_text()); sv=s['latestSourceArchitectObserved']; record('source_version',bool(re.fullmatch(r'v\d+',sv))); record('source_hash',h(source)==s['sourceArchitectHandoffSha256']); record('source_identity',sj['artifact']=='34_Fresnaye_SourceArchitect_handoff_'+sv and sj['canonical_geometry_changed'] is False and sj['geometry_authorization'] is s['geometryAuthorization'] is False)
+              key='effect_of_'+sv; eff=(sj.get('level02_priority_state') or {}).get(key); record('source_effect',str(eff).strip().rstrip('.').upper()==str(s['level02Effect']).strip().rstrip('.').upper())
+              pj=json.loads(pipe.read_text()); dp=json.loads(plan.read_text()); aq=json.loads(plannerqa.read_text())
+              record('pipeline_hash',h(pipe)==g['sha256']); record('planner_hash',h(planner)==g['plannerSha256']); record('plan_hash',h(plan)==g['currentDeltaPlanSha256']); record('planner_qa_hash',h(plannerqa)==g['plannerQaSha256'])
+              record('pipeline_identity',pj['artifact']==g['artifact'] and pj['sourceObserved']['sourceArchitect']==sv and pj['canonical']['level02']==c['canonicalModel'] and pj['geometryChanged'] is False)
+              record('delta_decision',dp['sourceArchitect']==sv and dp['planner']==g['planner'] and dp['decision']==g['currentDecision'] and dp['geometryBuildRequired'] is g['geometryBuildRequired'] is False and dp['fullModelRegenerationRequired'] is g['fullModelRegenerationRequired'] is False and dp['fullBrowserRegressionRequired'] is g['fullBrowserRegressionRequired'] is False)
+              record('planner_fail_closed',aq['pass'] is True and aq['geometryChanged'] is False and aq['plannerSha256']==g['plannerSha256'] and aq['checks']['authorized_missing_changed_ids_fails_closed'] is True and aq['checks']['authorized_changed_ids_patch_plan'] is True)
+              record('acceptance_hold',a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False and a['minimumDistanceM']==40 and a['minimumDurationSec']==12)
+              result['pass']=True
+          except Exception as e:
+              result['error']=f'{type(e).__name__}: {e}'; result['traceback']=traceback.format_exc(limit=6)
+          pathlib.Path('stable-v13-identity-qa.json').write_text(json.dumps(result,indent=2)+'\n')
+          print(json.dumps(result,indent=2))
+          if not result['pass']: raise SystemExit(1)
           PY
           python3 - "$tmp/gate.html" "$tmp/gate.js" <<'PY'
           import pathlib,re,sys
@@ -72,34 +93,54 @@ jobs:
           PY
           node --check "$tmp/gate.js"
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
       - name: Install Chromium QA runtime
+        if: steps.identity.outcome == 'success'
         shell: bash
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
       - name: Verify live stable gate and preferred walkthrough load
+        id: live
+        if: steps.identity.outcome == 'success'
         shell: bash
         run: |
           cat > stable-v13.cjs <<'JS'
-          const {chromium}=require('playwright');
+          const {chromium}=require('playwright'),fs=require('fs');
           (async()=>{
-            const base='https://lgalansky.github.io/34-fresnaye/';
+            const base='https://lgalansky.github.io/34-fresnaye/'; const out={artifact:'34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v13',timestampUtc:new Date().toISOString(),url:base+'walkthrough-review.html',geometryChanged:false,pass:false};
             const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
             try{
               const p=await b.newPage({viewport:{width:1280,height:800}}); const errors=[]; p.on('pageerror',e=>errors.push(String(e)));
-              await p.goto(base+'walkthrough-review.html?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+              await p.goto(out.url+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
               await p.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),null,{timeout:90000});
-              const gate=await p.locator('#gate').textContent(), source=await p.locator('#source').textContent(), pipe=await p.locator('#pipe').textContent(), qa=await p.locator('#qa').textContent(), href=await p.locator('#open').getAttribute('href');
-              if(!gate.includes('VERIFIED REVIEW READY')||!source.includes('v72')||!pipe.includes('NO OP SHORT CIRCUIT')||!qa.includes('PASS')||href!=='./v96/'||errors.length) throw Error(JSON.stringify({gate,source,pipe,qa,href,errors}));
+              out.gate=await p.locator('#gate').textContent(); out.source=await p.locator('#source').textContent(); out.pipeline=await p.locator('#pipe').textContent(); out.qa=await p.locator('#qa').textContent(); out.href=await p.locator('#open').getAttribute('href'); out.gatePageErrors=errors;
+              if(!out.gate.includes('VERIFIED REVIEW READY')||!out.source.includes('v72')||!out.pipeline.includes('NO OP SHORT CIRCUIT')||!out.qa.includes('PASS')||out.href!=='./v96/'||errors.length) throw Error('stable gate state mismatch');
               await p.goto(base+'v96/?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
               await p.waitForFunction(()=>document.querySelector('canvas') && !document.body.innerText.includes('Walkthrough blocked'),null,{timeout:90000});
-              const canvas=await p.locator('canvas').count(); if(canvas<1) throw Error('preferred walkthrough did not create a canvas');
-              console.log('LIVE GATE PASS', {source,pipe,qa,href,canvas});
-            } finally { await b.close(); }
-          })().catch(e=>{console.error(e.stack||e);process.exit(1)});
+              out.preferredCanvasCount=await p.locator('canvas').count(); out.preferredPageErrors=errors.slice(); if(out.preferredCanvasCount<1) throw Error('preferred walkthrough did not create a canvas');
+              out.pass=true;
+            } catch(e) { out.error=String(e?.stack||e); }
+            finally { await b.close(); fs.writeFileSync('stable-v13-live-browser-qa.json',JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2)); }
+            if(!out.pass) process.exit(1);
+          })();
           JS
           node stable-v13.cjs
+
+      - name: Persist QA evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          files=()
+          test -f stable-v13-identity-qa.json && files+=(stable-v13-identity-qa.json)
+          test -f stable-v13-live-browser-qa.json && files+=(stable-v13-live-browser-qa.json)
+          if ((${#files[@]})); then
+            git add "${files[@]}"
+            if ! git diff --cached --quiet; then
+              git commit -m 'Record stable v13 live QA evidence'
+              git push origin HEAD:gh-pages
+            fi
+          fi
