@@ -11,10 +11,26 @@
   "deltaPlanSha256": "ab6f08dcd75e13690a4148fb82be0a0717a26b551601ec622dc4e9b3e64ca931",
   "decision": "NO_OP_SHORT_CIRCUIT",
   "cases": [
-    {"name": "v82_classification_bridge_noop", "pass": true, "rc": 0},
-    {"name": "missing_effect_without_bridge_fails_closed", "pass": true, "rc": 2},
-    {"name": "authorization_without_changed_ids_fails_closed", "pass": true, "rc": 2},
-    {"name": "unpromoted_canonical_mutation_fails_closed", "pass": true, "rc": 2}
+    {
+      "name": "v82_classification_bridge_noop",
+      "pass": true,
+      "rc": 0
+    },
+    {
+      "name": "missing_effect_without_bridge_fails_closed",
+      "pass": true,
+      "rc": 2
+    },
+    {
+      "name": "authorization_without_changed_ids_fails_closed",
+      "pass": true,
+      "rc": 2
+    },
+    {
+      "name": "unpromoted_canonical_mutation_fails_closed",
+      "pass": true,
+      "rc": 2
+    }
   ],
   "pass": true
 }
