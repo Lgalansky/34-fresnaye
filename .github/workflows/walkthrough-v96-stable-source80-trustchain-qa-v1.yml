@@ -1,0 +1,133 @@
+name: Walkthrough v96 stable Source v80 trust-chain QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-source80-trustchain-qa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Snapshot current gh-pages trust root
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          mkdir -p /tmp/trust
+          git show origin/gh-pages:walkthrough-review.json > /tmp/trust/expected-manifest.json
+          git show origin/gh-pages:walkthrough-review.html > /tmp/trust/expected-gate.html
+          python3 - <<'PY'
+          import json
+          m=json.load(open('/tmp/trust/expected-manifest.json'))
+          assert m['sourceState']['latestSourceArchitectObserved']=='v80'
+          assert m['sourceState']['geometryAuthorization'] is False
+          assert m['sourceState']['newerSourceSyncChangesCandidateGeometry'] is False
+          assert m['reviewCandidate']['viewerVersion']=='v96'
+          assert m['reviewCandidate']['canonicalModel']=='v23'
+          assert m['reviewCandidate']['geometryChanged'] is False
+          assert m['reviewCandidate']['portableLoaderRevision']=='r7'
+          assert m['geometryPipeline']['currentDecision']=='NO_OP_SHORT_CIRCUIT'
+          assert m['geometryPipeline']['geometryBuildRequired'] is False
+          assert m['acceptance']['finalStatus']=='OPEN'
+          PY
+      - name: Wait for public trust root to equal gh-pages bytes
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          OK=0
+          for I in $(seq 1 120); do
+            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.json?trust=$GITHUB_RUN_ID-$I" -o /tmp/trust/public-manifest.json || true
+            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.html?trust=$GITHUB_RUN_ID-$I" -o /tmp/trust/public-gate.html || true
+            if cmp -s /tmp/trust/expected-manifest.json /tmp/trust/public-manifest.json && cmp -s /tmp/trust/expected-gate.html /tmp/trust/public-gate.html; then OK=1; break; fi
+            sleep 3
+          done
+          test "$OK" = 1
+      - name: Verify every manifest-referenced public byte identity
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          python3 - <<'PY'
+          import json
+          m=json.load(open('/tmp/trust/public-manifest.json'))
+          c,s,g=m['reviewCandidate'],m['sourceState'],m['geometryPipeline']
+          refs=[
+            (c['portableLoader'],c['portableLoaderSha256'],'loader.html'),
+            (c['portableServiceWorker'],c['portableServiceWorkerSha256'],'sw.js'),
+            (c['portableQaEvidence'],c['portableQaSha256'],'portableqa.json'),
+            (c['startResetQaEvidence'],c['startResetQaSha256'],'startsqa.json'),
+            (s['sourceArchitectHandoffPublicPath'],s['sourceArchitectHandoffSha256'],'source.json'),
+            (s['effectClassificationPublicPath'],s['effectClassificationSha256'],'classification.json'),
+            (g['publicPath'],g['sha256'],'pipeline.json'),
+            (g['plannerPublicPath'],g['plannerSha256'],'planner.py'),
+            (g['currentDeltaPlanPublicPath'],g['currentDeltaPlanSha256'],'delta.json'),
+            (g['plannerQaPublicPath'],g['plannerQaSha256'],'plannerqa.json')]
+          with open('/tmp/trust/refs.tsv','w') as f:
+            for path,sha,out in refs:f.write(f'{path}\t{sha}\t{out}\n')
+          PY
+          while IFS=$'\t' read -r P H O; do
+            OK=0
+            for N in $(seq 1 60); do
+              curl -fsSL --retry 2 --retry-delay 1 "$B/$P?trust=$GITHUB_RUN_ID-$N" -o "/tmp/trust/$O" || true
+              if echo "$H  /tmp/trust/$O" | sha256sum -c - >/dev/null 2>&1; then OK=1; break; fi
+              sleep 2
+            done
+            test "$OK" = 1
+          done < /tmp/trust/refs.tsv
+      - name: Reproduce Source v80 no-op delta and verify viewer readiness identity
+        run: |
+          set -euo pipefail
+          python3 -m py_compile /tmp/trust/planner.py
+          python3 /tmp/trust/planner.py --handoff /tmp/trust/source.json --pipeline /tmp/trust/pipeline.json --classification /tmp/trust/classification.json --out /tmp/trust/rebuilt-delta.json
+          python3 - <<'PY'
+          import hashlib,json
+          m=json.load(open('/tmp/trust/public-manifest.json'));d=json.load(open('/tmp/trust/rebuilt-delta.json'));s=json.load(open('/tmp/trust/source.json'));q=json.load(open('/tmp/trust/plannerqa.json'))
+          h=hashlib.sha256(open('/tmp/trust/rebuilt-delta.json','rb').read()).hexdigest()
+          assert h==m['geometryPipeline']['currentDeltaPlanSha256']
+          assert d['decision']=='NO_OP_SHORT_CIRCUIT' and d['geometryBuildRequired'] is False and d['fullModelRegenerationRequired'] is False and d['fullBrowserRegressionRequired'] is False
+          assert s['canonical_geometry_changed'] is False and s['geometry_authorization'] is False
+          assert q['pass'] is True
+          PY
+          curl -fsSL --retry 3 'https://lgalansky.github.io/34-fresnaye/walkthrough-v96-ready.json' -o /tmp/trust/ready.json
+          python3 - <<'PY'
+          import json
+          m=json.load(open('/tmp/trust/public-manifest.json'));r=json.load(open('/tmp/trust/ready.json'));c=m['reviewCandidate']
+          assert r['stageComplete'] is True and r['geometryChanged'] is False
+          assert r['viewerVersion']==c['viewerVersion'] and r['viewerSha256']==c['viewerSha256'] and r['viewerBytes']==c['viewerBytes']
+          assert r['modelSha256']==c['modelSha256'] and r['glbSha256']==c['glbSha256'] and r['vertices']==c['vertices'] and r['triangles']==c['triangles']
+          PY
+      - name: Verify stable gate and browser QA JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/trust/public-gate.html').read();m=re.search(r'<script>\n([\s\S]*?)\n</script>',t);assert m;open('/tmp/trust/gate.js','w').write(m.group(1))
+          PY
+          node --check /tmp/trust/gate.js
+          node --check engineering/walkthrough-v96-stable-source80-publicqa-v1.cjs
+      - name: Fresh public stable Source v80 desktop mobile navigation QA
+        run: NODE_PATH="$GITHUB_WORKSPACE/node_modules" node engineering/walkthrough-v96-stable-source80-publicqa-v1.cjs
+      - name: Persist trust-chain public browser QA evidence
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/stable-v80-r7-publicbrowserqa-v1.json /tmp/pages/stable-v80-r7-trustchain-publicbrowserqa-v1.json
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add stable-v80-r7-trustchain-publicbrowserqa-v1.json
+          git commit -m 'Persist stable Source v80 trust-chain public browser QA v1'
+          git push origin HEAD:gh-pages
