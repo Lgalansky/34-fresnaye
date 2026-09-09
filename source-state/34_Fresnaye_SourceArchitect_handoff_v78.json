@@ -35,21 +35,28 @@
   },
   "carry_forward_later_stage_state": {
     "L04_lean_to_roof": "v77 remains source-closed at explicit 3 degrees only for the annotated lean-to roof; do not propagate to main Mazista roof.",
-    "L01_windows": "W06 rough width and W08 brickwork head remain open; W04/W05/W06 25mm vertical interface allocations remain unspecified."
+    "L01_windows": "W06 rough width and W08 brickwork head remain open; W04/W05/W06 25mm vertical interface allocations remain unspecified.",
+    "L03": "D02 duplicate schedule-system ownership; D04 schedule omission; iD02 brickwork-head2100 versus scheduled panel/leaf2150; skylight interfaces/IDs; S01/S02 masonry heads; S03 grille overall size remain open."
   },
-  "chief_of_staff_status": "LEVEL02_PRIORITY_GATE_REMAINS_PASS_UNCHANGED__REMAINING_CURVED_CEILING_EXCEPTION_RECLASSIFIED_DESIGN_NOT_FROZEN_BY_DIRECT_ARCHILAB_EMAIL__NO_MODEL_EDIT",
-  "source_authority": {
-    "direct_architect_clarification": {
-      "status": "AUTHORITATIVE_FOR_DESIGN_FREEZE_STATUS_ONLY",
-      "received_utc": "2026-09-09T16:41:59Z",
-      "finding": "Vaulted ceilings opposite guest toilet and opposite side remain in design process; workshop next week; quick section to be prepared next day is subject to change.",
-      "geometry_permission": "NONE"
-    }
-  },
-  "remaining_source_exceptions": [
-    "L02 vaulted/curved/stepped ceiling geometry opposite guest toilet and on opposite side: DESIGN_NOT_FROZEN__await final/current Archilab workshop outcome or explicit approved geometry.",
-    "L04 main Mazista roof pitch/eaves/ridge extents and 370mm parapet-adjacent ownership remain open; 3-degree note belongs only to explicit lean-to roof.",
-    "L01 W06 rough width, W08 brickwork head, and W04/W05/W06 25mm interface allocations remain open."
+  "unresolved_ambiguities": [
+    "Level02 vaulted/curved/stepped ceiling geometry opposite guest toilet and opposite side: architect confirms design still in process; final exact construction not frozen.",
+    "Level01 complex ceiling fields: complete curved/stepped/nested boundary topology remains incomplete despite explicit straight witnesses.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 D11 brickwork tag drift and masonry rough width.",
+    "Level01 W06 masonry rough width; local340/580 excluded and schedule600 cannot substitute.",
+    "Level01 W08 brickwork U/S opening/head; adjacent D08/D07 2100 candidates excluded.",
+    "Level01 W04/W05/W06 25mm vertical interface allocations remain unspecified.",
+    "Level03 D02 duplicate schedule-system ownership; D04 schedule omission; iD02 brickwork-head2100 versus scheduled panel/leaf2150.",
+    "Level03 skylight IDs/curb/upstand/structural rough-opening/frame-flashing interfaces.",
+    "Level03 S01/S02 masonry heads; L03_S03 overall grille width/height.",
+    "Level04 main Mazista roof numeric pitch/eaves/ridge extents and 370mm parapet-adjacent endpoint ownership remain open; 3 degrees applies only to the explicit lean-to condition."
   ],
-  "promotion_boundary": "Do not edit canonical Level02 geometry from pre-workshop sketches/sections or design-intent notes. Re-run source adjudication only when Archilab supplies final/current geometry or explicitly authorizes a defined change set."
+  "source_watch": "New Archilab source received 2026-09-09T16:41:59Z, subject RE: Render, with no attachments. It confirms the remaining Level02 vaulted ceiling design is not frozen and says a quick section will be sent the following day subject to change.",
+  "chief_of_staff_action": "Keep the Level02 priority-five gate passed and canonical geometry unchanged. Reclassify the remaining curved/vaulted ceiling blocker as ARCHITECT_DESIGN_NOT_FROZEN. Treat any promised pre-workshop quick section as preliminary unless Archilab explicitly confirms final/current post-workshop geometry.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level02_CeilingDesignStatusEvidenceRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level02_CircularSteppedToiletBulkhead_GeometryException_v2.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v61.json",
+    "34_Fresnaye_SourceArchitect_Run78_ArtifactManifest_v1.json"
+  ]
 }
