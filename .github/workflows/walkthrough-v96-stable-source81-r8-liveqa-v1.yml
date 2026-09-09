@@ -1,0 +1,31 @@
+name: Fresnaye Stable Source81 R8 Live QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-source81-r8-liveqa-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright Chromium
+        run: |
+          mkdir -p /tmp/pw
+          cd /tmp/pw
+          npm init -y
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          ln -s /tmp/pw/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Verify public stable gate, model, starts, desktop and mobile controls
+        run: node engineering/walkthrough-v96-stable-source81-r8-publicqa-v1.cjs
+      - name: Upload QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-source81-r8-publicbrowserqa-v1
+          path: /tmp/stable-source81-r8-publicbrowserqa-v1.json
+          if-no-files-found: error
