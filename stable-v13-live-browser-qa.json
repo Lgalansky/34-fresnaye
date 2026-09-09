@@ -1,0 +1,15 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v13",
+  "timestampUtc": "2026-09-09T12:47:27.010Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-review.html",
+  "geometryChanged": false,
+  "pass": true,
+  "gate": "VERIFIED REVIEW READY",
+  "source": "HASH-VERIFIED v72 · NONE__LATER_LEVEL_SOURCE_PREPARATION_ONLY · no geometry authorization",
+  "pipeline": "NO OP SHORT CIRCUIT · exact viewer/model QA reused by hash",
+  "qa": "PASS · desktop WebGL2 keyboard/mouse · mobile touch/reset · collision · offline/fallback",
+  "href": "./v96/",
+  "gatePageErrors": [],
+  "preferredCanvasCount": 2,
+  "preferredPageErrors": []
+}

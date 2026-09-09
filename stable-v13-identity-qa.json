@@ -7,7 +7,25 @@
     "gate_source_version_agnostic": true,
     "loader_hash": true,
     "loader_identity_literals": true,
-    "portable_qa_hash": false
+    "portable_qa_hash": true,
+    "portable_qa_identity": true,
+    "desktop_controls": true,
+    "mobile_controls": true,
+    "offline_fallback": true,
+    "ready_identity": true,
+    "direct_viewer_exact": true,
+    "source_version": true,
+    "source_hash": true,
+    "source_identity": true,
+    "source_effect": true,
+    "pipeline_hash": true,
+    "planner_hash": true,
+    "plan_hash": true,
+    "planner_qa_hash": true,
+    "pipeline_identity": true,
+    "delta_decision": true,
+    "planner_fail_closed": true,
+    "acceptance_hold": true
   },
   "hashes": {
     "gate": "de89bda4e7b643f2a24acd364a39586e7efd51fb5ccb98d0656847627dd69213",
@@ -20,10 +38,8 @@
     "plan": "6f65df4ed019fbc0f7a419a8e262745566c4964224cbb73b8904878f41a0b31a",
     "plannerQa": "ce8ca3f754a5391fe05fcf63ad00dc7a8753ce260e0956b63dca844d429e46b1"
   },
-  "pass": false,
+  "pass": true,
   "sourceArchitect": "v72",
   "viewerVersion": "v96",
-  "canonicalModel": "v23",
-  "error": "AssertionError: portable_qa_hash",
-  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 18, in <module>\n  File \"<stdin>\", line 3, in record\nAssertionError: portable_qa_hash\n"
+  "canonicalModel": "v23"
 }
