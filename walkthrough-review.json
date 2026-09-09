@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v23",
-  "schemaVersion": 23,
-  "updatedUtc": "2026-09-09T21:45:00Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v24",
+  "schemaVersion": 24,
+  "updatedUtc": "2026-09-09T21:50:00Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -37,31 +37,32 @@
     "directViewerAsset": "34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html"
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v81",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v81.json",
-    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v81.json",
-    "sourceArchitectHandoffSha256": "1f738e562a38019808c6b5c2d452817c33d48a85ad6efeaa9a036cce1f3ab7a5",
-    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L03_S03_FALSE_SIZE_CANDIDATES_EXCLUDED__S03_OVERALL_SIZE_REMAINS_OPEN__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
-    "level02Effect": "NONE__LATER_LEVEL_SOURCE_SAFETY_HARDENING_ONLY",
-    "effectClassificationPublicPath": "engineering/source-v81-walkthrough-classification-v1.json",
-    "effectClassificationSha256": "92b6c9f6fa03d46f300fd1d566e061a3cce7b265f1e7bfd9f661d360a536cdc7",
+    "latestSourceArchitectObserved": "v82",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v82.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v82.json",
+    "sourceArchitectHandoffSha256": "0ba9d4ed71afb3a0d7c3f11aee594220eb5b320b028e76875b1d1ba358056572",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__MAIN_MAZISTA_ROOF_WRITTEN_ASSEMBLY_CONFLICT_HARDENED__RECTANGULAR_SIMPLIFICATION_INTENT_REGISTERED__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+    "level02Effect": "NONE__LATER_LEVEL_SOURCE_CONFLICT_CORRECTION_ONLY",
+    "effectClassificationPublicPath": "engineering/source-v82-walkthrough-classification-v1.json",
+    "effectClassificationSha256": "c40e7e5ffefd4894878f6fb85c5a3d6fee03283a899f973bc7b871c55ff7d431",
     "geometryAuthorization": false,
     "newerSourceSyncChangesCandidateGeometry": false,
-    "browserQaCompatibilitySource": "v81",
-    "browserQaReuseReason": "Source v81 changes only later-Level03 source-safety classification. Canonical Level02 v23 and exact viewer v96 are unchanged. The exact r8 loader bytes were already public-browser QA tested on desktop/mobile plus cold/warm offline; start/reset QA remains valid against the unchanged viewer/model hashes.",
-    "materialLevel02SourceBlocker": "Exact curve/step construction for the separately named circular stepped toilet-cubicle bulkhead plus final exact geometry of architect-described vaulted conditions/other unwitnessed transitions. The two verbally described vaults are design-not-frozen; mapping is not to be inferred."
+    "browserQaCompatibilitySource": "v82",
+    "browserQaReuseReason": "Source v82 changes only later-Level04 source semantics. Canonical Level02 v23 and exact viewer v96 are unchanged. Stable r8 remains byte-identical; full public desktop/mobile/start/collision browser QA is rerun after source sync.",
+    "materialLevel02SourceBlocker": "Exact curve/step construction for separately named circular stepped toilet-cubicle bulkhead plus final exact geometry of architect-described vaulted conditions/other unwitnessed transitions. Two verbal vaults remain design-not-frozen and mapping is not inferred.",
+    "laterLevelSourceConflict": "L04 main Mazista assembly is OPEN_WRITTEN_SOURCE_CONFLICT: Klip-Lok rectangular-simplification instruction conflicts with new Mazista slate build-up; exact geometry/build-up remain locked pending Archilab clarification."
   },
   "geometryPipeline": {
     "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
-    "publicPath": "engineering/incremental-geometry-pipeline-v2-v81.json",
-    "sha256": "9dc86a04a901ac92842ca89332881a331588e54dbc0b9a1e8516e0afb25a710d",
+    "publicPath": "engineering/incremental-geometry-pipeline-v2-v82.json",
+    "sha256": "2a4a40c1548c407bb94cb671c906272c317f97412f22c74c620ceb65a76f89bb",
     "planner": "34_Fresnaye_GeometryDeltaPlanner_v6",
     "plannerPublicPath": "engineering/geometry-delta-planner-v6.py",
     "plannerSha256": "74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db",
-    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v16.json",
-    "plannerQaSha256": "f66e1d580b1ed6d13e2d2e8de3809121f8ea450a6e57bc1bb40e6238deaaeaff",
-    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v81-v1.json",
-    "currentDeltaPlanSha256": "793796f9c1c41b52b58f6f0fe5ad2c0b538979776d8dd9b3fab9b5166a5781dc",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v17.json",
+    "plannerQaSha256": "125faf825761460d1f5197a22ee99a0981850a74a6eae1fc0b1e2d521a4ceea0",
+    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v82-v1.json",
+    "currentDeltaPlanSha256": "ab6f08dcd75e13690a4148fb82be0a0717a26b551601ec622dc4e9b3e64ca931",
     "currentDecision": "NO_OP_SHORT_CIRCUIT",
     "geometryBuildRequired": false,
     "fullModelRegenerationRequired": false,
@@ -69,8 +70,8 @@
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "revision": "v21",
-    "sha256": "fce487588124b70a0b87219a5d97374483d7806617a0cb5a74810028206754ef"
+    "revision": "v22",
+    "sha256": "3a3183be4e6323245a1ca269ae797f10f04072a43979db332d7a16e6a719018b"
   },
   "acceptance": {
     "finalStatus": "OPEN",
