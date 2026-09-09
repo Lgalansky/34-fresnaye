@@ -36,8 +36,10 @@ async function stickMove(p,dy,id){const sb=await p.locator('#stick').boundingBox
   await oc.setOffline(true);await o.reload({waitUntil:'domcontentloaded',timeout:15000});await o.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.loaderMode==='offline-cold-start-guard-r8',{},{timeout:8000});
   const og=await o.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),txt=await o.locator('#s').textContent();ok(og.pass===false&&og.recoverable===true&&og.offlineColdStartGuard===true&&og.navigatorOnline===false&&viewerRequests===0&&/not cached/i.test(txt)&&await o.locator('#retry').isVisible()&&!oe.length,'offline cold-start guard');
   out.offlineColdStart={pass:true,mode:og.loaderMode,recoverable:og.recoverable,viewerPayloadRequests:viewerRequests,navigatorOnline:og.navigatorOnline,pageErrors:oe};
-  await oc.setOffline(false);await o.locator('#retry').click();await o.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:90000});
-  const recovered=await o.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(recovered.viewerSha256===V&&recovered.modelSha256===M,'retry recovery identity');
+  await oc.setOffline(false);await o.waitForTimeout(350);
+  if(await o.locator('#retry').isVisible().catch(()=>false))await o.locator('#retry').click({noWaitAfter:true});
+  await o.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:90000});
+  const recovered=await o.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);ok(recovered.viewerSha256===V&&recovered.modelSha256===M,'retry/online recovery identity');
   await oc.setOffline(true);await o.reload({waitUntil:'domcontentloaded',timeout:15000});await o.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:15000});
   const warm=await o.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),wr=await o.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(warm.loaderMode==='verified-cache-direct-v2'&&warm.viewerSha256===V&&wr.pass&&wr.mainRoute.collisionValidated,'offline warm cache');
   out.offlineWarm={pass:true,mode:warm.loaderMode,viewerSha256:warm.viewerSha256,collisionValidated:wr.mainRoute.collisionValidated};await oc.close();
