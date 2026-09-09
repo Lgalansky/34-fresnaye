@@ -1,4 +1,5 @@
 name: Stable review live QA v13
+# Portable QA public-byte SHA corrected in stable manifest v13.
 
 on:
   push:
