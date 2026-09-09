@@ -1,0 +1,37 @@
+name: Source v73 stable portable r2 live QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stable-v73-portable-r2-liveqa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run stable gate QA
+        run: node engineering/stable-v73-portable-r2-liveqa.cjs
+      - name: Publish stable QA evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v73-portable-r2-qa.json
+          git commit -m 'Record Source v73 portable r2 stable live QA'
+          git push origin HEAD:gh-pages
