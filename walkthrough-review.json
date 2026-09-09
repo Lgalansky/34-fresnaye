@@ -1,10 +1,11 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v1",
-  "updatedUtc": "2026-09-08T23:30:27Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v2",
+  "updatedUtc": "2026-09-09T00:31:10Z",
   "reviewCandidate": {
     "viewerVersion": "v95",
     "loader": "walkthrough-v95.html",
     "readySentinel": "walkthrough-v95-ready.json",
+    "publicBrowserQaEvidence": "v95-public-browser-qa.json",
     "viewerSha256": "63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249",
     "viewerBytes": 250254,
     "canonicalModel": "v23",
@@ -16,11 +17,14 @@
     "automatedPublicCandidateReviewReady": true
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v59",
-    "sourceArchitectHandoffSha256": "830e9ad438c631c5e7113fe64f5807fa280534333ea3887df21688bed15e545c",
+    "latestSourceArchitectObserved": "v60",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v60.json",
+    "sourceArchitectHandoffSha256": "6c810f95aa893a6a14317c8bd9a8dfc954e0f72facae1bf38655b475163a13dc",
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
-    "level02EffectOfV59": "NONE",
+    "level02Effect": "NONE",
+    "publicBrowserEvidenceSourceArchitect": "v51",
+    "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
     "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and transition segments lacking their own written radius/centre/tangent/horizontal witness. No scaling or inference."
   },
