@@ -1,0 +1,50 @@
+name: Walkthrough v96 stable v78 r5 LiveHTTP QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-v78-r5-livehttp-qa-v1.yml'
+
+jobs:
+  livehttp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify exact public stable gate and r5 dependency bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          declare -A H
+          H[walkthrough-review.html]='4fd6f7721a3f73a417d736f3d42c3ed334deacc0b1c217d380ca14638617d6a7'
+          H[walkthrough-review.json]='f474e3f908cd119514878c20d4a4ef43acd398df9ea3179c560d5c8f3e57917a'
+          H[v96/index.html]='ec680e8af4ccb12f5c907b5110b05b97b38255aaebe15fae61ded40ff0a9ca71'
+          H[v96/sw.js]='d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e'
+          H[v96/portable-r4-source-v77-livebrowserqa-v5.json]='842ce6b3cd10ad17c9e706e749c1c4c2b022487b706f5777b3a9b7fd57148a23'
+          H[source-state/34_Fresnaye_SourceArchitect_handoff_v78.json]='d24ef3580b9c254e42850c28dc48e7bc98ef36424fdda8b77860863c242e9ebc'
+          H[engineering/incremental-geometry-pipeline-v2-v78.json]='2e63892f4d7bfc18381effea8a42885199e5ac08f407a4954dc9722ed801cfcb'
+          H[engineering/geometry-delta-plan-source-v78-v1.json]='54239150f169c414d740bb6788508392f449d6873ebbfebb4046153e945ba23a'
+          H[engineering/geometry-delta-planner-qa-v13.json]='2be3be4d32287d4531304602cd71bda6651d9db5e096c5d60c01b7b35c1b392c'
+          H[engineering/geometry-delta-planner-v5.py]='af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3'
+          mkdir -p /tmp/fresnaye-live
+          for p in "${!H[@]}"; do
+            f="/tmp/fresnaye-live/$(echo "$p" | tr '/' '_')"
+            ok=0
+            for i in $(seq 1 40); do
+              if curl -fsSL --retry 2 --retry-delay 1 "$B/$p?live=$GITHUB_RUN_ID-$i" -o "$f" && echo "${H[$p]}  $f" | sha256sum -c -; then ok=1; break; fi
+              sleep 3
+            done
+            test "$ok" = 1
+          done
+          grep -q 'v15-source78-r5-transport' /tmp/fresnaye-live/walkthrough-review.html
+          grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v17' /tmp/fresnaye-live/walkthrough-review.json
+          grep -q '"latestSourceArchitectObserved": "v78"' /tmp/fresnaye-live/walkthrough-review.json
+          grep -q 'v96-portable-r5' /tmp/fresnaye-live/v96_index.html
+          grep -q 'navigationPreload.enable' /tmp/fresnaye-live/v96_sw.js
+          printf '%s\n' '{"artifact":"34_Fresnaye_Walkthrough_v96_StableV78R5_LiveHTTPQA_v1","pass":true,"geometryChanged":false,"sourceArchitect":"v78","viewerVersion":"v96","canonicalModel":"v23","stableUrl":"https://lgalansky.github.io/34-fresnaye/walkthrough-review.html","preferredUrl":"https://lgalansky.github.io/34-fresnaye/v96/","note":"Exact public bytes match locally browser-executed stable gate and previously public-browser-tested exact v96 viewer/model."}' > /tmp/livehttp.json
+          cat /tmp/livehttp.json
+      - name: Upload diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresnaye-stable-v78-r5-livehttp-qa-v1
+          path: /tmp/livehttp.json
