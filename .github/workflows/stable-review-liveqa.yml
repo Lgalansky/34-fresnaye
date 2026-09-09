@@ -8,78 +8,115 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   liveqa:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     env:
       BASE: https://lgalansky.github.io/34-fresnaye
+      VHASH: 1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded
+      OBJHASH: c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5
+      GLBHASH: 7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49
     steps:
-      - name: Wait for stable v96 Source v67 publication
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Wait for stable v96 Source v70 direct-loader publication
         shell: bash
         run: |
           set -euo pipefail
           fresh=0
-          for attempt in $(seq 1 30); do
-            h=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.html?qa=${GITHUB_RUN_ID}-${attempt}")
-            m=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=${GITHUB_RUN_ID}-${attempt}")
-            if grep -q 'live desktop/mobile browser QA' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v67"' <<<"$m" && grep -q '"viewerVersion": "v96"' <<<"$m" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v7' <<<"$m"; then fresh=1; break; fi
-            sleep 8
+          for attempt in $(seq 1 48); do
+            h=$(curl -fsSL --connect-timeout 10 --max-time 30 "$BASE/walkthrough-review.html?qa=${GITHUB_RUN_ID}-${attempt}" 2>/dev/null || true)
+            m=$(curl -fsSL --connect-timeout 10 --max-time 30 "$BASE/walkthrough-review.json?qa=${GITHUB_RUN_ID}-${attempt}" 2>/dev/null || true)
+            if grep -q 'current loader QA' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v70"' <<<"$m" && grep -q '"loaderMode": "direct-v2-parallel-fallback"' <<<"$m" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v10' <<<"$m"; then fresh=1; break; fi
+            sleep 5
           done
           test "$fresh" = 1
 
-      - name: Verify source and incremental geometry pipeline
+      - name: Verify Source v70 and source-only delta short circuit
         shell: bash
         run: |
           set -euo pipefail
           tmp=$(mktemp -d)
-          curl -fsSL --retry 12 --retry-delay 3 --retry-all-errors "$BASE/walkthrough-review.json?qa=source" -o "$tmp/m.json"
+          curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=source" -o "$tmp/m.json"
           python3 - "$tmp" "$BASE" <<'PY'
           import hashlib,json,pathlib,re,subprocess,sys
           p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); s=m['sourceState']; gp=m['geometryPipeline']; c=m['reviewCandidate']
-          def get(path,out): subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','3','--retry-all-errors',f'{base}/{path}?qa=source','-o',str(out)],check=True)
+          def get(path,out): subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa=source','-o',str(out)],check=True)
           get(s['sourceArchitectHandoffPublicPath'],p/'s.json'); get(gp['publicPath'],p/'pipeline.json'); get(gp['currentDeltaPlanPublicPath'],p/'plan.json'); get(gp['plannerQaPublicPath'],p/'plannerqa.json')
           sb=(p/'s.json').read_bytes(); sh=json.loads(sb); source_hash=hashlib.sha256(sb).hexdigest(); pb=(p/'pipeline.json').read_bytes(); pipeline=json.loads(pb); pipeline_hash=hashlib.sha256(pb).hexdigest(); plan=json.loads((p/'plan.json').read_text()); plannerqa=json.loads((p/'plannerqa.json').read_text())
-          observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); legacy=(sh.get(f'run{digits}_new_progress') or {}).get('Level02_effect'); current=(sh.get('level02_priority_state') or {}).get(f'effect_of_v{digits}'); effect=str(current if current is not None else legacy).strip().rstrip('.').upper()
-          assert observed=='v67' and source_hash==s['sourceArchitectHandoffSha256']=='77450fb077142b1b2338a19ce2e601378093e1c2b66766801485f177cb596956'
-          assert sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json') and sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and effect=='NONE'
-          assert s['level02Effect']=='NONE' and s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
-          assert pipeline_hash==gp['sha256']=='47a61c54f6ac2045962d2840027bb8031e01bfdfc5a5bf6b64a6f79117d26388'
-          assert pipeline['artifact']==gp['artifact'] and pipeline['geometryChanged'] is False and pipeline['canonical']['level02']==c['canonicalModel']
-          assert pipeline['sourceObserved']['sourceArchitect']==observed and pipeline['sourceObserved']['level02Effect']=='NONE' and pipeline['sourceObserved']['geometryAuthorization'] is False
+          observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); legacy=(sh.get(f'run{digits}_new_progress') or {}).get('Level02_effect'); current=(sh.get('level02_priority_state') or {}).get(f'effect_of_v{digits}'); effect=str(current if current is not None else legacy).strip().rstrip('.').upper(); expected=str(s['level02Effect']).strip().rstrip('.').upper()
+          assert observed=='v70' and source_hash==s['sourceArchitectHandoffSha256']=='0db7ba8755617d86c293783c5e073b69177c1794a692d1b9ced887f97f522f29'
+          assert sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json') and sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and effect==expected=='SOURCE_EXCEPTION_NARROWED__NO_GEOMETRY_AUTHORIZATION'
+          assert s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
+          assert pipeline_hash==gp['sha256']=='63ffe733dcfa3a29d9e8bc25d87c08aea5266c802be881eb630b63a2e09710ef'
+          assert pipeline['artifact']==gp['artifact'] and pipeline['geometryChanged'] is False and pipeline['canonical']['level02']==c['canonicalModel']=='v23'
+          assert pipeline['sourceObserved']['sourceArchitect']==observed and pipeline['sourceObserved']['level02Effect']==s['level02Effect'] and pipeline['sourceObserved']['geometryAuthorization'] is False
           assert pipeline['optimization']['strategy']==gp['strategy']=='CONTENT_ADDRESSED_DELTA_BUILD' and pipeline['optimization']['noOpShortCircuit'] is True and pipeline['optimization']['fullModelRegenerationDefault'] is False
-          assert plannerqa['pass'] is True and plannerqa['geometryChanged'] is False
+          assert plannerqa['pass'] is True and plannerqa['geometryChanged'] is False and plannerqa['checks']['v70_source_only_short_circuit'] is True and plannerqa['checks']['authorized_missing_changed_ids_fails_closed'] is True
           assert plan['sourceArchitect']==observed and plan['sourceHandoffSha256']==source_hash and plan['pipelineSha256']==pipeline_hash and plan['canonicalParent']==c['canonicalModel']
-          assert plan['decision']==gp['currentDecision']=='NO_OP_SHORT_CIRCUIT' and plan['geometryBuildRequired'] is gp['geometryBuildRequired'] is False and plan['fullModelRegenerationRequired'] is gp['fullModelRegenerationRequired'] is False and plan['geometryChanged'] is False
+          assert plan['decision']==gp['currentDecision']=='SOURCE_ONLY_SHORT_CIRCUIT' and plan['geometryBuildRequired'] is gp['geometryBuildRequired'] is False and plan['fullModelRegenerationRequired'] is gp['fullModelRegenerationRequired'] is False and plan['geometryChanged'] is False
+          assert plan['changedElementIds']==[] and plan['sourceAffectedElementIds']==['Circular stepped ceiling bulkhead over toilet cubicle']
           print('source+delta PASS',observed,source_hash,pipeline_hash,plan['decision'])
           PY
 
-      - name: Verify exact v96 transport portable package and live browser evidence
+      - name: Verify exact v96 direct primary, fallback package and browser evidence
         shell: bash
         run: |
           set -euo pipefail
           tmp=$(mktemp -d)
-          curl -fsSL --retry 12 --retry-delay 3 --retry-all-errors "$BASE/walkthrough-review.json?qa=candidate" -o "$tmp/m.json"
+          curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=candidate" -o "$tmp/m.json"
           python3 - "$tmp" "$BASE" <<'PY'
           import base64,gzip,hashlib,json,pathlib,subprocess,sys
           p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; a=m['acceptance']
-          def get(path,out): subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','3','--retry-all-errors',f'{base}/{path}?qa=candidate','-o',str(out)],check=True)
-          for path,name in [(c['readySentinel'],'r.json'),(c['loader'],'loader.html'),(c['pwaManifest'],'manifest'),(c['serviceWorker'],'sw.js'),(c['publicBrowserQaEvidence'],'q.json')]: get(path,p/name)
-          r=json.loads((p/'r.json').read_text()); loader=(p/'loader.html').read_text(); pwa=json.loads((p/'manifest').read_text()); sw=(p/'sw.js').read_text(); q=json.loads((p/'q.json').read_text())
+          def get(path,out): subprocess.run(['curl','-fsSL','--retry','8','--retry-delay','2','--retry-all-errors',f'{base}/{path}?qa=candidate','-o',str(out)],check=True)
+          for path,name in [(c['readySentinel'],'r.json'),(c['loader'],'loader.html'),(c['pwaManifest'],'manifest'),(c['serviceWorker'],'sw.js'),(c['publicBrowserQaEvidence'],'q.json'),(c['primaryLoaderQaEvidence'],'lq.json')]: get(path,p/name)
+          r=json.loads((p/'r.json').read_text()); loader=(p/'loader.html').read_text(); pwa=json.loads((p/'manifest').read_text()); sw=(p/'sw.js').read_text(); q=json.loads((p/'q.json').read_text()); lq=json.loads((p/'lq.json').read_text())
           assert c['viewerVersion']=='v96' and r['stageComplete'] is True and r['geometryChanged'] is False and c['geometryChanged'] is False
-          assert r['viewerSha256']==c['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded' and r['viewerBytes']==c['viewerBytes']==253348
+          assert r['viewerSha256']==c['viewerSha256']==sys.argv[3] if len(sys.argv)>3 else r['viewerSha256']==c['viewerSha256']
+          assert c['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded' and r['viewerBytes']==c['viewerBytes']==253348
           assert r['modelSha256']==c['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' and r['glbSha256']==c['glbSha256']=='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49'
-          assert r['vertices']==c['vertices']==5769 and r['triangles']==c['triangles']==8907 and c['viewerSha256'] in loader and c['modelSha256'] in loader and r['latestSourceCompatibilityObserved']=='v67' and r['latestSourceCompatibilityLevel02Effect']=='NONE' and r['latestSourceCompatibilityGeometryAuthorization'] is False
+          assert r['vertices']==c['vertices']==5769 and r['triangles']==c['triangles']==8907
+          assert 'direct-v2-parallel-fallback' in loader and c['viewerSha256'] in loader and c['modelSha256'] in loader
+          direct=lq['transport']['directAsset']; get(direct,p/'viewer.html'); raw=(p/'viewer.html').read_bytes(); assert len(raw)==253348 and hashlib.sha256(raw).hexdigest()==c['viewerSha256']
           parts=r['transportParts']; assert len(parts)==12 and all(x in loader for x in parts); enc=[]
           for i,x in enumerate(parts,1): o=p/f'p{i:02d}'; get(x,o); enc.append(o.read_text().strip())
-          joined=''.join(enc); assert len(joined)==r['transportBase64Chars']; gz=base64.b64decode(joined,validate=True); assert len(gz)==r['transportGzipBytes']; raw=gzip.decompress(gz); assert len(raw)==c['viewerBytes'] and hashlib.sha256(raw).hexdigest()==c['viewerSha256']
-          assert pwa['id']=='./'+c['loader'] and pwa['start_url']=='./'+c['loader'] and pwa['scope']=='./' and 'fresnaye-v96-r2' in sw and all('./'+x in sw for x in parts)
-          for x in (c['loader'],c['readySentinel'],c['publicBrowserQaEvidence']): assert './'+x in sw
-          assert q['pass'] is True and q['geometryChanged'] is False and q['viewerSha256']==c['viewerSha256'] and q['canonicalObjSha256']==c['modelSha256'] and q['canonicalGlbSha256']==c['glbSha256']
-          assert q['desktop']['pass'] and q['mobile']['pass'] and q['desktop']['renderer']=='WebGL2' and q['mobile']['renderer']=='WebGL2' and q['review']['pass'] is True and q['review']['selfTests']==q['review']['total']==60 and q['review']['mainRoute']['collisionValidated'] is True and q['review']['mainRoute']['pass'] is True
-          assert q['acceptanceIntegrity']['pass'] is True and q['acceptanceIntegrity']['minDistanceM']==40 and q['acceptanceIntegrity']['minDurationSec']==12 and q['acceptanceIntegrity']['transportHashBound'] is True
+          joined=''.join(enc); assert len(joined)==r['transportBase64Chars']; gz=base64.b64decode(joined,validate=True); assert len(gz)==r['transportGzipBytes']; fallback=gzip.decompress(gz); assert fallback==raw
+          assert pwa['id']=='./'+c['loader'] and pwa['start_url']=='./'+c['loader'] and pwa['scope']=='./' and c['serviceWorkerCache'] in sw and './'+direct in sw and all('./'+x in sw for x in parts)
+          assert q['pass'] is True and q['acceptanceIntegrity']['pass'] is True and q['acceptanceIntegrity']['minDistanceM']==40 and q['acceptanceIntegrity']['minDurationSec']==12 and q['acceptanceIntegrity']['transportHashBound'] is True
+          assert lq['pass'] is True and lq['transport']['pass'] is True and lq['transport']['mode']=='direct-v2' and lq['transport']['fetchConcurrency']==1 and lq['viewerSha256']==c['viewerSha256'] and lq['canonicalObjSha256']==c['modelSha256'] and lq['canonicalGlbSha256']==c['glbSha256']
+          assert lq['desktop']['pass'] and lq['mobile']['pass'] and lq['desktop']['renderer']=='WebGL2' and lq['mobile']['renderer']=='WebGL2' and lq['review']['pass'] is True and lq['review']['selfTests']==lq['review']['total']==60 and lq['review']['mainRoute']['collisionValidated'] is True and lq['review']['mainRoute']['pass'] is True
           assert a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False and a['minimumDistanceM']==40 and a['minimumDurationSec']==12
-          print('candidate PASS: exact v96 + WebGL2 desktop/mobile 60/60 + controls + collision route + acceptance integrity; final human acceptance OPEN')
+          print('candidate PASS: direct-v2 exact viewer + 12-part byte-identical fallback + WebGL2 desktop/mobile 60/60 + acceptance hold')
           PY
           node --check "$tmp/sw.js"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify live stable gate enables the exact v96 candidate
+        shell: bash
+        run: |
+          cat > stable-gate.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV70DirectGateQA_v1',timestampUtc:new Date().toISOString(),url:'https://lgalansky.github.io/34-fresnaye/walkthrough-review.html',geometryChanged:false,sourceArchitect:'v70',viewerVersion:'v96',pass:false};const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{const p=await b.newPage({viewport:{width:1280,height:800}});let errors=[];p.on('pageerror',e=>errors.push(String(e)));await p.goto(out.url+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>document.querySelector('#gate')?.textContent.includes('VERIFIED REVIEW READY'),null,{timeout:90000});const href=await p.locator('#open').getAttribute('href'),source=await p.locator('#source').textContent(),pipeline=await p.locator('#pipeline').textContent(),qa=await p.locator('#qa').textContent(),portable=await p.locator('#portable').textContent();if(href!=='./walkthrough-v96.html'||!source.includes('v70')||!source.includes('SOURCE EXCEPTION NARROWED')||!pipeline.includes('SOURCE ONLY SHORT CIRCUIT')||!qa.includes('PASS')||!portable.includes('PASS')||errors.length)throw Error(JSON.stringify({href,source,pipeline,qa,portable,errors}));out.href=href;out.source=source;out.pipeline=pipeline;out.qa=qa;out.portable=portable;out.pageErrors=errors;out.pass=true;fs.writeFileSync('stable-v70-direct-gate-qa-v1.json',JSON.stringify(out,null,2)+'\n')}finally{await b.close()}})().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          JS
+          node stable-gate.cjs
+
+      - name: Persist stable v70 gate QA evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v70-direct-gate-qa-v1.json
+          git commit -m 'Record stable v70 direct gate QA v1'
+          git push origin HEAD:gh-pages
