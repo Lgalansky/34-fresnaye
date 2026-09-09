@@ -1,0 +1,27 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v12",
+  "date": "2026-09-09",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v5.py",
+  "plannerSha256": "af9ac435c26b6fc4bedf82f5297e97476813ce85812c0e423bdca3e5d790a8b3",
+  "sourceV77HandoffSha256": "cfa3cd0ce79272066bd8eff758b66db7ba9b1329429f92e42598d4deb9d7b6bf",
+  "pipelineV77Sha256": "7eccfecef0afc57fc8e04bdb97ef167257236a5833d6eb59190eefcf91399805",
+  "deltaPlanV77Sha256": "e77a769a79e5cb02b30ba2f2ff19490844c8dc981c14cdaa5308b047aea662b8",
+  "checks": {
+    "py_compile": true,
+    "normalized_v77_schema_read": true,
+    "v77_no_op_short_circuit": true,
+    "canonical_parent_v23": true,
+    "viewer_reuse_v96": true,
+    "no_geometry_build": true,
+    "no_full_model_regeneration": true,
+    "no_full_browser_regression": true,
+    "source_geometry_authorization_false": true,
+    "source_only_non_none_short_circuit": true,
+    "authorized_missing_changed_ids_fails_closed": true,
+    "authorized_changed_ids_patch_plan": true,
+    "deduplicates_changed_ids": true
+  },
+  "pass": true,
+  "geometryChanged": false,
+  "improvement": "v77 remains a true Level 02 no-op; later-stage 3-degree lean-to roof evidence is source-only, while the planner continues to fail closed for any authorized change without explicit element IDs."
+}
