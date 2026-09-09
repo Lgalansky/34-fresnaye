@@ -28,10 +28,13 @@ jobs:
           set -euo pipefail
           git fetch origin gh-pages
           git worktree add /tmp/pages origin/gh-pages
-          test -s /tmp/pages/v96-r7/index.html
-          test -s /tmp/pages/v96-r7/sw.js
-          echo '9240e13dff84bc8f13746636cb43840ed83a2ad2a4f1ed12796947a9b1b82712  /tmp/pages/v96-r7/index.html' | sha256sum -c -
-          echo 'd24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e  /tmp/pages/v96-r7/sw.js' | sha256sum -c -
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          test -s v96-r7/index.html
+          test -s v96-r7/sw.js
+          echo '9240e13dff84bc8f13746636cb43840ed83a2ad2a4f1ed12796947a9b1b82712  v96-r7/index.html' | sha256sum -c -
+          echo 'd24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e  v96-r7/sw.js' | sha256sum -c -
       - name: Fresh r7 adaptive transport QA
         run: |
           node --check engineering/walkthrough-v96-portable-r7-publicqa-v2.cjs
@@ -57,8 +60,6 @@ jobs:
         run: |
           set -euo pipefail
           cd /tmp/pages
-          git config user.name 'Larry Galansky'
-          git config user.email 'larry@bounceinteractive.co.uk'
           git add v96/index.html v96/sw.js v96/portable-r7-stable-qa-v1.json v96/r7-starts-qa-v1.json walkthrough-review.html walkthrough-review.json
           git commit -m 'Promote verified v96 r7 adaptive transport to stable'
           git push origin HEAD:gh-pages
