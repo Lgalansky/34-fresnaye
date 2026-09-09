@@ -1,0 +1,20 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v17",
+  "date": "2026-09-10",
+  "geometryChanged": false,
+  "sourceArchitect": "v82",
+  "sourceHandoffSha256": "0ba9d4ed71afb3a0d7c3f11aee594220eb5b320b028e76875b1d1ba358056572",
+  "classificationSha256": "c40e7e5ffefd4894878f6fb85c5a3d6fee03283a899f973bc7b871c55ff7d431",
+  "pipelineSha256": "2a4a40c1548c407bb94cb671c906272c317f97412f22c74c620ceb65a76f89bb",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v6",
+  "plannerSha256": "74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db",
+  "deltaPlanSha256": "ab6f08dcd75e13690a4148fb82be0a0717a26b551601ec622dc4e9b3e64ca931",
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "cases": [
+    {"name": "v82_classification_bridge_noop", "pass": true, "rc": 0},
+    {"name": "missing_effect_without_bridge_fails_closed", "pass": true, "rc": 2},
+    {"name": "authorization_without_changed_ids_fails_closed", "pass": true, "rc": 2},
+    {"name": "unpromoted_canonical_mutation_fails_closed", "pass": true, "rc": 2}
+  ],
+  "pass": true
+}
