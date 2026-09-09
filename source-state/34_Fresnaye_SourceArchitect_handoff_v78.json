@@ -1,0 +1,55 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v78",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T20:26:32+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume written dimensions/IDs/FFLs/sections/elevations/brickwork/schedules and direct architect clarifications only. No visual scaling, pixel/vector-to-mm conversion, curve fitting, or invented dimensions.",
+  "level02_effect": "SOURCE_EXCEPTION_RECLASSIFIED__DESIGN_NOT_FROZEN__NO_GEOMETRY_AUTHORIZATION",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": [
+      "L02_D09",
+      "L02_D22 (corrected identity; former D21 physical instance 1)",
+      "L02_W11",
+      "L02_iD05",
+      "L02_iD08"
+    ],
+    "closure_summary": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22": "former D21 physical instance1 corrected to D22; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090; explicit finished/overall wall thickness400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100; central leaf with25mm side clearances; exact leaf thickness remains approximate only",
+      "L02_iD08": "rough855 / U-S2400 / pocket90; central leaf with20mm side clearances; exact leaf thickness remains approximate only"
+    },
+    "remaining_material_lock": "Exact vaulted/curved/stepped ceiling geometry opposite the guest toilet and on the opposite side is not design-frozen by Archilab.",
+    "effect_of_v78": "SOURCE_EXCEPTION_RECLASSIFIED__DESIGN_NOT_FROZEN__NO_GEOMETRY_AUTHORIZATION"
+  },
+  "v78_material_advance": {
+    "level": "L02",
+    "subject": "Remaining vaulted/curved ceiling design status",
+    "finding": "Direct Archilab email received 2026-09-09T16:41:59Z states that the vaulted ceilings opposite the guest toilet and on the opposite side are still in the design process. Michael and Laura have a workshop next week. Staff are to prepare a quick section the next day, but Michael explicitly says it is subject to change depending on the workshop outcome.",
+    "impact": "The outstanding Level02 ceiling lock is reclassified from missing exact dimensional construction to ARCHITECT_DESIGN_NOT_FROZEN. A pre-workshop section is evidence of design intent only and cannot freeze canonical exact geometry unless Archilab explicitly marks it final/current."
+  },
+  "carry_forward_later_stage_state": {
+    "L04_lean_to_roof": "v77 remains source-closed at explicit 3 degrees only for the annotated lean-to roof; do not propagate to main Mazista roof.",
+    "L01_windows": "W06 rough width and W08 brickwork head remain open; W04/W05/W06 25mm vertical interface allocations remain unspecified."
+  },
+  "chief_of_staff_status": "LEVEL02_PRIORITY_GATE_REMAINS_PASS_UNCHANGED__REMAINING_CURVED_CEILING_EXCEPTION_RECLASSIFIED_DESIGN_NOT_FROZEN_BY_DIRECT_ARCHILAB_EMAIL__NO_MODEL_EDIT",
+  "source_authority": {
+    "direct_architect_clarification": {
+      "status": "AUTHORITATIVE_FOR_DESIGN_FREEZE_STATUS_ONLY",
+      "received_utc": "2026-09-09T16:41:59Z",
+      "finding": "Vaulted ceilings opposite guest toilet and opposite side remain in design process; workshop next week; quick section to be prepared next day is subject to change.",
+      "geometry_permission": "NONE"
+    }
+  },
+  "remaining_source_exceptions": [
+    "L02 vaulted/curved/stepped ceiling geometry opposite guest toilet and on opposite side: DESIGN_NOT_FROZEN__await final/current Archilab workshop outcome or explicit approved geometry.",
+    "L04 main Mazista roof pitch/eaves/ridge extents and 370mm parapet-adjacent ownership remain open; 3-degree note belongs only to explicit lean-to roof.",
+    "L01 W06 rough width, W08 brickwork head, and W04/W05/W06 25mm interface allocations remain open."
+  ],
+  "promotion_boundary": "Do not edit canonical Level02 geometry from pre-workshop sketches/sections or design-intent notes. Re-run source adjudication only when Archilab supplies final/current geometry or explicitly authorizes a defined change set."
+}
