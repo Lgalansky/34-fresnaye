@@ -1,0 +1,97 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PublicBrowserQA_v2",
+  "timestampUtc": "2026-09-09T07:48:45.894Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-v96.html",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "canonicalGlbSha256": "7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49",
+  "geometryChanged": false,
+  "sourceCompatibilityObserved": "v67",
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.785,
+    "pointerLock": true,
+    "mouseLookYawRad": 1.405,
+    "pointerLockExitRecovery": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.898,
+    "touchLookYawRad": 0.35,
+    "lostPointerCaptureRecovery": true,
+    "reset": true,
+    "pageErrors": []
+  },
+  "review": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "selfTests": 60,
+    "total": 60,
+    "hostTier": "durable-candidate",
+    "mainRoute": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    }
+  },
+  "acceptanceIntegrity": {
+    "pass": true,
+    "sessionIdIssued": true,
+    "minDistanceM": 40,
+    "minDurationSec": 12,
+    "focusInvalidation": true,
+    "transportHashBound": true
+  },
+  "pass": true
+}
