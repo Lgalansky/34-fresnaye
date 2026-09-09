@@ -1,0 +1,133 @@
+name: Walkthrough v96 stable gate v18 Source79 start-links public browser QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-gate-v18-source79-startlinks-qa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Wait for exact public v18 Source79 gate
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          declare -A H
+          H[walkthrough-review.html]='4a6002fafd5482933c266b608273b93b4591eba63944db20e835a69be3ae236c'
+          H[walkthrough-review.json]='888df4695f1db30a705f06cf1fd4a4357136e59d32ffe8fea7c3756aade60233'
+          H[v96/index.html]='f6eb584d456f4056ea1aae38275230afa844d1345467af089a5400f40a0e9431'
+          H[v96/sw.js]='d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e'
+          H[v96/portable-r6-qa-v1.json]='889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f'
+          H[v96/start-reset-qa-v1.json]='9a9b78823d528bcb81c46fd774de810557cfa7dfb28e55517c2025503e7564d6'
+          H[source-state/34_Fresnaye_SourceArchitect_handoff_v79.json]='9bdedbd046407d806806863d2e730481f0cffa3ce981b6bd1d5b859a8ed15643'
+          H[engineering/incremental-geometry-pipeline-v2-v79.json]='62d439ed39911d568dfface458e3610039cf9bdf1d01727225d332658855a676'
+          H[engineering/geometry-delta-plan-source-v79-v1.json]='269d78ade53267833aead4cd347ad6434c546bd7a849c193c7ff1ff17f8986f3'
+          H[engineering/geometry-delta-planner-qa-v14.json]='22052d5b44b2e7a4890e691f90aa5f6d6a02c193b264d1bd292f8c40de945e72'
+          mkdir -p /tmp/fresnaye-v18
+          for p in "${!H[@]}"; do
+            f="/tmp/fresnaye-v18/$(echo "$p"|tr '/' '_')"; ok=0
+            for i in $(seq 1 80); do
+              if curl -fsSL --retry 2 --retry-delay 1 "$B/$p?v18=$GITHUB_RUN_ID-$i" -o "$f" && echo "${H[$p]}  $f" | sha256sum -c - >/dev/null 2>&1; then ok=1; break; fi
+              sleep 3
+            done
+            test "$ok" = 1
+          done
+          grep -q 'v18-source79-r6-startlinks-v1' /tmp/fresnaye-v18/walkthrough-review.html
+          grep -q '"schemaVersion": 20' /tmp/fresnaye-v18/walkthrough-review.json
+          grep -q '"preferredReviewUrl": "v96/#entrance"' /tmp/fresnaye-v18/walkthrough-review.json
+          grep -q '"startResetQaEvidence": "v96/start-reset-qa-v1.json"' /tmp/fresnaye-v18/walkthrough-review.json
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/fresnaye-v18/walkthrough-review.html').read()
+          m=re.search(r'<script>\n([\s\S]*?)\n</script>',t)
+          assert m
+          open('/tmp/gate-v18.js','w').write(m.group(1))
+          PY
+          node --check /tmp/gate-v18.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Execute gate and all six deep-link starts
+        run: |
+          cat > /tmp/qa.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          const B='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const starts={
+            entrance:{x:'7.90',y:'17.10'},
+            living:{x:'3.60',y:'13.00'},
+            kitchen:{x:'8.00',y:'8.20'},
+            bedroom:{x:'3.50',y:'26.70'},
+            second:{x:'-15.40',y:'5.20'},
+            service:{x:'-5.08',y:'2.11'}
+          };
+          const out={artifact:'34_Fresnaye_Walkthrough_StableGateV18_Source79_StartLinks_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v79',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,gate:{},startLinks:[],pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          (async()=>{
+            const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const c=await b.newContext({viewport:{width:1365,height:768}});
+              const p=await c.newPage(),errs=[];p.on('pageerror',e=>errs.push(String(e)));
+              await p.goto(B+'walkthrough-review.html?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:90000});
+              await p.waitForFunction(()=>window.__FRESNAYE_STABLE_GATE_QA?.pass===true,{}, {timeout:90000});
+              const g=await p.evaluate(()=>window.__FRESNAYE_STABLE_GATE_QA);
+              ok(g.sourceArchitect==='v79'&&g.viewerSha256===V&&g.modelSha256===M,'gate identity');
+              ok(g.loaderOk&&g.swOk&&g.qaOk&&g.startResetOk&&g.identity&&g.sourceOk&&g.pipeOk,'gate sub-check');
+              ok(g.preferredReviewUrl==='v96/#entrance','primary route is not Entrance');
+              const primary=await p.locator('#open').getAttribute('href');
+              ok(primary==='./v96/#entrance','primary href '+primary);
+              const buttons=await p.locator('[data-start-link]').count();
+              ok(buttons===6,'expected six start buttons, got '+buttons);
+              ok(errs.length===0,'gate page errors '+errs.join('; '));
+              out.gate={pass:true,preferredHref:primary,startResetOk:g.startResetOk,buttonCount:buttons,pageErrors:errs};
+
+              for(const [key,e] of Object.entries(starts)){
+                const href=await p.locator(`[data-start-link="${key}"]`).getAttribute('href');
+                ok(href===`./v96/#${key}`,`gate href ${key}: ${href}`);
+                const sp=await c.newPage(),perrs=[];sp.on('pageerror',x=>perrs.push(String(x)));
+                await sp.goto(B+`v96/#${key}`,{waitUntil:'domcontentloaded',timeout:90000});
+                await sp.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true,{}, {timeout:90000});
+                await sp.waitForSelector('#coords',{timeout:90000}); await sp.waitForTimeout(150);
+                const t=await sp.evaluate(()=>window.__FRESNAYE_TRANSPORT_META);
+                const lm=await sp.evaluate(()=>window.__FRESNAYE_LIVE_META);
+                const coords=await sp.locator('#coords').innerText();
+                const pass=t.viewerSha256===V&&t.modelSha256===M&&lm.renderer==='WebGL2'&&coords.startsWith(key+' ·')&&coords.includes(`x ${e.x} m`)&&coords.includes(`y ${e.y} m`)&&coords.includes('collision')&&perrs.length===0;
+                out.startLinks.push({key,href,coords,renderer:lm.renderer,loaderMode:t.loaderMode,pageErrors:perrs,pass});
+                ok(pass,`deep link failed ${key}: ${coords}; errors=${perrs.join('; ')}`);
+                await sp.close();
+              }
+              out.pass=out.gate.pass&&out.startLinks.length===6&&out.startLinks.every(x=>x.pass);
+              await c.close();
+            }catch(e){out.error=String(e?.stack||e)}
+            finally{await b.close();fs.writeFileSync('/tmp/stable-gate-v18-source79-startlinks-qa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}
+            if(!out.pass)process.exit(1);
+          })();
+          JS
+          node --check /tmp/qa.cjs
+          NODE_PATH="$GITHUB_WORKSPACE/node_modules" node /tmp/qa.cjs
+      - name: Persist v18 Source79 public browser QA evidence
+        if: always()
+        run: |
+          if [ ! -s /tmp/stable-gate-v18-source79-startlinks-qa-v1.json ]; then printf '{"artifact":"34_Fresnaye_Walkthrough_StableGateV18_Source79_StartLinks_PublicBrowserQA_v1","pass":false,"error":"QA process produced no diagnostic JSON"}\n' > /tmp/stable-gate-v18-source79-startlinks-qa-v1.json; fi
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp /tmp/stable-gate-v18-source79-startlinks-qa-v1.json /tmp/pages/stable-v79-r6-gate-v18-startlinks-publicbrowserqa-v1.json
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add stable-v79-r6-gate-v18-startlinks-publicbrowserqa-v1.json
+          git commit -m 'Persist stable gate v18 Source79 start-links public browser QA v1' || true
+          git push origin HEAD:gh-pages
