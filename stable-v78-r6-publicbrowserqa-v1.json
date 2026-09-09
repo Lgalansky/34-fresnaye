@@ -1,0 +1,34 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_StableV78R6_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T18:23:12.013Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v78",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gate": {
+    "pass": true,
+    "preferredHref": "./v96/",
+    "pageErrors": [],
+    "loaderOk": true,
+    "swOk": true,
+    "qaOk": true,
+    "identity": true,
+    "sourceOk": true,
+    "pipeOk": true,
+    "sourceArchitect": "v78",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "portableQaSha256": "889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f"
+  },
+  "preferred": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v7",
+    "speculativePayloadPreload": false,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
