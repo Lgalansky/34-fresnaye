@@ -1,0 +1,47 @@
+name: Stable review v11 gate QA v3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stable-review-v11-gateqa-v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gateqa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run committed gate QA harness
+        shell: bash
+        run: |
+          node --check engineering/stable-v11-gate-qa-v3.cjs
+          node engineering/stable-v11-gate-qa-v3.cjs
+      - name: Persist gate evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          test -f stable-v11-reliable-gate-qa-v3.json || echo '{"pass":false,"error":"QA output missing"}' > stable-v11-reliable-gate-qa-v3.json
+          git add stable-v11-reliable-gate-qa-v3.json
+          git commit -m 'Record stable v11 reliable gate QA v3' || true
+          git push origin HEAD:gh-pages
+      - name: Enforce gate ready
+        shell: bash
+        run: node -e "const q=require('./stable-v11-reliable-gate-qa-v3.json'); if(!q.pass){console.error(q); process.exit(1)}"
