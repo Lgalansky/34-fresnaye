@@ -1,0 +1,15 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableV70DirectGateQA_v1",
+  "timestampUtc": "2026-09-09T09:50:54.744Z",
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-review.html",
+  "geometryChanged": false,
+  "sourceArchitect": "v70",
+  "viewerVersion": "v96",
+  "pass": true,
+  "href": "./walkthrough-v96.html",
+  "source": "HASH-VERIFIED v70 · SOURCE EXCEPTION NARROWED  NO GEOMETRY AUTHORIZATION · no geometry authorization",
+  "pipeline": "DELTA PIPELINE ARMED · SOURCE ONLY SHORT CIRCUIT · no full rebuild",
+  "qa": "PASS · current direct loader + desktop/mobile WebGL2 · 60/60 · controls + collision route + acceptance integrity verified",
+  "portable": "PASS · direct exact viewer cached + 12-part verified fallback",
+  "pageErrors": []
+}
