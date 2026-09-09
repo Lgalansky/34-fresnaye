@@ -1,0 +1,40 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v66",
+  "date": "2026-09-09",
+  "created_local": "2026-09-09T08:26:18+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_TWO_DRAWN_SKYLIGHT_SYMBOL_ENVELOPES_SOURCE_CLOSED_AT_600X1200_EACH__SKYLIGHT_ID_CURB_ROUGH_OPENING_SEMANTICS_REMAIN_OPEN__NO_MODEL_EDIT",
+  "level02_state": "Retain Source Architect v50/discrepancy log v72 dimensional state. D09, corrected D22/former D21 physical instance 1, W11, iD05 and iD08 remain source-closed; later W09/G04/entrance-allocation/ceiling-height and explicit horizontal-witness closures remain intact.",
+  "current_material_level02_source_lock": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness.",
+  "run66_new_progress": {
+    "new_Archilab_source": "NONE; fresh Outlook check found no Archilab mail on 2026-09-09. Latest known remains Michael/Archilab 2026-09-08T13:49:17Z same-scale package.",
+    "Level03_skylight_dimensions": "FRE_WD_203_REV_B directly dimensions two drawn new-skylight-zone rectangular symbols at 600mm short side x 1200mm long side each.",
+    "ownership_method": "Printed 600/1200 values were tied to each symbol by native dimension-arrow/extension endpoint ownership. No graphic/vector/pixel distance was converted to a dimension.",
+    "excluded_false_candidates": "Nearby 1900/1960/960 plan dimensions are separate spacing/offset witnesses and are not skylight envelope dimensions.",
+    "remaining_skylight_lock": "Unique skylight IDs/quantity mapping beyond the two audited symbols, any additional symbol dimensions, curb/upstand, structural rough opening, manufacturer/model and frame/flashing interface remain open.",
+    "Level02_effect": "NONE."
+  },
+  "unresolved_ambiguities": [
+    "Level02 curved/unwitnessed ceiling/bulkhead footprint geometry.",
+    "Level01 full curved/stepped/nested ceiling polygon completion where missing turns/curves/opposite-side subdivisions are not explicitly written.",
+    "Level01 stair-soffit exact slope/line/termination.",
+    "Level01 FRE_WD_205 D11 brickwork tag drift and D11 masonry rough width.",
+    "Level03 D02 duplicate schedule ID/system ownership: 3000x2100 frameless versus 1500x2100 aluminium records.",
+    "Level03 D04 confirmed component/system schedule omission.",
+    "Level03 iD02 2100 brickwork head versus 2150 scheduled panel/leaf conflict.",
+    "Level03 skylights: two audited drawn symbol envelopes are now 600x1200 each; instance-specific ID/quantity mapping beyond those two, any additional symbol dimensions, curb/upstand and structural rough-opening/interface details remain open.",
+    "Level03 S03 roof-void grille explicit overall width/height.",
+    "Level04 written 370mm parapet-adjacent vertical has unresolved opposite-end datum ownership and remains quarantined."
+  ],
+  "chief_of_staff_action": "Adopt v66 as additive later-level source evidence only. Keep Level02 source/geometry state unchanged. For Level03, permit only the two audited roof-plan symbol envelopes to be treated as written 600x1200 evidence; do not infer IDs, rough openings, curbs or other skylight instances. Retain all v65 opening/grille/parapet locks.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_SkylightSymbol_DimensionalOwnershipRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_SkylightDimensionExceptionRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_TwoSkylightSymbols_600x1200_Evidence_v1.png",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v49.json",
+    "34_Fresnaye_SourceArchitect_Run66_ArtifactManifest_v1.json"
+  ]
+}

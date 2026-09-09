@@ -1,6 +1,6 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v5",
-  "updatedUtc": "2026-09-09T05:38:57Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v6",
+  "updatedUtc": "2026-09-09T06:32:16Z",
   "reviewCandidate": {
     "viewerVersion": "v95",
     "loader": "walkthrough-v95.html",
@@ -19,11 +19,11 @@
     "automatedPublicCandidateReviewReady": true
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v65",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v65.json",
-    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v65.json",
-    "sourceArchitectHandoffSha256": "2f3da55ca1161fc515828fba9eec94fff68ea45d790bc134d246dd1f64be83f1",
-    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S03_COUNT_FUNCTION_IDENTITY_CLOSED_AND_FALSE_DIMENSION_CANDIDATES_EXCLUDED__OVERALL_GRILLE_SIZE_STILL_OPEN__NO_MODEL_EDIT",
+    "latestSourceArchitectObserved": "v66",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v66.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v66.json",
+    "sourceArchitectHandoffSha256": "f8f9a9d9be4188f868ba442357066d3b071e78b8c5f4f67a1ac11a502238677c",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_TWO_DRAWN_SKYLIGHT_SYMBOL_ENVELOPES_SOURCE_CLOSED_AT_600X1200_EACH__SKYLIGHT_ID_CURB_ROUGH_OPENING_SEMANTICS_REMAIN_OPEN__NO_MODEL_EDIT",
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
     "level02Effect": "NONE",
@@ -31,14 +31,14 @@
     "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
     "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness. No scaling or inference.",
-    "laterLevelProgress": "Source Architect v65 closes Level 03 S03 grille identity/count=3/function and excludes misleading nearby dimensions; exact S03 overall width/height remains open. Level 02 effect NONE."
+    "laterLevelProgress": "Source Architect v66 source-closes two audited Level 03 skylight symbol envelopes at 600 x 1200 mm each; IDs, curbs and rough-opening semantics remain open. Level 02 effect NONE."
   },
   "geometryPipeline": {
     "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
     "publicPath": "engineering/incremental-geometry-pipeline-v2.json",
-    "sha256": "cc609fd6be7da6aa313ea4f8193d1f7026a8929186e8da2342914a298021a571",
-    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v1.json",
-    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v65-v1.json",
+    "sha256": "fc84a2fdfa02bf09a588d541b54bbdcfe33f61390c700faa3549a7f780da5ee7",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v2.json",
+    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v66-v1.json",
     "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
     "currentDecision": "NO_OP_SHORT_CIRCUIT",
     "fullModelRegenerationRequired": false,

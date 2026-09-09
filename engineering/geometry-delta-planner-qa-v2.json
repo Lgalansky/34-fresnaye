@@ -1,0 +1,19 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v2",
+  "geometryChanged": false,
+  "checks": [
+    {
+      "name": "python_syntax",
+      "pass": true
+    },
+    {
+      "name": "v66_noop_short_circuit",
+      "pass": true
+    },
+    {
+      "name": "source_hash_exact",
+      "pass": true
+    }
+  ],
+  "pass": true
+}

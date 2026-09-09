@@ -14,7 +14,7 @@
     "policy": "REUSE_VIEWER_WHEN_ONLY_MODEL_BYTES_CHANGE"
   },
   "sourceObserved": {
-    "sourceArchitect": "v65",
+    "sourceArchitect": "v66",
     "level02Effect": "NONE",
     "geometryAuthorization": false
   },
@@ -53,11 +53,36 @@
     "D": "presentation_materials_lighting_furniture"
   },
   "qaTriggerMatrix": {
-    "local_dimension_or_opening_patch": ["local_dimensions", "topology", "opening_clearance"],
-    "ceiling_bulkhead_patch": ["local_dimensions", "topology", "section_elevation_match", "head_clearance"],
-    "circulation_or_collision_patch": ["local_dimensions", "topology", "collision", "navigation_connectivity", "main_route_regression"],
-    "level_or_stair_patch": ["full_model_regression", "collision", "navigation_connectivity", "desktop_mobile_browser_QA"],
-    "canonical_promotion_candidate": ["full_model_regression", "model_hash_topology", "desktop_mobile_browser_QA", "deployment_identity_QA"]
+    "local_dimension_or_opening_patch": [
+      "local_dimensions",
+      "topology",
+      "opening_clearance"
+    ],
+    "ceiling_bulkhead_patch": [
+      "local_dimensions",
+      "topology",
+      "section_elevation_match",
+      "head_clearance"
+    ],
+    "circulation_or_collision_patch": [
+      "local_dimensions",
+      "topology",
+      "collision",
+      "navigation_connectivity",
+      "main_route_regression"
+    ],
+    "level_or_stair_patch": [
+      "full_model_regression",
+      "collision",
+      "navigation_connectivity",
+      "desktop_mobile_browser_QA"
+    ],
+    "canonical_promotion_candidate": [
+      "full_model_regression",
+      "model_hash_topology",
+      "desktop_mobile_browser_QA",
+      "deployment_identity_QA"
+    ]
   },
   "failClosedRules": [
     "NO_MISSING_DIMENSION_INFERENCE",
@@ -66,6 +91,6 @@
     "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
     "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"
   ],
-  "currentAction": "NO_LEVEL02_PATCH_REQUIRED_FOR_SOURCE_V65",
+  "currentAction": "NO_LEVEL02_PATCH_REQUIRED_FOR_SOURCE_V66",
   "remainingLevel02Lock": "exact curved/transition ceiling-bulkhead footprint without written radius/centre/tangent/horizontal witness"
 }

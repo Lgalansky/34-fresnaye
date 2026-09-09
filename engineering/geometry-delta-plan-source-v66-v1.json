@@ -1,0 +1,22 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlan_Source_v66_v1",
+  "sourceArchitect": "v66",
+  "sourceHandoffSha256": "f8f9a9d9be4188f868ba442357066d3b071e78b8c5f4f67a1ac11a502238677c",
+  "pipeline": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "pipelineSha256": "fc84a2fdfa02bf09a588d541b54bbdcfe33f61390c700faa3549a7f780da5ee7",
+  "canonicalParent": "v23",
+  "geometryAuthorization": false,
+  "level02Effect": "NONE",
+  "geometryChanged": false,
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "qa": [
+    "source_identity",
+    "canonical_identity",
+    "deployment_source_sync"
+  ],
+  "reason": "Level 02 effect is NONE and geometry authorization is false; preserve canonical model and reuse viewer."
+}
