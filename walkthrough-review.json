@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v17",
-  "schemaVersion": 17,
-  "updatedUtc": "2026-09-09T17:56:00Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v18",
+  "schemaVersion": 18,
+  "updatedUtc": "2026-09-09T18:18:30Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -14,11 +14,13 @@
     "geometryChanged": false,
     "readySentinel": "walkthrough-v96-ready.json",
     "portableLoader": "v96/index.html",
-    "portableLoaderSha256": "ec680e8af4ccb12f5c907b5110b05b97b38255aaebe15fae61ded40ff0a9ca71",
+    "portableLoaderRevision": "r6",
+    "portableLoaderSha256": "f6eb584d456f4056ea1aae38275230afa844d1345467af089a5400f40a0e9431",
     "portableServiceWorker": "v96/sw.js",
+    "portableServiceWorkerRevision": "r5",
     "portableServiceWorkerSha256": "d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e",
-    "portableQaEvidence": "v96/portable-r4-source-v77-livebrowserqa-v5.json",
-    "portableQaSha256": "842ce6b3cd10ad17c9e706e749c1c4c2b022487b706f5777b3a9b7fd57148a23",
+    "portableQaEvidence": "v96/portable-r6-qa-v1.json",
+    "portableQaSha256": "889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f",
     "preferredReviewUrl": "v96/",
     "exactCandidateUrl": "walkthrough-v96.html",
     "automatedPublicCandidateReviewReady": true,
@@ -33,8 +35,8 @@
     "level02Effect": "SOURCE_EXCEPTION_RECLASSIFIED__DESIGN_NOT_FROZEN__NO_GEOMETRY_AUTHORIZATION",
     "geometryAuthorization": false,
     "newerSourceSyncChangesCandidateGeometry": false,
-    "browserQaCompatibilitySource": "v77",
-    "browserQaReuseReason": "Source v78 reclassifies the remaining Level02 curved/vaulted ceiling blocker as architect design-not-frozen; geometry authorization remains false and canonical v23 plus exact v96 viewer/model hashes are unchanged. Exact-hash v77 public desktop/mobile/collision QA remains applicable. Portable r5 loader and service worker are independently byte/hash and syntax verified.",
+    "browserQaCompatibilitySource": "v78",
+    "browserQaReuseReason": "Fresh public r6 browser QA executed against the unchanged exact v96 viewer and canonical v23 model under Source v78. Desktop/mobile WebGL2, collision, verified warm cache, forced fallback and offline reopen passed; warm cache emitted zero direct payload requests.",
     "materialLevel02SourceBlocker": "Exact vaulted/curved/stepped ceiling geometry opposite the guest toilet and on the opposite side is not design-frozen by Archilab. Treat pre-workshop sections as design intent only until Archilab explicitly supplies final/current geometry."
   },
   "geometryPipeline": {
@@ -55,7 +57,8 @@
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "sha256": "4fd6f7721a3f73a417d736f3d42c3ed334deacc0b1c217d380ca14638617d6a7"
+    "revision": "v16",
+    "sha256": "083a197306344eace4aa2d554365a0a83555b49bf7def5c94240753da75877ad"
   },
   "acceptance": {
     "finalStatus": "OPEN",
