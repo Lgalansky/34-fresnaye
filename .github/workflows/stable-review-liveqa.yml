@@ -16,16 +16,16 @@ jobs:
     env:
       BASE: https://lgalansky.github.io/34-fresnaye
     steps:
-      - name: Wait for v64 stable-review publication
+      - name: Wait for current stable-review publication
         shell: bash
         run: |
           set -euo pipefail
           fresh=0
-          for attempt in $(seq 1 18); do
+          for attempt in $(seq 1 24); do
             h=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.html?qa=${GITHUB_RUN_ID}-${attempt}")
             m=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=${GITHUB_RUN_ID}-${attempt}")
-            if grep -q 'Portable package' <<<"$h" && grep -q 'source-state/34_Fresnaye_SourceArchitect_handoff_v64.json' <<<"$m"; then
-              echo "Fresh v64 Pages state observed on attempt $attempt"
+            if grep -q 'Geometry pipeline' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v65"' <<<"$m" && grep -q '"artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v5"' <<<"$m"; then
+              echo "Fresh v65 + delta-pipeline Pages state observed on attempt $attempt"
               fresh=1
               break
             fi
@@ -34,26 +34,34 @@ jobs:
           done
           test "$fresh" = 1
 
-      - name: Verify public v64 source proof bytes
+      - name: Verify public source and delta-pipeline proofs
         shell: bash
         run: |
           set -euo pipefail
           tmp=$(mktemp -d)
           curl -fsSL --retry 12 --retry-delay 5 --retry-all-errors "$BASE/walkthrough-review.json?qa=source" -o "$tmp/m.json"
           python3 - "$tmp" "$BASE" <<'PY'
-          import hashlib,json,pathlib,subprocess,sys
+          import hashlib,json,pathlib,re,subprocess,sys
           p=pathlib.Path(sys.argv[1]); base=sys.argv[2]
-          m=json.loads((p/'m.json').read_text()); s=m['sourceState']
-          subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','5','--retry-all-errors',f"{base}/{s['sourceArchitectHandoffPublicPath']}?qa=source",'-o',str(p/'s.json')],check=True)
-          b=(p/'s.json').read_bytes(); sh=json.loads(b); h=hashlib.sha256(b).hexdigest()
-          print('source sha256',h,'bytes',len(b),'observed',s['latestSourceArchitectObserved'])
-          assert s['latestSourceArchitectObserved']=='v64'
-          assert h==s['sourceArchitectHandoffSha256']=='c4ed6f3cd39e102b3dc66a6c1d815201618e0564ea3277c7a0cd5cf618bc3e0f'
-          assert sh['artifact']=='34_Fresnaye_SourceArchitect_handoff_v64'
-          assert sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False
-          assert sh['run64_new_progress']['Level02_effect']=='NONE.'
-          assert s['level02Effect']=='NONE' and s['geometryAuthorization'] is False
-          assert s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
+          m=json.loads((p/'m.json').read_text()); s=m['sourceState']; gp=m['geometryPipeline']; c=m['reviewCandidate']
+          def get(path,out): subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','5','--retry-all-errors',f'{base}/{path}?qa=source','-o',str(out)],check=True)
+          get(s['sourceArchitectHandoffPublicPath'],p/'s.json'); get(gp['publicPath'],p/'pipeline.json'); get(gp['currentDeltaPlanPublicPath'],p/'plan.json'); get(gp['plannerQaPublicPath'],p/'plannerqa.json')
+          sb=(p/'s.json').read_bytes(); sh=json.loads(sb); source_hash=hashlib.sha256(sb).hexdigest()
+          pb=(p/'pipeline.json').read_bytes(); pipeline=json.loads(pb); pipeline_hash=hashlib.sha256(pb).hexdigest()
+          plan=json.loads((p/'plan.json').read_text()); plannerqa=json.loads((p/'plannerqa.json').read_text())
+          observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); progress=sh[f'run{digits}_new_progress']; effect=str(progress['Level02_effect']).strip().rstrip('.').upper()
+          print('source',observed,'sha256',source_hash,'pipeline sha256',pipeline_hash,'decision',plan['decision'])
+          assert source_hash==s['sourceArchitectHandoffSha256']=='2f3da55ca1161fc515828fba9eec94fff68ea45d790bc134d246dd1f64be83f1'
+          assert sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json') and sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and effect=='NONE'
+          assert s['level02Effect']=='NONE' and s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
+          assert pipeline_hash==gp['sha256']=='cc609fd6be7da6aa313ea4f8193d1f7026a8929186e8da2342914a298021a571'
+          assert pipeline['artifact']==gp['artifact'] and pipeline['geometryChanged'] is False and pipeline['canonical']['level02']==c['canonicalModel'] and pipeline['viewer']['version']==c['viewerVersion']
+          assert pipeline['sourceObserved']['sourceArchitect']==observed and pipeline['optimization']['strategy']==gp['strategy']=='CONTENT_ADDRESSED_DELTA_BUILD'
+          assert pipeline['optimization']['noOpShortCircuit'] is True and pipeline['optimization']['fullModelRegenerationDefault'] is False
+          assert plannerqa['pass'] is True and plannerqa['geometryChanged'] is False
+          assert plan['sourceArchitect']==observed and plan['sourceHandoffSha256']==source_hash and plan['pipelineSha256']==pipeline_hash and plan['canonicalParent']==c['canonicalModel']
+          assert plan['decision']==gp['currentDecision']=='NO_OP_SHORT_CIRCUIT' and plan['geometryBuildRequired'] is gp['geometryBuildRequired'] is False
+          assert plan['fullModelRegenerationRequired'] is gp['fullModelRegenerationRequired'] is False and plan['geometryChanged'] is False
           PY
 
       - name: Reconstruct exact public v95 candidate
