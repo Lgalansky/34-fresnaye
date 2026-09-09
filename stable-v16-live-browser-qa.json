@@ -1,0 +1,85 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableReviewLiveBrowserQA_v16",
+  "timestampUtc": "2026-09-09T15:11:25.536Z",
+  "sourceArchitect": "v74",
+  "geometryChanged": false,
+  "review": {
+    "gate": "VERIFIED REVIEW READY",
+    "source": "HASH-VERIFIED v74 · NONE · no geometry authorization",
+    "pipeline": "NO OP SHORT CIRCUIT · exact viewer/model reused by hash",
+    "href": "./v96/",
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.502,
+    "reset": true,
+    "livingStart": true,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.275,
+    "mainRoute": {
+      "kind": "34-fresnaye-main-route-connectivity-qa",
+      "viewer": "Walkthrough_v96_v23CanonicalRichProductionParity_SA58DL72_AcceptanceIntegrity",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "sourceContract": "SA58-DL72-RW41-v23-LATEST_SOURCE_SYNC_NO_GEOMETRY_AUTH",
+      "sequence": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "entrance"
+      ],
+      "collisionValidated": true,
+      "segments": [
+        {
+          "from": "entrance",
+          "to": "living",
+          "ok": true,
+          "lengthM": 8,
+          "waypoints": 33,
+          "expanded": 356,
+          "reason": null
+        },
+        {
+          "from": "living",
+          "to": "kitchen",
+          "ok": true,
+          "lengthM": 8.5,
+          "waypoints": 35,
+          "expanded": 399,
+          "reason": null
+        },
+        {
+          "from": "kitchen",
+          "to": "bedroom",
+          "ok": true,
+          "lengthM": 22.5,
+          "waypoints": 91,
+          "expanded": 1534,
+          "reason": null
+        },
+        {
+          "from": "bedroom",
+          "to": "entrance",
+          "ok": true,
+          "lengthM": 13,
+          "waypoints": 53,
+          "expanded": 474,
+          "reason": null
+        }
+      ],
+      "pass": true
+    },
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.75,
+    "touchLookYawRad": 0.325,
+    "reset": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
