@@ -1,0 +1,38 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_CodeQA_v1",
+  "timestampUtc": "2026-09-09T19:13:39.201566Z",
+  "geometryChanged": false,
+  "viewerVersion": "v96",
+  "viewerBytes": 253348,
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "loader": {
+    "revision": "r7",
+    "bytes": 7539,
+    "sha256": "9240e13dff84bc8f13746636cb43840ed83a2ad2a4f1ed12796947a9b1b82712",
+    "gitBlobSha": "961b7fe46713bea6e8ba9b242456d374b4a42913",
+    "mode": "verified-cache-first-direct-v8-network-aware-cancelable-hedged-parallel-fallback"
+  },
+  "serviceWorker": {
+    "revision": "r5",
+    "bytes": 1865,
+    "sha256": "d24abf3567e840ac66c4cec2e7f74af49272809f373a3e9971ee77d635d6835e",
+    "gitBlobSha": "e0cbcf0f8c90381a32889634b4112f40232d1152",
+    "cacheName": "fresnaye-v96-portable-r5"
+  },
+  "checks": {
+    "loaderNodeSyntax": true,
+    "serviceWorkerNodeSyntax": true,
+    "exactViewerHashLiteral": true,
+    "canonicalModelHashLiteral": true,
+    "saveDataNoHedgePolicy": true,
+    "networkAwareHedgePolicy": true,
+    "forcedFallbackRetained": true,
+    "verifiedCacheRetained": true,
+    "serviceWorkerVerifiedCacheMarker": true,
+    "serviceWorkerNavigationPreload": true
+  },
+  "pass": true,
+  "improvement": "Adaptive hedging preserves the fast 2s fallback on normal/4g links, delays hedging on 3g/2g-class links, and suppresses duplicate fallback transport entirely when Save-Data is requested while retaining exact viewer/model integrity gates."
+}
