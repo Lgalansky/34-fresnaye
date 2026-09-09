@@ -3,48 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="fresnaye-loader" content="v96-fast-parallel-v1">
+<meta name="fresnaye-loader" content="v96-fast-direct-v2">
+<meta name="fresnaye-loader-mode" content="direct-v2-parallel-fallback">
 <meta name="fresnaye-viewer-sha256" content="1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded">
 <meta name="fresnaye-model-sha256" content="c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5">
-<title>34 Fresnaye Walkthrough v96 — Fast Loader</title>
+<meta name="fresnaye-source-compatibility" content="v69-level02-none-no-geometry-auth">
+<title>34 Fresnaye Walkthrough v96 — Fast Loader v2</title>
 <style>html,body{margin:0;width:100%;height:100%;background:#111;color:#fff;font-family:system-ui,sans-serif}#s{padding:24px;line-height:1.45}#p{opacity:.7;font-size:14px;margin-top:8px}</style>
 </head>
 <body>
-<div id="s">Loading verified walkthrough…<div id="p">Starting 12-part parallel fetch</div></div>
+<div id="s">Loading verified walkthrough…<div id="p">Trying single-request verified viewer</div></div>
 <script>
 (async()=>{
+  const DIRECT='34_Fresnaye_Level02_25pct_v23_Walkthrough_v96_RichProductionParity_Source58_AcceptanceIntegrity.html';
   const P=Array.from({length:12},(_,i)=>`walkthrough-v96.final.part${String(i+1).padStart(2,'0')}.b64`);
   const E='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
   const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
-  const S=document.getElementById('s'),Q=document.getElementById('p');
-  const started=performance.now();let done=0;
-  const fetchPart=async(p)=>{
-    let last;
-    for(let attempt=0;attempt<2;attempt++){
-      try{
-        const r=await fetch(p,{cache:'no-store'});
-        if(!r.ok) throw Error(`${p} ${r.status}`);
-        const text=(await r.text()).trim();
-        done++; if(Q) Q.textContent=`Loaded ${done}/${P.length} transport parts`;
-        return text;
-      }catch(e){last=e;if(attempt===0)await new Promise(r=>setTimeout(r,250));}
-    }
-    throw last;
+  const BYTES=253348,S=document.getElementById('s'),Q=document.getElementById('p'),started=performance.now();
+  const digest=async raw=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',raw))].map(x=>x.toString(16).padStart(2,'0')).join('');
+  const verifiedDirect=async()=>{
+    const t=performance.now();const r=await fetch(DIRECT,{cache:'default'});if(!r.ok)throw Error(`direct ${r.status}`);
+    const raw=new Uint8Array(await r.arrayBuffer());if(raw.length!==BYTES)throw Error(`direct bytes ${raw.length}`);
+    const dig=await digest(raw);if(dig!==E)throw Error('direct integrity mismatch');
+    return {raw,dig,ms:Math.round(performance.now()-t)};
+  };
+  const verifiedFallback=async()=>{
+    if(Q)Q.textContent='Single request unavailable; using verified parallel fallback';let done=0;
+    const load=async p=>{let last;for(let attempt=0;attempt<2;attempt++){try{const r=await fetch(p,{cache:'default'});if(!r.ok)throw Error(`${p} ${r.status}`);const x=(await r.text()).trim();done++;return x}catch(e){last=e;if(attempt===0)await new Promise(r=>setTimeout(r,200))}}throw last};
+    const t=performance.now(),joined=(await Promise.all(P.map(load))).join(''),gz=Uint8Array.from(atob(joined),c=>c.charCodeAt(0)),ds=new DecompressionStream('gzip'),raw=new Uint8Array(await new Response(new Blob([gz]).stream().pipeThrough(ds)).arrayBuffer());
+    if(raw.length!==BYTES)throw Error(`fallback bytes ${raw.length}`);const dig=await digest(raw);if(dig!==E)throw Error('fallback integrity mismatch');
+    return {raw,dig,ms:Math.round(performance.now()-t)};
   };
   try{
-    const parts=await Promise.all(P.map(fetchPart));
-    const t=parts.join('');
-    const b=Uint8Array.from(atob(t),c=>c.charCodeAt(0));
-    const ds=new DecompressionStream('gzip');
-    const raw=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(ds)).arrayBuffer());
-    const dig=[...new Uint8Array(await crypto.subtle.digest('SHA-256',raw))].map(x=>x.toString(16).padStart(2,'0')).join('');
-    if(dig!==E) throw Error('viewer integrity mismatch');
-    window.__FRESNAYE_TRANSPORT_META={pass:true,loaderMode:'parallel-v1',viewerSha256:dig,viewerBytes:raw.length,parts:P.length,fetchConcurrency:P.length,retryBudgetPerPart:1,modelSha256:M,geometryAuthorization:false,transportLoadMs:Math.round(performance.now()-started)};
-    document.open();document.write(new TextDecoder().decode(raw));document.close();
-  }catch(e){
-    window.__FRESNAYE_TRANSPORT_META={pass:false,loaderMode:'parallel-v1',error:String(e&&e.message||e),transportLoadMs:Math.round(performance.now()-started)};
-    S.textContent='Walkthrough blocked: '+(e&&e.message||e);console.error(e);
-  }
+    let r,mode='direct-v2',fallbackReason=null;
+    try{r=await verifiedDirect()}catch(e){fallbackReason=String(e&&e.message||e);r=await verifiedFallback();mode='parallel-fallback-v2'}
+    window.__FRESNAYE_TRANSPORT_META={pass:true,loaderMode:mode,preferredMode:'direct-v2',viewerSha256:r.dig,viewerBytes:r.raw.length,directAsset:DIRECT,parts:mode==='direct-v2'?0:P.length,fetchConcurrency:mode==='direct-v2'?1:P.length,retryBudgetPerPart:1,modelSha256:M,latestSourceCompatibility:'v69',geometryAuthorization:false,fallbackReason,transportLoadMs:r.ms,totalLoaderMs:Math.round(performance.now()-started)};
+    document.open();document.write(new TextDecoder().decode(r.raw));document.close();
+  }catch(e){window.__FRESNAYE_TRANSPORT_META={pass:false,loaderMode:'direct-v2-parallel-fallback',error:String(e&&e.message||e),totalLoaderMs:Math.round(performance.now()-started)};S.textContent='Walkthrough blocked: '+(e&&e.message||e);console.error(e)}
 })();
 </script>
 </body>
