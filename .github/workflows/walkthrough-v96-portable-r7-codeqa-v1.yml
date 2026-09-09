@@ -1,0 +1,72 @@
+name: Walkthrough v96 portable r7 code identity QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-portable-r7-codeqa-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  codeqa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify and persist exact r7 code identity
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/pages/v96-r7/index.html').read()
+          m=re.search(r'<script>\n([\s\S]*?)\n</script>',t)
+          assert m
+          open('/tmp/r7-loader.js','w').write(m.group(1))
+          PY
+          node --check /tmp/r7-loader.js
+          node --check /tmp/pages/v96-r7/sw.js
+          python3 - <<'PY'
+          import hashlib,json,subprocess,datetime
+          from pathlib import Path
+          p=Path('/tmp/pages/v96-r7/index.html'); sw=Path('/tmp/pages/v96-r7/sw.js'); t=p.read_text(); s=sw.read_text()
+          sha=lambda x:hashlib.sha256(x.read_bytes()).hexdigest()
+          blob=lambda x:subprocess.check_output(['git','hash-object',str(x)],cwd='/tmp/pages',text=True).strip()
+          checks={
+            'loaderNodeSyntax':True,'serviceWorkerNodeSyntax':True,
+            'exactViewerHashLiteral':'1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded' in t,
+            'canonicalModelHashLiteral':'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' in t,
+            'saveDataNoHedgePolicy':"direct-first-save-data-no-hedge" in t and 'hedgeDelayMs=saveData?null' in t,
+            'networkAwareHedgePolicy':"effectiveType==='slow-2g'" in t and "effectiveType==='3g'" in t,
+            'forcedFallbackRetained':'parallel-fallback-v8-forced' in t,
+            'verifiedCacheRetained':'X-Fresnaye-Verified-SHA256' in t and 'verified-cache-direct-v2' in t,
+            'serviceWorkerVerifiedCacheMarker':'X-Fresnaye-Verified-SHA256' in s,
+            'serviceWorkerNavigationPreload':'navigationPreload.enable' in s
+          }
+          out={
+            'artifact':'34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_CodeQA_v1',
+            'timestampUtc':datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),
+            'geometryChanged':False,
+            'viewerVersion':'v96','viewerBytes':253348,'viewerSha256':'1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',
+            'canonicalModel':'v23','canonicalObjSha256':'c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',
+            'loader':{'revision':'r7','bytes':p.stat().st_size,'sha256':sha(p),'gitBlobSha':blob(p),'mode':'verified-cache-first-direct-v8-network-aware-cancelable-hedged-parallel-fallback'},
+            'serviceWorker':{'revision':'r5','bytes':sw.stat().st_size,'sha256':sha(sw),'gitBlobSha':blob(sw),'cacheName':'fresnaye-v96-portable-r5'},
+            'checks':checks,'pass':all(checks.values()),
+            'improvement':'Adaptive hedging preserves the fast 2s fallback on normal/4g links, delays hedging on 3g/2g-class links, and suppresses duplicate fallback transport entirely when Save-Data is requested while retaining exact viewer/model integrity gates.'
+          }
+          assert out['pass']
+          open('/tmp/pages/v96-r7/codeqa-v1.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+          cd /tmp/pages
+          git config user.name 'Larry Galansky'
+          git config user.email 'larry@bounceinteractive.co.uk'
+          git add v96-r7/codeqa-v1.json
+          git commit -m 'Persist v96 portable r7 code QA v1'
+          git push origin HEAD:gh-pages
