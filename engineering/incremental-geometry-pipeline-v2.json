@@ -1,0 +1,71 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-09",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v95",
+    "policy": "REUSE_VIEWER_WHEN_ONLY_MODEL_BYTES_CHANGE"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v65",
+    "level02Effect": "NONE",
+    "geometryAuthorization": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "dependency_graph_resolution",
+    "no_op_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "qaTriggerMatrix": {
+    "local_dimension_or_opening_patch": ["local_dimensions", "topology", "opening_clearance"],
+    "ceiling_bulkhead_patch": ["local_dimensions", "topology", "section_elevation_match", "head_clearance"],
+    "circulation_or_collision_patch": ["local_dimensions", "topology", "collision", "navigation_connectivity", "main_route_regression"],
+    "level_or_stair_patch": ["full_model_regression", "collision", "navigation_connectivity", "desktop_mobile_browser_QA"],
+    "canonical_promotion_candidate": ["full_model_regression", "model_hash_topology", "desktop_mobile_browser_QA", "deployment_identity_QA"]
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE"
+  ],
+  "currentAction": "NO_LEVEL02_PATCH_REQUIRED_FOR_SOURCE_V65",
+  "remainingLevel02Lock": "exact curved/transition ceiling-bulkhead footprint without written radius/centre/tangent/horizontal witness"
+}
