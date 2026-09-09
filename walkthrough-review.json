@@ -22,7 +22,7 @@
     "portableQaEvidence": "v96/portable-r6-qa-v1.json",
     "portableQaSha256": "889f7d4d1a122de1ccb234e343560d3d079cc01a3a548f4a6e205b653e90417f",
     "startResetQaEvidence": "v96/start-reset-qa-v1.json",
-    "startResetQaSha256": "9bec39e1468f1b29ff5b6c33659c67e3de22c24696183b98d9b2aaa07e02a077",
+    "startResetQaSha256": "9a9b78823d528bcb81c46fd774de810557cfa7dfb28e55517c2025503e7564d6",
     "preferredReviewUrl": "v96/#entrance",
     "startLinks": {
       "entrance": "v96/#entrance",
