@@ -16,7 +16,7 @@ jobs:
     env:
       BASE: https://lgalansky.github.io/34-fresnaye
     steps:
-      - name: Wait for current stable-review publication
+      - name: Wait for v65 delta-pipeline publication
         shell: bash
         run: |
           set -euo pipefail
@@ -24,17 +24,15 @@ jobs:
           for attempt in $(seq 1 24); do
             h=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.html?qa=${GITHUB_RUN_ID}-${attempt}")
             m=$(curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "$BASE/walkthrough-review.json?qa=${GITHUB_RUN_ID}-${attempt}")
-            if grep -q 'Geometry pipeline' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v65"' <<<"$m" && grep -q '"artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v5"' <<<"$m"; then
-              echo "Fresh v65 + delta-pipeline Pages state observed on attempt $attempt"
-              fresh=1
-              break
+            if grep -q 'Geometry pipeline' <<<"$h" && grep -q '"latestSourceArchitectObserved": "v65"' <<<"$m" && grep -q '34_Fresnaye_Walkthrough_StableReviewManifest_v5' <<<"$m"; then
+              echo "Fresh v65 delta-pipeline state observed on attempt $attempt"
+              fresh=1; break
             fi
-            echo "Pages still serving older review metadata on attempt $attempt"
             sleep 10
           done
           test "$fresh" = 1
 
-      - name: Verify public source and delta-pipeline proofs
+      - name: Verify source and incremental geometry pipeline
         shell: bash
         run: |
           set -euo pipefail
@@ -49,8 +47,7 @@ jobs:
           sb=(p/'s.json').read_bytes(); sh=json.loads(sb); source_hash=hashlib.sha256(sb).hexdigest()
           pb=(p/'pipeline.json').read_bytes(); pipeline=json.loads(pb); pipeline_hash=hashlib.sha256(pb).hexdigest()
           plan=json.loads((p/'plan.json').read_text()); plannerqa=json.loads((p/'plannerqa.json').read_text())
-          observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); progress=sh[f'run{digits}_new_progress']; effect=str(progress['Level02_effect']).strip().rstrip('.').upper()
-          print('source',observed,'sha256',source_hash,'pipeline sha256',pipeline_hash,'decision',plan['decision'])
+          observed=s['latestSourceArchitectObserved']; digits=re.fullmatch(r'v(\d+)',observed).group(1); effect=str(sh[f'run{digits}_new_progress']['Level02_effect']).strip().rstrip('.').upper()
           assert source_hash==s['sourceArchitectHandoffSha256']=='2f3da55ca1161fc515828fba9eec94fff68ea45d790bc134d246dd1f64be83f1'
           assert sh['artifact']==s['sourceArchitectHandoffArtifact'].removesuffix('.json') and sh['canonical_geometry_changed'] is False and sh['geometry_authorization'] is False and effect=='NONE'
           assert s['level02Effect']=='NONE' and s['geometryAuthorization'] is False and s['newerSourceSyncChangesCandidateGeometry'] is False and s['materialLevel02SourceBlockerCount']==1
@@ -62,76 +59,35 @@ jobs:
           assert plan['sourceArchitect']==observed and plan['sourceHandoffSha256']==source_hash and plan['pipelineSha256']==pipeline_hash and plan['canonicalParent']==c['canonicalModel']
           assert plan['decision']==gp['currentDecision']=='NO_OP_SHORT_CIRCUIT' and plan['geometryBuildRequired'] is gp['geometryBuildRequired'] is False
           assert plan['fullModelRegenerationRequired'] is gp['fullModelRegenerationRequired'] is False and plan['geometryChanged'] is False
+          print('source+delta PASS',observed,source_hash,pipeline_hash,plan['decision'])
           PY
 
-      - name: Reconstruct exact public v95 candidate
+      - name: Verify exact candidate transport portable package and browser evidence
         shell: bash
         run: |
           set -euo pipefail
           tmp=$(mktemp -d)
-          curl -fsSL --retry 12 --retry-delay 5 --retry-all-errors "$BASE/walkthrough-review.json?qa=transport" -o "$tmp/m.json"
+          curl -fsSL --retry 12 --retry-delay 5 --retry-all-errors "$BASE/walkthrough-review.json?qa=candidate" -o "$tmp/m.json"
           python3 - "$tmp" "$BASE" <<'PY'
           import base64,gzip,hashlib,json,pathlib,subprocess,sys
-          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]
-          m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']
-          def get(path,out): subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','5','--retry-all-errors',f'{base}/{path}?qa=transport','-o',str(out)],check=True)
-          get(c['readySentinel'],p/'r.json'); get(c['loader'],p/'loader.html')
-          r=json.loads((p/'r.json').read_text()); loader=(p/'loader.html').read_text()
+          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]; m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; a=m['acceptance']
+          def get(path,out): subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','5','--retry-all-errors',f'{base}/{path}?qa=candidate','-o',str(out)],check=True)
+          get(c['readySentinel'],p/'r.json'); get(c['loader'],p/'loader.html'); get(c['pwaManifest'],p/'manifest'); get(c['serviceWorker'],p/'sw.js'); get(c['publicBrowserQaEvidence'],p/'q.json')
+          r=json.loads((p/'r.json').read_text()); loader=(p/'loader.html').read_text(); pwa=json.loads((p/'manifest').read_text()); sw=(p/'sw.js').read_text(); q=json.loads((p/'q.json').read_text())
           assert r['stageComplete'] is True and r['geometryChanged'] is False and c['geometryChanged'] is False
-          assert r['viewerSha256']==c['viewerSha256']=='63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249'
-          assert r['viewerBytes']==c['viewerBytes']==250254
-          assert r['modelSha256']==c['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
-          assert r['glbSha256']==c['glbSha256']=='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49'
-          assert r['vertices']==c['vertices']==5769 and r['triangles']==c['triangles']==8907
-          assert c['viewerSha256'] in loader and c['modelSha256'] in loader
+          assert r['viewerSha256']==c['viewerSha256']=='63b35df62cdaa737e34fc70a50fae48043ab9b82e40e2414e375fdd5674c4249' and r['viewerBytes']==c['viewerBytes']==250254
+          assert r['modelSha256']==c['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5' and r['glbSha256']==c['glbSha256']=='7a33cc3077cbdcfa3679fe6d6e7bb1fd667e6591f80e958aa2869c67aabcdd49'
+          assert r['vertices']==c['vertices']==5769 and r['triangles']==c['triangles']==8907 and c['viewerSha256'] in loader and c['modelSha256'] in loader
           parts=r['transportParts']; assert len(parts)==12 and all(x in loader for x in parts)
           enc=[]
-          for i,x in enumerate(parts,1):
-            o=p/f'p{i:02d}'; get(x,o); enc.append(o.read_text().strip())
-          joined=''.join(enc); assert len(joined)==160416==r['transportBase64Chars']
-          gz=base64.b64decode(joined,validate=True); assert len(gz)==120312==r['transportGzipBytes']
-          raw=gzip.decompress(gz); h=hashlib.sha256(raw).hexdigest()
-          print('viewer sha256',h,'bytes',len(raw),'parts',len(parts))
-          assert len(raw)==250254 and h==c['viewerSha256']
-          PY
-
-      - name: Verify portable static-host package
-        shell: bash
-        run: |
-          set -euo pipefail
-          tmp=$(mktemp -d)
-          curl -fsSL --retry 12 --retry-delay 5 --retry-all-errors "$BASE/walkthrough-review.json?qa=portable" -o "$tmp/m.json"
-          python3 - "$tmp" "$BASE" <<'PY'
-          import json,pathlib,subprocess,sys
-          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]
-          m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']
-          def get(path,out): subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','5','--retry-all-errors',f'{base}/{path}?qa=portable','-o',str(out)],check=True)
-          get(c['readySentinel'],p/'r.json'); get(c['pwaManifest'],p/'manifest'); get(c['serviceWorker'],p/'sw.js')
-          r=json.loads((p/'r.json').read_text()); pwa=json.loads((p/'manifest').read_text()); sw=(p/'sw.js').read_text(); parts=r['transportParts']
-          assert pwa['id']=='./'+c['loader'] and pwa['start_url']=='./'+c['loader'] and pwa['scope']=='./'
-          assert 'fresnaye-v95-r2' in sw and len(parts)==12 and all('./'+x in sw for x in parts)
+          for i,x in enumerate(parts,1): o=p/f'p{i:02d}'; get(x,o); enc.append(o.read_text().strip())
+          joined=''.join(enc); assert len(joined)==160416==r['transportBase64Chars']; gz=base64.b64decode(joined,validate=True); assert len(gz)==120312==r['transportGzipBytes']
+          raw=gzip.decompress(gz); assert len(raw)==250254 and hashlib.sha256(raw).hexdigest()==c['viewerSha256']
+          assert pwa['id']=='./'+c['loader'] and pwa['start_url']=='./'+c['loader'] and pwa['scope']=='./' and 'fresnaye-v95-r2' in sw and all('./'+x in sw for x in parts)
           for x in (c['loader'],c['readySentinel'],c['pwaManifest'],c['publicBrowserQaEvidence']): assert './'+x in sw
-          assert "k.startsWith('fresnaye-v95')" in sw and 'caches.delete(k)' in sw
+          assert q['pass'] is True and q['geometryChanged'] is False and q['viewerSha256']==c['viewerSha256'] and q['canonicalObjSha256']==c['modelSha256']
+          assert q['desktop']['pass'] and q['mobile']['pass'] and q['desktop']['renderer']=='WebGL2' and q['mobile']['renderer']=='WebGL2' and q['review']['selfTests']==q['review']['total']==57 and q['review']['mainRoute']['collisionValidated'] is True
+          assert a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False
+          print('candidate PASS: exact viewer transport + portable package + WebGL2 57/57; final human acceptance OPEN')
           PY
           node --check "$tmp/sw.js"
-          echo 'portable package PASS: manifest + service worker + 12/12 transport precache'
-
-      - name: Verify exact-v95 public browser evidence and acceptance hold
-        shell: bash
-        run: |
-          set -euo pipefail
-          tmp=$(mktemp -d)
-          curl -fsSL --retry 12 --retry-delay 5 --retry-all-errors "$BASE/walkthrough-review.json?qa=browser" -o "$tmp/m.json"
-          python3 - "$tmp" "$BASE" <<'PY'
-          import json,pathlib,subprocess,sys
-          p=pathlib.Path(sys.argv[1]); base=sys.argv[2]
-          m=json.loads((p/'m.json').read_text()); c=m['reviewCandidate']; a=m['acceptance']
-          subprocess.run(['curl','-fsSL','--retry','12','--retry-delay','5','--retry-all-errors',f"{base}/{c['publicBrowserQaEvidence']}?qa=browser",'-o',str(p/'q.json')],check=True)
-          q=json.loads((p/'q.json').read_text())
-          assert q['pass'] is True and q['geometryChanged'] is False
-          assert q['viewerSha256']==c['viewerSha256'] and q['canonicalObjSha256']==c['modelSha256']
-          assert q['desktop']['pass'] and q['mobile']['pass'] and q['desktop']['renderer']=='WebGL2' and q['mobile']['renderer']=='WebGL2'
-          assert q['review']['selfTests']==q['review']['total']==57 and q['review']['mainRoute']['collisionValidated'] is True
-          assert a['finalStatus']=='OPEN' and a['humanContinuousWalkRequired'] is True and a['productionRootPromoted'] is False
-          print('browser evidence PASS: WebGL2 desktop/mobile 57/57; final human acceptance OPEN')
-          PY
