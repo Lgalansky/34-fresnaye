@@ -47,14 +47,15 @@ jobs:
         shell: bash
         run: |
           git fetch origin main
-          git show origin/main:qa/v96-portable-faststart.cjs > /tmp/portable-qa.cjs
+          git show origin/main:qa/v96-portable-faststart.cjs > ./portable-qa.cjs
       - name: Syntax check QA harness
         shell: bash
-        run: node --check /tmp/portable-qa.cjs
+        run: node --check ./portable-qa.cjs
       - name: Run public desktop mobile cache offline QA
         shell: bash
-        run: node /tmp/portable-qa.cjs
+        run: node ./portable-qa.cjs
       - name: Persist portable QA evidence
+        if: success()
         shell: bash
         run: |
           mkdir -p v96
