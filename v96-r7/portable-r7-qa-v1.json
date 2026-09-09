@@ -1,0 +1,46 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_PortableR7_AdaptiveNetwork_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-09T19:08:54.692Z",
+  "geometryChanged": false,
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "loaderRevision": "r7",
+  "serviceWorkerRevision": "r5",
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.325,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {},
+  "forcedFallback": {
+    "pass": true,
+    "mode": "parallel-fallback-v8-forced",
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "saveData": {
+    "pass": true,
+    "mode": "direct-v8",
+    "hedged": false,
+    "hedgeMs": null,
+    "fallbackPartRequests": 0,
+    "bandwidthPolicy": "direct-first-save-data-no-hedge"
+  },
+  "defaultHedge": {
+    "pass": true,
+    "mode": "parallel-fallback-v8-hedged",
+    "hedged": true,
+    "hedgeMs": 2000,
+    "cancelledLoser": "direct",
+    "fallbackPartRequests": 12,
+    "bandwidthPolicy": "hedged-4g"
+  },
+  "pass": false,
+  "error": "Error: joystick\n    at ok (/home/runner/work/34-fresnaye/34-fresnaye/engineering/walkthrough-v96-portable-r7-publicqa-v1.cjs:4:30)\n    at /home/runner/work/34-fresnaye/34-fresnaye/engineering/walkthrough-v96-portable-r7-publicqa-v1.cjs:11:1176"
+}
