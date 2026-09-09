@@ -1,6 +1,6 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v7",
-  "updatedUtc": "2026-09-09T07:50:00Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v8",
+  "updatedUtc": "2026-09-09T08:03:00Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "loader": "walkthrough-v96.html",
@@ -19,26 +19,26 @@
     "automatedPublicCandidateReviewReady": true
   },
   "sourceState": {
-    "latestSourceArchitectObserved": "v67",
-    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v67.json",
-    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v67.json",
-    "sourceArchitectHandoffSha256": "77450fb077142b1b2338a19ce2e601378093e1c2b66766801485f177cb596956",
-    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S01_S02_SHUTTER_COMPONENTS_SOURCE_CLOSED_1500X2100__MASONRY_INTERFACES_AND_S03_SIZE_REMAIN_OPEN__NO_MODEL_EDIT",
+    "latestSourceArchitectObserved": "v68",
+    "sourceArchitectHandoffArtifact": "34_Fresnaye_SourceArchitect_handoff_v68.json",
+    "sourceArchitectHandoffPublicPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v68.json",
+    "sourceArchitectHandoffSha256": "6fe06371eaa1311d357079b623a7ad70ed3653945cd4ca484d98e79206644cbb",
+    "sourceArchitectChiefOfStaffStatus": "LEVEL02_PRIORITY_GATE_REMAINS_PASSED__L03_S01_S02_BRICKWORK_ROUGH_WIDTHS_SOURCE_CLOSED_1500_EACH__HEADS_AND_S03_SIZE_REMAIN_OPEN__NO_MODEL_EDIT",
     "level02DimensionalBaseline": "Source Architect v50 / discrepancy log v72",
     "geometryAuthorization": false,
     "level02Effect": "NONE",
-    "publicBrowserEvidenceSourceArchitect": "v58",
+    "publicBrowserEvidenceSourceArchitect": "v67",
     "newerSourceSyncChangesCandidateGeometry": false,
     "materialLevel02SourceBlockerCount": 1,
     "materialLevel02SourceBlocker": "Exact ceiling/bulkhead footprint completion for curved arcs and any transition segment without its own written radius/centre/tangent or owned horizontal witness. No scaling or inference.",
-    "laterLevelProgress": "Source Architect v67 source-closes Level 03 S01/S02 shutter component dimensions at 1500 x 2100 mm; masonry rough-opening/head ownership remains open and S03 overall size remains open. Level 02 effect NONE."
+    "laterLevelProgress": "Source Architect v68 source-closes Level 03 S01/S02 brickwork rough-opening widths at 1500 mm each; their masonry U/S/head ownership remains open and S03 overall size remains open. Level 02 effect NONE."
   },
   "geometryPipeline": {
     "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
     "publicPath": "engineering/incremental-geometry-pipeline-v2.json",
-    "sha256": "47a61c54f6ac2045962d2840027bb8031e01bfdfc5a5bf6b64a6f79117d26388",
-    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v3.json",
-    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v67-v1.json",
+    "sha256": "a93b0173dd40b8a80510b25f2fce0a51b2aadbafa5e324cbe266124c16613a31",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v4.json",
+    "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v68-v1.json",
     "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
     "currentDecision": "NO_OP_SHORT_CIRCUIT",
     "fullModelRegenerationRequired": false,
