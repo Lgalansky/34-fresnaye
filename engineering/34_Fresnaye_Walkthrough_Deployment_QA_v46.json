@@ -1,0 +1,65 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_Deployment_QA_v46",
+  "timestampUtc": "2026-09-10T10:20:00.014Z",
+  "pass": true,
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "canonicalModel": "v23",
+  "canonicalVertices": 5769,
+  "canonicalTriangles": 8907,
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "transport": "r9.2",
+  "manifestVersion": "v36",
+  "manifestSha256": "e074f4eb15de4a8098888ccc745821d239778807588fd209ac3af7ad231d6a2a",
+  "gateRevision": "v27",
+  "gateSha256": "bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b",
+  "recorderCodeRevision": "v2.1-manual-control-attestation",
+  "recorderSha256": "ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37",
+  "sourceDirectBrowserQa": "stable-v94-r9-2-publicbrowserqa-v2.json",
+  "sourceDirectBrowserQaRun": 34464933782,
+  "recorderSourceQa": "human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v2.json",
+  "recorderSourceQaRun": 34465042773,
+  "realGateQa": "stable-v94-r9-2-gate-v27-liveqa-v1.json",
+  "realGateQaRun": 34465206390,
+  "realGateQaJob": 102832046039,
+  "endpoints": {
+    "gate": {
+      "pass": true,
+      "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-review.html?final46=1789035600273",
+      "sourceArchitect": "v94",
+      "decision": "NO_OP_SHORT_CIRCUIT",
+      "startLinks": [
+        "entrance",
+        "living",
+        "kitchen",
+        "bedroom",
+        "second",
+        "service"
+      ]
+    },
+    "launcher": {
+      "pass": true,
+      "url": "https://lgalansky.github.io/34-fresnaye/v96-r9/#entrance",
+      "renderer": "WebGL2",
+      "loaderMode": "direct-v9.2",
+      "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5"
+    },
+    "recorder": {
+      "pass": true,
+      "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-human-acceptance.html?final46=1789035602124",
+      "sourceArchitect": "v94",
+      "gateVerified": true,
+      "codeRevision": "v2.1-manual-control-attestation"
+    }
+  },
+  "finalAcceptance": "OPEN",
+  "quarantinedCandidate": {
+    "path": "walkthrough-human-acceptance-v2-2.html",
+    "codeRevision": "v2.2-joystick-deflection-attestation",
+    "status": "NOT_PROMOTED",
+    "reason": "center-touch deflection attestation failed in v2.2-specific QA"
+  },
+  "pageErrors": []
+}
