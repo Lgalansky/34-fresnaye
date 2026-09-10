@@ -1,7 +1,7 @@
 {
   "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v36",
   "schemaVersion": 36,
-  "updatedUtc": "2026-09-10T10:15:51.758985Z",
+  "updatedUtc": "2026-09-10T10:18:27.886332Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -80,10 +80,10 @@
     "path": "walkthrough-review.html",
     "revision": "v27",
     "sha256": "bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b",
-    "liveQaEvidence": "stable-v93-r9-2-gate-v27-liveqa-v1.json",
-    "liveQaSha256": "50e2aa9e7903909a091cda4af6aa33052caaff786dea5ff466746f14ed7f7ef8",
-    "liveQaRun": 34457386423,
-    "liveQaJob": 102806852027
+    "liveQaEvidence": "stable-v94-r9-2-gate-v27-liveqa-v1.json",
+    "liveQaSha256": "dfa407d690d460e7556160a2957f81ad2435267169680bad3262d276cbdd42ea",
+    "liveQaRun": 34465206390,
+    "liveQaJob": 102832046039
   },
   "acceptance": {
     "finalStatus": "OPEN",
@@ -127,6 +127,8 @@
       "codeRevision": "v2.2-joystick-deflection-attestation",
       "status": "NOT_PROMOTED",
       "reason": "Source-v93 v2.2-specific Playwright QA failed the center-touch deflection attestation; stable remains v2.1 until corrected and fully reverified."
-    }
+    },
+    "sourceV94RealGateVerified": true,
+    "sourceV94RealGateLiveQaEvidence": "stable-v94-r9-2-gate-v27-liveqa-v1.json"
   }
 }

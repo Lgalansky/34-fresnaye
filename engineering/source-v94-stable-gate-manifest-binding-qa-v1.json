@@ -1,0 +1,15 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_SourceV94_StableGateManifestBinding_QA_v1",
+  "timestampUtc": "2026-09-10T10:18:27.886710Z",
+  "pass": true,
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "canonicalModel": "v23",
+  "viewerVersion": "v96",
+  "gateRevision": "v27",
+  "gateQaEvidence": "stable-v94-r9-2-gate-v27-liveqa-v1.json",
+  "gateQaSha256": "dfa407d690d460e7556160a2957f81ad2435267169680bad3262d276cbdd42ea",
+  "gateQaRun": 34465206390,
+  "gateQaJob": 102832046039,
+  "manifestSha256": "e074f4eb15de4a8098888ccc745821d239778807588fd209ac3af7ad231d6a2a"
+}
