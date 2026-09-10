@@ -1,0 +1,105 @@
+name: Promote Source v94 stable manifest v36
+
+on:
+  push:
+    paths:
+      - '.github/workflows/promote-source-v94-stable-manifest-v36.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Wait for fresh Source v94 browser and recorder QA
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          ok=0
+          for i in $(seq 1 90); do
+            curl -fsSL --retry 1 "$B/stable-v94-r9-2-publicbrowserqa-v1.json?v=$GITHUB_RUN_ID-$i" -o /tmp/sourceqa.json || true
+            curl -fsSL --retry 1 "$B/human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v1.json?v=$GITHUB_RUN_ID-$i" -o /tmp/humanqa.json || true
+            if python3 - <<'PY'
+          import json
+          try:
+            a=json.load(open('/tmp/sourceqa.json')); h=json.load(open('/tmp/humanqa.json'))
+            assert a['pass'] is True and a['sourceArchitect']=='v94'
+            assert a['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+            assert a['canonicalObjSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+            assert a['desktop']['pass'] and a['mobile']['pass']
+            assert h['pass'] is True and h['sourceArchitect']=='v94'
+            assert h['recorderSha256']=='ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37'
+            assert h['desktop']['pass'] and h['mobile']['pass'] and h['mobile']['startVisible']
+          except Exception:
+            raise SystemExit(1)
+          PY
+            then ok=1; break; fi
+            sleep 4
+          done
+          test "$ok" = 1
+          sha256sum /tmp/sourceqa.json /tmp/humanqa.json
+      - name: Promote manifest with exact hashes
+        run: |
+          set -euo pipefail
+          git worktree add /tmp/pages gh-pages
+          cd /tmp/pages
+          python3 - <<'PY'
+          import json,hashlib,datetime,os,pathlib
+          P=pathlib.Path('.')
+          def sha(path): return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
+          m=json.load(open('walkthrough-review.json'))
+          s=json.load(open('source-state/34_Fresnaye_SourceArchitect_handoff_v94_d02_schedule_conflict_hardening.json'))
+          m['artifact']='34_Fresnaye_Walkthrough_StableReviewManifest_v36'
+          m['schemaVersion']=36
+          m['updatedUtc']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          c=m['reviewCandidate']
+          c['liveBrowserQaEvidence']='stable-v94-r9-2-publicbrowserqa-v1.json'
+          c['liveBrowserQaSha256']=sha('stable-v94-r9-2-publicbrowserqa-v1.json')
+          c['freshSourceLiveQaRequired']=True
+          ss=m['sourceState']
+          ss['latestSourceArchitectObserved']='v94'
+          ss['sourceArchitectHandoffArtifact']='34_Fresnaye_SourceArchitect_handoff_v94_d02_schedule_conflict_hardening.json'
+          ss['sourceArchitectHandoffPublicPath']='source-state/34_Fresnaye_SourceArchitect_handoff_v94_d02_schedule_conflict_hardening.json'
+          ss['sourceArchitectHandoffSha256']='039180558f10a8517c02ecf89dd6e86f92c36fb7a0a60222cabbaca3407c32c3'
+          ss['sourceArchitectChiefOfStaffStatus']=s['chief_of_staff_status']
+          ss['level02Effect']='NONE'
+          ss['effectClassificationPublicPath']='engineering/source-v94-walkthrough-classification-v1.json'
+          ss['effectClassificationSha256']='e9ca33fba6899c4ca01eb342938d3f3e0380fbe068c5de627411486dc922bfeb'
+          ss['geometryAuthorization']=False
+          ss['newerSourceSyncChangesCandidateGeometry']=False
+          ss['browserQaCompatibilitySource']='v94'
+          ss['browserQaReuseReason']='Canonical Level02 v23 and exact viewer v96 remain byte-identical under Source v94. Source v94 advances only Level03 D02 duplicate schedule/system conflict evidence; Level02 remains PASS_UNCHANGED and no geometry is authorized.'
+          ss['materialLevel02SourceBlocker']='Circular stepped toilet-cubicle radius/vertical centre/step construction remains open; two generic VAULTED CEILING OVER instances still lack semantic ownership and exact AFFL/profile/section mapping; explicit AFFLs 2860/2860/2610 remain unmapped; other unwitnessed curved Level02 transitions remain locked.'
+          ss['laterLevelSourceConflict']='L03_D02 is now demonstrated as an authoritative duplicate schedule-ID/system conflict; physical rough3000/U-S2100 stays source-closed but exact component/system ownership remains locked. L01 stair-soffit and L04 Mazista/roof issues remain open. No Level02 geometry effect.'
+          ss['latestPointerPublicPath']='source-state/latest-walkthrough-source.json'
+          ss['latestPointerSha256']='97f926d837c6764d16981d547849dcea5d9551b623bbaf322a11e29bb4918139'
+          g=m['geometryPipeline']
+          g['publicPath']='engineering/incremental-geometry-pipeline-v2-v94.json'
+          g['sha256']='bf49f534973fde5ded8ef8930b845478232495e41e860f76ff92ae8d78617044'
+          g['plannerQaPublicPath']='engineering/geometry-delta-planner-qa-v26.json'
+          g['plannerQaSha256']='89656ea0fc766565ca714ab940ccdd23092215229476f4325e8f3410e1bff7ad'
+          g['currentDeltaPlanPublicPath']='engineering/geometry-delta-plan-source-v94-v1.json'
+          g['currentDeltaPlanSha256']='7d4c078b02b45262049a55419f017bd287b350e754586b87094e4d43066b5e5f'
+          g['currentDecision']='NO_OP_SHORT_CIRCUIT'; g['geometryBuildRequired']=False; g['fullModelRegenerationRequired']=False; g['fullBrowserRegressionRequired']=False
+          a=m['acceptance']
+          a['humanAcceptanceRecorderQaEvidence']='human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v1.json'
+          a['humanAcceptanceRecorderQaSha256']=sha('human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v1.json')
+          a['humanAcceptanceRecorderQaSourceArchitect']='v94'
+          a['sourceV94ManifestPromotionRun']=int(os.environ['GITHUB_RUN_ID'])
+          a['quarantinedCandidate']={'path':'walkthrough-human-acceptance-v2-2.html','codeRevision':'v2.2-joystick-deflection-attestation','status':'NOT_PROMOTED','reason':'Source-v93 v2.2-specific Playwright QA failed the center-touch deflection attestation; stable remains v2.1 until corrected and fully reverified.'}
+          out=json.dumps(m,indent=2,ensure_ascii=False)+'\n'
+          open('walkthrough-review.json','w').write(out)
+          open('34_Fresnaye_Walkthrough_StableReviewManifest_v36.json','w').write(out)
+          print('manifest_sha256',sha('walkthrough-review.json'))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-review.json 34_Fresnaye_Walkthrough_StableReviewManifest_v36.json
+          git commit -m 'Promote Source v94 stable review manifest v36'
+          git push origin gh-pages
