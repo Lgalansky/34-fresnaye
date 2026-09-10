@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v33",
-  "schemaVersion": 33,
-  "updatedUtc": "2026-09-10T08:46:30Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v34",
+  "schemaVersion": 34,
+  "updatedUtc": "2026-09-10T08:52:10Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -79,7 +79,11 @@
   "stableGate": {
     "path": "walkthrough-review.html",
     "revision": "v27",
-    "sha256": "3e9787000a5562a69a697f6f940dc7339e85384fe6da19470f5ea13cf0bbfe16"
+    "sha256": "bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b",
+    "liveQaEvidence": "stable-v93-r9-2-gate-v27-liveqa-v1.json",
+    "liveQaSha256": "50e2aa9e7903909a091cda4af6aa33052caaff786dea5ff466746f14ed7f7ef8",
+    "liveQaRun": 34457386423,
+    "liveQaJob": 102806852027
   },
   "acceptance": {
     "finalStatus": "OPEN",
