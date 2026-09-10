@@ -1,0 +1,59 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v105_L02_ceiling_height_revision_differential",
+  "source_architect_version": "v105",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T01:28:28+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__FIVE_SERVICE_CEILING_AFFL_INSTANCES_REVISED_BY_2026_09_08_ANSWER_SHEET__OLD_JULY_VALUES_QUARANTINED_AT_EXACT_INSTANCES__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "L02_D09": {
+      "rough_width_mm": 1790,
+      "u_s_opening_mm": 2400
+    },
+    "L02_D22_corrected_former_D21_physical_instance_1": {
+      "rough_width_mm": 2980,
+      "u_s_opening_mm": 2210,
+      "assembly_mm": {
+        "overall": 6240,
+        "inner": 3080,
+        "height": 2210
+      }
+    },
+    "L02_W11": {
+      "rough_width_mm": 1800,
+      "u_s_opening_mm": 2090,
+      "finished_wall_thickness_mm": 400
+    },
+    "L02_iD05": {
+      "rough_width_mm": 1200,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 100,
+      "side_clearance_mm_each": 25
+    },
+    "L02_iD08": {
+      "rough_width_mm": 855,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 90,
+      "side_clearance_mm_each": 20
+    },
+    "boundary": "Structural/brickwork opening values remain separate from scheduled component envelopes."
+  },
+  "v105_material_advance": {
+    "level": "L02",
+    "subject": "same-instance ceiling-height revision differential July\u21928 Sep 2026",
+    "finding": "Native text-layer alignment establishes five exact annotation instances with revised written AFFLs: 2910\u21922960; three 2910\u21922750; 2750\u21922800. Ten detail-reference letter spans are also relabelled, confirming the answer sheet is a revised ceiling markup rather than a duplicate export.",
+    "impact": "Later 2026-09-08 written values are current source for those five instances only. This prepares the later Level 02 ceiling stage and prevents stale July values being propagated."
+  },
+  "current_L02_locks": [
+    "Entrance vault pair final/current post-workshop Archilab freeze/reissue remains open; preliminary 2900 AFFL sections are not final geometry.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy remain open.",
+    "Separate 2610 vaulted condition remains source-preserved but semantically unassigned if later build scope requires it."
+  ],
+  "chief_of_staff_action": "Keep priority five closed. For the five exact v105 ceiling instances, quarantine the July FRE_WD_212 heights and source only the 2026-09-08 written values. Do not generalize revisions to neighboring ceiling fields. No canonical model edit.",
+  "source_watch": "Library source set unchanged after 2026-09-10 model PDF; mailbox freshness not verified this run because connector required interactive input.",
+  "geometry_action": "NONE"
+}
