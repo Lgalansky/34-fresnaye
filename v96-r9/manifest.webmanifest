@@ -1,1 +1,11 @@
-{"name":"34 Fresnaye Walkthrough v96 — Self-Contained Portable r9.1","short_name":"Fresnaye v96 r9.1","id":"./","start_url":"./#entrance","scope":"./","display":"standalone","background_color":"#111111","theme_color":"#151515","description":"Canonical Level 02 v23 walkthrough v96. Self-contained static-host package with local verified viewer and fallback parts, isolated cache namespace, and commit-before-viewer offline durability; no architectural geometry change."}
+{
+  "name": "34 Fresnaye Walkthrough v96 — Portable r9.2",
+  "short_name": "34 Fresnaye v96",
+  "start_url": "./#entrance",
+  "id": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#151515",
+  "description": "Self-contained exact v96 / canonical Level 02 v23 walkthrough package. r9.2 uses scope-derived CacheStorage isolation, hash-verified viewer bytes, recoverable offline/network failure guards, adaptive transport and no architectural geometry change."
+}
