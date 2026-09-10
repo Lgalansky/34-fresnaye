@@ -1,0 +1,31 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlanner_QA_v22",
+  "date": "2026-09-10",
+  "sourceArchitect": "v88",
+  "sourceHandoffSha256": "2b58d19400ea5786ff914b3b88f5e2d07b8f7f8030cdcec3b603055c754d86fe",
+  "classificationSha256": "974b72f41e933c2fa1256b59c762b52f76e7e6f6bc22fcc86eb6110bc0a88d4f",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v7",
+  "plannerSha256": "91aff788368482e67df1ae26f004cf4ca3d6cefd44c101e0a9a2ada24233846e",
+  "pipelineSha256": "18e39c588d8edc1675faace31da6717b7c78de4d08ce61c9e75d83295d513078",
+  "deltaPlanSha256": "6d72e0c4744b831b8c000d589b945ec7066dc148a560d0bbe6375873ee8ab395",
+  "expectedDecision": "NO_OP_SHORT_CIRCUIT",
+  "checks": {
+    "sourceArtifactSuffixVersionParsed": true,
+    "sourceCanonicalGeometryChangedFalse": true,
+    "sourceGeometryAuthorizationFalse": true,
+    "level02PassUnchanged": true,
+    "handoffEffectFieldAbsent": true,
+    "classificationBridgeIdentityMatched": true,
+    "classificationBridgeGeometryNeutral": true,
+    "classificationLevel02EffectNone": true,
+    "classificationSchemaPathUsed": true,
+    "changedElementSetEmpty": true,
+    "canonicalModelV23Preserved": true,
+    "viewerV96Preserved": true,
+    "geometryBuildRequiredFalse": true,
+    "fullModelRegenerationRequiredFalse": true,
+    "fullBrowserRegressionRequiredFalse": true
+  },
+  "regressionFix": "Planner v7 replaces v6 artifact-version parsing with a regex that safely accepts Source Architect artifact suffixes such as _v88_vault_plan_labels while retaining fail-closed classification and geometry-authorization rules.",
+  "pass": true
+}
