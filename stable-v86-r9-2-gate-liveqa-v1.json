@@ -1,0 +1,39 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableGateV24_SourceV86_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-10T02:44:51.119Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v86",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gate": {
+    "pass": true,
+    "allTrustChecks": true,
+    "sourceBoundLiveQa": true,
+    "preferredHref": "./v96-r9/#entrance",
+    "startShortcutCount": 6,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "keyboardMovementM": 0.714,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "joystickMovementM": 0.829,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
