@@ -1,0 +1,88 @@
+name: Walkthrough human acceptance recorder v2 QA
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - 'walkthrough-human-acceptance.html'
+      - 'walkthrough-human-acceptance-v2.html'
+      - '.github/workflows/walkthrough-human-acceptance-v2-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Wait for public recorder v2
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          ok=0
+          for i in $(seq 1 60); do
+            if curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-human-acceptance.html?v2=$GITHUB_RUN_ID-$i" -o /tmp/recorder.html; then
+              got=$(sha256sum /tmp/recorder.html|awk '{print $1}')
+              if [ "$got" = 'ab56173d527aa523fad0e19fcf58ad72087a872cee8c7888bea54473e277f4dc' ] && grep -q 'v2-stable-gate-backed' /tmp/recorder.html; then ok=1; break; fi
+            fi
+            sleep 5
+          done
+          echo "recorder observed=${got:-missing}"
+          test "$ok" = 1
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify fail-closed gate, fresh start verification, shortcut guard and mobile readiness
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const out={artifact:'34_Fresnaye_Walkthrough_HumanAcceptanceRecorderV2_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,recorderVersion:'v2',recorderSha256:'ab56173d527aa523fad0e19fcf58ad72087a872cee8c7888bea54473e277f4dc',sourceArchitect:'v91',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,failClosed:{},desktop:{},mobile:{},pass:false};
+          (async()=>{
+            const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const fc=await b.newContext({viewport:{width:1280,height:720}}),fp=await fc.newPage(),fe=[];fp.on('pageerror',e=>fe.push(String(e)));
+              await fp.route('**/walkthrough-review.html?humanAcceptance=2**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><script>window.__FRESNAYE_STABLE_GATE_QA={pass:false,error:"synthetic gate failure"}</script>'}));
+              await fp.goto(ROOT+'walkthrough-human-acceptance.html?failclosed='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});
+              await fp.waitForFunction(()=>document.querySelector('#status')?.textContent.startsWith('BLOCKED'),{}, {timeout:30000});
+              const fq=await fp.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),src=await fp.locator('#walk').getAttribute('src');
+              ok(fq.version==='v2'&&!fq.ready&&!fq.gateVerified,'fail-closed QA state');ok(src==='about:blank','unverified walkthrough loaded');ok(!fe.length,'fail-closed page errors '+fe);out.failClosed={pass:true,walkthroughRemainedBlank:true,pageErrors:fe};await fc.close();
+
+              const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));let gateRequests=0;p.on('request',r=>{if(r.url().includes('/walkthrough-review.html?humanAcceptance=2'))gateRequests++});
+              await p.goto(ROOT+'walkthrough-human-acceptance.html?desktop='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});
+              await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});
+              let q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(q.version==='v2'&&q.gateVerified&&q.sourceArchitect==='v91'&&q.viewerSha256===V&&q.modelSha256===M&&q.sameOriginFrameAccessible,'desktop recorder identity');
+              const renderer=await p.locator('#walk').contentFrame().evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);ok(renderer==='WebGL2','desktop renderer '+renderer);
+              await p.getByRole('button',{name:'Start human route'}).click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(gateRequests>=2,'fresh start gate verification not observed');ok(q.session.active&&q.sourceArchitect==='v91','session did not bind current source');
+              const wf=p.locator('#walk').contentFrame();await wf.locator('#next').click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.invalid===true,{}, {timeout:10000});q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(/shortcut/.test(q.session.reason),'shortcut guard reason');ok(!de.length,'desktop page errors '+de);out.desktop={pass:true,renderer,gateRequests,startFreshVerification:true,shortcutInvalidated:true,reason:q.session.reason,pageErrors:de};await dc.close();
+
+              const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await m.goto(ROOT+'walkthrough-human-acceptance.html?mobile='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});const mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),mr=await m.locator('#walk').contentFrame().evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);ok(mq.gateVerified&&mq.viewerSha256===V&&mq.modelSha256===M&&mr==='WebGL2','mobile identity/renderer');ok(await m.getByRole('button',{name:'Start human route'}).isVisible(),'mobile start not visible');ok(!me.length,'mobile page errors '+me);out.mobile={pass:true,renderer:mr,gateVerified:true,startVisible:true,pageErrors:me};await mc.close();
+
+              out.pass=out.failClosed.pass&&out.desktop.pass&&out.mobile.pass;ok(out.pass,'aggregate');fs.writeFileSync('human-acceptance-v2-qa.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+            } finally {await b.close()}
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node qa.cjs
+      - name: Publish permanent recorder v2 QA evidence
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp human-acceptance-v2-qa.json /tmp/pages/human-acceptance-recorder-v2-publicbrowserqa-v1.json
+          cd /tmp/pages
+          git checkout -B gh-pages origin/gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add human-acceptance-recorder-v2-publicbrowserqa-v1.json
+          git commit -m 'Publish human acceptance recorder v2 browser QA evidence'
+          git push origin gh-pages
