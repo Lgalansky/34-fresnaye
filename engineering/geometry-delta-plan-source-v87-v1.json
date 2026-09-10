@@ -1,0 +1,18 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlan_SourceV87_v1",
+  "date": "2026-09-10",
+  "sourceArchitect": "v87",
+  "sourceHandoffSha256": "fc4dd92ad49eddf0bc9155c8c735fcafcf90d48c5fc47d882a32ccf0faa8813d",
+  "classificationSha256": "4fa1443c72a13c10deda1c95ee68b5b2ffb2c8d69be7885a6210cf9a9d7f8495",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v6",
+  "plannerSha256": "74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db",
+  "pipelineSha256": "652f07c00394234325e557a76c945d07466838de8bc0997479684391c55f54b8",
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "canonicalModel": "v23",
+  "viewerVersion": "v96",
+  "reason": "Source v87 affects Level04 lean-to annotation ownership only. Level02 remains PASS_UNCHANGED, effect_of_v87=NONE, canonical_geometry_changed=false, and geometry_authorization=false."
+}
