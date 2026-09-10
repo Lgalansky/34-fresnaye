@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v34",
-  "schemaVersion": 34,
-  "updatedUtc": "2026-09-10T08:52:10Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v35",
+  "schemaVersion": 35,
+  "updatedUtc": "2026-09-10T09:15:30Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -95,11 +95,12 @@
     "stableTransportPromotedTo": "r9.2",
     "humanAcceptanceRecorderUrl": "walkthrough-human-acceptance.html",
     "humanAcceptanceRecorderRevision": "v2",
-    "humanAcceptanceRecorderSha256": "ab56173d527aa523fad0e19fcf58ad72087a872cee8c7888bea54473e277f4dc",
-    "humanAcceptanceRecorderQaEvidence": "human-acceptance-recorder-v2-source-v93-publicbrowserqa-v1.json",
-    "humanAcceptanceRecorderQaSha256": "f0c7af9e76e571183897736e4cb04098477eec13f766f9216bba80057c280157",
-    "humanAcceptanceRecorderQaRun": 34456802250,
-    "humanAcceptanceRecorderQaJob": 102804983868,
+    "humanAcceptanceRecorderCodeRevision": "v2.1-manual-control-attestation",
+    "humanAcceptanceRecorderSha256": "ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37",
+    "humanAcceptanceRecorderQaEvidence": "human-acceptance-recorder-v2-1-source-v93-publicbrowserqa-v2.json",
+    "humanAcceptanceRecorderQaSha256": "182f69771211a8f2adc7ee56baf2c1aafc54fd5b5425245536fea4358619cafe",
+    "humanAcceptanceRecorderQaRun": 34459475902,
+    "humanAcceptanceRecorderQaJob": 102813606337,
     "humanAcceptanceRecorderGuards": [
       "ordered waypoint sequence",
       "minimum 40 m distance",
@@ -107,10 +108,18 @@
       "human input required",
       "Reset/Next Room/start shortcuts invalidate",
       "position discontinuity >1.6 m invalidates",
-      "active-run visibility loss invalidates"
+      "active-run visibility loss invalidates",
+      "active keyboard/touch movement attestation",
+      "manual movement must be >=85% of recorded distance",
+      "minimum 1 m manual movement on each route leg",
+      "uncontrolled movement >1 m invalidates"
     ],
     "humanAcceptanceRecorderFreshGateOnStart": true,
     "humanAcceptanceRecorderFailClosed": true,
-    "humanAcceptanceRecorderQaSourceArchitect": "v93"
+    "humanAcceptanceRecorderQaSourceArchitect": "v93",
+    "humanAcceptanceMovementControlAttestation": true,
+    "minimumManualMovementRatio": 0.85,
+    "minimumManualMovementPerLegM": 1,
+    "maximumUncontrolledMovementM": 1
   }
 }
