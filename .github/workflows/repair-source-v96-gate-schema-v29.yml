@@ -1,0 +1,63 @@
+name: Repair Source v96 stable gate schema compatibility v29
+
+on:
+  push:
+    paths:
+      - '.github/workflows/repair-source-v96-gate-schema-v29.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+      - name: Patch only Source Architect status schema compatibility
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, hashlib
+          p=Path('walkthrough-review.html')
+          s=p.read_text(encoding='utf-8')
+          old="sj.level02_priority_state?.status==='PASS_UNCHANGED'"
+          new="((sj.level02_priority_state?.status??sj.level02_priority_five?.status)==='PASS_UNCHANGED')"
+          if old not in s:
+              raise SystemExit('expected v28 source-status expression not found')
+          s=s.replace(old,new,1)
+          s=s.replace('content="v28-source-dynamic-freshness-pointer-human-recorder-v2.2-r9.2"','content="v29-source-schema-compat-dynamic-freshness-pointer-human-recorder-v2.2-r9.2"',1)
+          s=s.replace('Stable gate v28.','Stable gate v29.',1)
+          if "level02_priority_five?.status" not in s:
+              raise SystemExit('schema compatibility patch missing')
+          p.write_text(s,encoding='utf-8')
+          gate_sha=hashlib.sha256(p.read_bytes()).hexdigest()
+          m=Path('walkthrough-review.json')
+          j=json.loads(m.read_text(encoding='utf-8'))
+          j['stableGate']['revision']='v29'
+          j['stableGate']['sha256']=gate_sha
+          j['stableGate']['sourceSchemaCompatibility']='level02_priority_state.status OR level02_priority_five.status'
+          j['stableGate']['sourceSchemaCompatibilityReason']='Source Architect v96 renamed the PASS_UNCHANGED status container; semantic status and all hash/authorization checks remain fail-closed.'
+          m.write_text(json.dumps(j,separators=(',',':'))+'\n',encoding='utf-8')
+          print('gate_sha256='+gate_sha)
+          print('manifest_sha256='+hashlib.sha256(m.read_bytes()).hexdigest())
+          PY
+      - name: Verify patch is metadata/gate-only
+        run: |
+          git diff -- walkthrough-review.html walkthrough-review.json
+          test "$(git status --short | wc -l)" -eq 2
+          git diff --name-only | grep -qx 'walkthrough-review.html'
+          git diff --name-only | grep -qx 'walkthrough-review.json'
+          grep -q 'level02_priority_five?.status' walkthrough-review.html
+          grep -q 'Stable gate v29.' walkthrough-review.html
+      - name: Commit gate v29
+        run: |
+          git config user.name '34 Fresnaye Walkthrough Engineer'
+          git config user.email 'actions@users.noreply.github.com'
+          git add walkthrough-review.html walkthrough-review.json
+          git commit -m 'Repair Source v96 stable gate schema compatibility v29'
+          git push origin HEAD:gh-pages
