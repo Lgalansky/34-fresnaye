@@ -1,0 +1,64 @@
+name: Walkthrough Source v93 recorder v2.1 stable live QA
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - '.github/workflows/walkthrough-v93-v2-1-stable-liveqa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  liveqa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Wait for exact promoted live bytes
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          MH='dec920c6808057780916c9ac8f21e59317dbb2cbe94cfa70a7114f5ca79ab8a9'
+          RH='ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37'
+          ok=0
+          for i in $(seq 1 80); do
+            curl -fsSL "$B/walkthrough-review.json?qa=$GITHUB_RUN_ID-$i" -o /tmp/m.json || true
+            curl -fsSL "$B/walkthrough-human-acceptance.html?qa=$GITHUB_RUN_ID-$i" -o /tmp/r.html || true
+            mh=$(sha256sum /tmp/m.json 2>/dev/null|awk '{print $1}' || true); rh=$(sha256sum /tmp/r.html 2>/dev/null|awk '{print $1}' || true)
+            if [ "$mh" = "$MH" ] && [ "$rh" = "$RH" ]; then ok=1; break; fi
+            sleep 5
+          done
+          echo "manifest=$mh recorder=$rh"; test "$ok" = 1
+      - name: Install browser runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify stable gate and promoted recorder desktop/mobile
+        run: |
+          cat > liveqa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const B='https://lgalansky.github.io/34-fresnaye/',V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',R='ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37',S='v93';
+          const ok=(v,m)=>{if(!v)throw Error(m)},vf=p=>p.frames().find(f=>f.url().includes('/34-fresnaye/v96-r9/'));
+          const out={artifact:'34_Fresnaye_Walkthrough_SourceV93_RecorderV2_1_StableLiveQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:S,viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,recorderSha256:R,gate:{},desktop:{},mobile:{},pass:false};
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const gc=await b.newContext({viewport:{width:1365,height:768}}),g=await gc.newPage(),ge=[];g.on('pageerror',e=>ge.push(String(e)));await g.goto(B+'walkthrough-review.html?final='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await g.waitForFunction(()=>window.__FRESNAYE_STABLE_GATE_QA?.pass===true,{}, {timeout:120000});const gq=await g.evaluate(()=>window.__FRESNAYE_STABLE_GATE_QA);ok(gq.sourceArchitect===S&&gq.viewerSha256===V&&gq.modelSha256===M&&gq.humanOk&&gq.liveQaOk&&gq.pipeOk&&gq.freshnessOk&&!ge.length,'stable gate');out.gate={pass:true,sourceArchitect:gq.sourceArchitect,viewerSha256:gq.viewerSha256,modelSha256:gq.modelSha256,humanOk:gq.humanOk,liveQaOk:gq.liveQaOk,pipeOk:gq.pipeOk,freshnessOk:gq.freshnessOk,pageErrors:ge};await gc.close();
+            const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));let gr=0;p.on('request',r=>{if(r.url().includes('/walkthrough-review.html?humanAcceptance=2'))gr++});await p.goto(B+'walkthrough-human-acceptance.html?finald='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});let q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(q.codeRevision==='v2.1-manual-control-attestation'&&q.sourceArchitect===S&&q.viewerSha256===V&&q.modelSha256===M&&q.requirements.movementControlAttestation,'desktop live identity');let f=vf(p);ok(f&&await f.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer)==='WebGL2','desktop WebGL2');await p.getByRole('button',{name:'Start human route'}).click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});f=vf(p);await f.locator('#c').click({position:{x:20,y:20}});await p.keyboard.down('w');await p.waitForTimeout(900);await p.keyboard.up('w');await p.waitForTimeout(400);q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(gr>=2&&q.session.manualMovementM>.1&&q.session.manualMovementRatio>.8&&!q.session.invalid&&!de.length,'desktop live movement '+JSON.stringify(q.session));out.desktop={pass:true,renderer:'WebGL2',freshGateRequests:gr,keyboardManualMovementM:q.session.manualMovementM,manualMovementRatio:q.session.manualMovementRatio,humanInputs:q.session.humanInputs,pageErrors:de};await dc.close();
+            const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await m.goto(B+'walkthrough-human-acceptance.html?finalm='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});let mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),mf=vf(m);ok(mq.codeRevision==='v2.1-manual-control-attestation'&&mq.sourceArchitect===S&&mq.viewerSha256===V&&mq.modelSha256===M&&await mf.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer)==='WebGL2','mobile live identity');await m.getByRole('button',{name:'Start human route'}).click();await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});mf=vf(m);const bb=await mf.locator('#stick').boundingBox(),x=bb.x+bb.width/2,y=bb.y+bb.height/2;await mf.locator('#stick').dispatchEvent('pointerdown',{pointerId:51,pointerType:'touch',clientX:x,clientY:y-25,isPrimary:true,bubbles:true});await mf.locator('#stick').dispatchEvent('pointermove',{pointerId:51,pointerType:'touch',clientX:x,clientY:y-45,isPrimary:true,bubbles:true});await m.waitForTimeout(900);await mf.locator('#stick').dispatchEvent('pointerup',{pointerId:51,pointerType:'touch',clientX:x,clientY:y-45,isPrimary:true,bubbles:true});await m.waitForTimeout(400);mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(mq.session.manualMovementM>.08&&mq.session.manualMovementRatio>.75&&!mq.session.invalid&&!me.length,'mobile live movement '+JSON.stringify(mq.session));out.mobile={pass:true,renderer:'WebGL2',joystickManualMovementM:mq.session.manualMovementM,manualMovementRatio:mq.session.manualMovementRatio,humanInputs:mq.session.humanInputs,pageErrors:me};await mc.close();out.pass=true;fs.writeFileSync('liveqa.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          }finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node liveqa.cjs
+      - name: Publish permanent live QA evidence
+        run: |
+          set -euo pipefail
+          cp liveqa.json /tmp/liveqa.json
+          git fetch origin gh-pages
+          git reset --hard origin/gh-pages
+          cp /tmp/liveqa.json stable-v93-recorder-v2-1-liveqa-v1.json
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v93-recorder-v2-1-liveqa-v1.json
+          git commit -m 'Publish Source v93 recorder v2.1 stable live QA'
+          git push origin HEAD:gh-pages
