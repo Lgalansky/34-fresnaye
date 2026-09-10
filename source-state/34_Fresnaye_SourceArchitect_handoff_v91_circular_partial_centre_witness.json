@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T09:31:00+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume only explicit written Archilab dimensions, IDs, FFLs, sections/elevations, brickwork dimensions and schedules. Native PDF/vector coordinates may establish annotation ownership only; never convert page distances to architectural dimensions, visually scale drawings, repair tags by assumption, or invent missing geometry.",
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v91_circular_partial_centre_witness",
+  "predecessor": "34_Fresnaye_SourceArchitect_handoff_v90_stair_soffit_semantics.json",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__CIRCULAR_FEATURE_HORIZONTAL_CENTRELINE_1500_WITNESS_SOURCE_CLOSED__RADIUS_VERTICAL_CENTRE_AND_STEP_CONSTRUCTION_STILL_LOCKED__NO_NEW_ARCHILAB_SECTION__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": "brickwork rough1790 / U-S2400; schedule component separately2685x2400",
+      "L02_D22_former_D21_physical_instance1": "corrected ID; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400; schedule1660x2100 separate",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / central leaf / 25mm side clearances; exact leaf thickness approximate only; schedule1300x2400 separate",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / central leaf / 20mm side clearances; exact leaf thickness approximate only; schedule955x2400 separate"
+    }
+  },
+  "v91_material_advance": {
+    "level": "L02",
+    "subject": "Circular stepped toilet-cubicle bulkhead partial centre witness",
+    "finding": "FRE_WD_212_REV_B directly dimensions the drawn circular/concentric Level02 ceiling feature centreline 1500mm horizontally from the left inner boundary of its 3080mm local span; the enclosing vertical field is written 3100mm and the circular inner field is annotated @3110mm AFFL.",
+    "impact": "Narrow the prior exception: horizontal centreline location is no longer wholly missing for the drawn circular feature. Exact radius/diameter, vertical centre position, stepped-ring widths/profile/terminals and condition-specific outer-band AFFLs remain unsourced. 1500 must not be treated as a diameter."
+  },
+  "current_level02_locks": [
+    "Named circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre location, stepped-ring/profile dimensions and exact transitions remain open.",
+    "VAULTED CEILING OVER ENTRANCE and VAULTED CEILING OVER NEW KITCHEN are named; explicit 2860/2860/2610 AFFL witnesses remain unmapped to named conditions.",
+    "Michael/Archilab 2026-09-09 verbal vault conditions remain design-not-frozen and are not paired to plan labels/AFFLs by inference.",
+    "Other curved/unwitnessed Level02 ceiling transitions lacking complete written construction evidence."
+  ],
+  "later_stage_open_summary": [
+    "L01: exact stair-soffit slope/profile/endpoints; complex curved/stepped/nested ceiling boundaries; D11 brickwork tag/rough width; W06 rough width; W08 head; W04/W05/W06 25mm interface allocations.",
+    "L03: D02 duplicate schedule/system ownership; D04 component schedule omission; iD02 2100-vs-2150 conflict; skylight IDs/interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04: main Mazista written assembly conflict; main-roof numeric pitch/eaves/ridge extents; lean-to quantitative run/eave/ridge-edge geometry; quarantined 370mm parapet-adjacent condition."
+  ],
+  "source_watch": "Fresh Outlook searches for Archilab and Michael Borgstrom received on/after 2026-09-10 returned no results. Latest known architect inbound remains 2026-09-09T16:41:59Z RE: Render with no attachment; promised quick section still not received.",
+  "chief_of_staff_action": "Adopt v91 as a Level02 source-safety refinement over v90. Retain priority five closed. For the named circular stepped toilet-cubicle condition, consume the written callout and the FRE_WD_212 1500mm horizontal centreline witness only; do not interpret 1500 as diameter and do not construct radius/vertical centre/step bands by symmetry or visual fitting. No canonical model edit.",
+  "geometry_action": "NONE"
+}
