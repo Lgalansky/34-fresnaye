@@ -1,0 +1,20 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_SourceClassification_v91_v1",
+  "date": "2026-09-10",
+  "sourceArchitect": "v91",
+  "sourceHandoffSha256": "0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522",
+  "level02Effect": "NONE",
+  "effectSource": "CLASSIFICATION_BRIDGE",
+  "effectBasis": "Source Architect v91 omits an effect_of_v91 field but explicitly states canonical_geometry_changed=false, geometry_authorization=false, Level02 PASS_UNCHANGED and geometry_action=NONE. Its material advance closes only a 1500mm horizontal centreline witness for the drawn circular Level02 ceiling feature; radius/diameter, vertical centre, stepped-ring/profile dimensions and exact transitions remain locked. This bridge records the Level02 geometry-neutral effect only and does not infer architectural geometry.",
+  "canonicalGeometryChanged": false,
+  "geometryAuthorization": false,
+  "geometryChanged": false,
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "canonicalModel": "v23",
+  "viewerReuseCandidate": "v96",
+  "rule": "Classification is walkthrough pipeline metadata only. It does not modify or overwrite the exact Source Architect handoff; geometry remains locked unless Source Architect explicitly authorizes it."
+}
