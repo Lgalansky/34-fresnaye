@@ -1,0 +1,115 @@
+name: Walkthrough human acceptance recorder v2.2 Source v93 QA
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-human-acceptance-v2-2-source-v93-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Wait for public candidate and verify payload bytes
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          LOADER='388a7b994b126280da0414737bde6456c3cd05e372a7acd624ae16c9a663710c'
+          PAYLOAD='e38bb204d0081c41ad6801b6547ecfb0efa094c4e796f17c2a7499da5e5acaf2'
+          ok=0
+          for i in $(seq 1 80); do
+            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-human-acceptance-v2-2.html?v=$GITHUB_RUN_ID-$i" -o /tmp/loader.html || true
+            if [ "$(sha256sum /tmp/loader.html 2>/dev/null | awk '{print $1}')" = "$LOADER" ]; then
+              : > /tmp/payload.b64
+              parts_ok=1
+              for n in 01 02 03 04; do
+                curl -fsSL --retry 2 --retry-delay 1 "$B/recorder-v2-2b/part${n}.b64?v=$GITHUB_RUN_ID-$i" >> /tmp/payload.b64 || parts_ok=0
+              done
+              if [ "$parts_ok" = 1 ]; then
+                base64 -d /tmp/payload.b64 > /tmp/payload.html
+                if [ "$(sha256sum /tmp/payload.html | awk '{print $1}')" = "$PAYLOAD" ]; then ok=1; break; fi
+              fi
+            fi
+            sleep 4
+          done
+          test "$ok" = 1
+          grep -q "v2-stable-gate-backed" /tmp/payload.html
+          grep -q "v2.2-joystick-deflection-attestation" /tmp/payload.html
+          grep -q "MIN_JOYSTICK_DEFLECTION=.08" /tmp/payload.html
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify candidate fail-closed, desktop binding, and mobile deflection attestation
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const URL=ROOT+'walkthrough-human-acceptance-v2-2.html';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const REC='388a7b994b126280da0414737bde6456c3cd05e372a7acd624ae16c9a663710c';
+          const PAY='e38bb204d0081c41ad6801b6547ecfb0efa094c4e796f17c2a7499da5e5acaf2';
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const vf=p=>p.frames().find(fr=>fr.url().includes('/34-fresnaye/v96-r9/'));
+          const out={artifact:'34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV93_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,recorderVersion:'v2',codeRevision:'v2.2-joystick-deflection-attestation',recorderSha256:REC,payloadSha256:PAY,sourceArchitect:'v93',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,failClosed:{},desktop:{},mobile:{},pass:false};
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const fc=await b.newContext({viewport:{width:1280,height:720}}),fp=await fc.newPage(),fe=[];fp.on('pageerror',e=>fe.push(String(e)));
+            await fp.route('**/walkthrough-review.html?humanAcceptance=2**',r=>r.fulfill({status:200,contentType:'text/html',body:'<!doctype html><script>window.__FRESNAYE_STABLE_GATE_QA={pass:false,error:"synthetic gate failure"}</script>'}));
+            await fp.goto(URL+'?failclosed='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});
+            await fp.waitForFunction(()=>document.querySelector('#status')?.textContent.startsWith('BLOCKED'),{}, {timeout:30000});
+            const fq=await fp.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),src=await fp.locator('#walk').getAttribute('src');
+            ok(fq?.version==='v2'&&!fq.ready&&!fq.gateVerified&&src==='about:blank'&&!fe.length,'fail closed');
+            out.failClosed={pass:true,walkthroughRemainedBlank:true,pageErrors:fe}; await fc.close();
+
+            const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));let gateRequests=0;
+            p.on('request',r=>{if(r.url().includes('/walkthrough-review.html?humanAcceptance=2'))gateRequests++});
+            await p.goto(URL+'?desktop='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});
+            await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});
+            let q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA); const frame=vf(p); ok(frame,'desktop viewer missing');
+            const renderer=await frame.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);
+            ok(q.codeRevision==='v2.2-joystick-deflection-attestation'&&q.gateVerified&&q.sourceArchitect==='v93'&&q.viewerSha256===V&&q.modelSha256===M&&renderer==='WebGL2','desktop identity');
+            await p.getByRole('button',{name:'Start human route'}).click(); await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});
+            q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA); ok(gateRequests>=2&&q.session.active&&q.sourceArchitect==='v93','fresh start bind');
+            await p.frameLocator('#walk').locator('#next').click(); await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.invalid===true,{}, {timeout:10000});
+            q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA); ok(/shortcut/.test(q.session.reason)&&!de.length,'shortcut guard');
+            out.desktop={pass:true,renderer,gateRequests,startFreshVerification:true,sourceBound:'v93',shortcutInvalidated:true,reason:q.session.reason,pageErrors:de}; await dc.close();
+
+            const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));
+            await m.goto(URL+'?mobile='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000}); await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});
+            const mf=vf(m); ok(mf,'mobile viewer missing'); const mr=await mf.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer); let mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);
+            ok(mq.gateVerified&&mq.sourceArchitect==='v93'&&mq.viewerSha256===V&&mq.modelSha256===M&&mr==='WebGL2'&&!me.length,'mobile identity');
+            await m.getByRole('button',{name:'Start human route'}).click(); await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});
+            const stick=mf.locator('#stick'),box=await stick.boundingBox(); ok(box,'stick bbox'); const cx=box.x+box.width/2,cy=box.y+box.height/2;
+            await stick.dispatchEvent('pointerdown',{pointerId:77,pointerType:'touch',isPrimary:true,clientX:cx,clientY:cy,bubbles:true}); await m.waitForTimeout(120);
+            let center=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput); ok(center.joystickDeflection<0.02&&center.touch===false&&center.direct===false&&center.active===false,'center touch incorrectly attested');
+            await stick.dispatchEvent('pointermove',{pointerId:77,pointerType:'touch',isPrimary:true,clientX:cx+30,clientY:cy,bubbles:true}); await m.waitForTimeout(120);
+            let moved=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput); ok(moved.joystickDeflection>0.5&&moved.touch===true&&moved.direct===true&&moved.active===true,'deflected joystick not attested');
+            await stick.dispatchEvent('pointerup',{pointerId:77,pointerType:'touch',isPrimary:true,clientX:cx+30,clientY:cy,bubbles:true});
+            out.mobile={pass:true,renderer:mr,gateVerified:true,sourceBound:'v93',startVisible:true,centerTouchDirect:false,centerDeflection:center.joystickDeflection,deflectedTouchDirect:true,deflectedValue:moved.joystickDeflection,pageErrors:me}; await mc.close();
+            out.pass=out.failClosed.pass&&out.desktop.pass&&out.mobile.pass; ok(out.pass,'aggregate'); fs.writeFileSync('human-v2-2-qa.json',JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2));
+          }finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node qa.cjs
+      - name: Publish candidate QA evidence
+        run: |
+          set -euo pipefail
+          git worktree add /tmp/pages gh-pages
+          cp human-v2-2-qa.json /tmp/pages/human-acceptance-recorder-v2-2-source-v93-publicbrowserqa-v1.json
+          sha256sum human-v2-2-qa.json | awk '{print $1}' > /tmp/pages/human-acceptance-recorder-v2-2-source-v93-publicbrowserqa-v1.sha256
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add human-acceptance-recorder-v2-2-source-v93-publicbrowserqa-v1.json human-acceptance-recorder-v2-2-source-v93-publicbrowserqa-v1.sha256
+          git commit -m 'Publish Source v93 recorder v2.2 candidate QA'
+          git push origin gh-pages
