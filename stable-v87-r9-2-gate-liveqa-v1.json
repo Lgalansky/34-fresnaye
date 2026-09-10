@@ -1,0 +1,43 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableGateV24_SourceV87_LiveBrowserQA_v1",
+  "timestampUtc": "2026-09-10T03:42:44.616Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v87",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gateUrl": "https://lgalansky.github.io/34-fresnaye/walkthrough-review.html",
+  "humanAcceptanceRecorderUrl": "https://lgalansky.github.io/34-fresnaye/walkthrough-human-acceptance.html",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v87",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "decision": "NO_OP_SHORT_CIRCUIT",
+    "preferredReviewUrl": "v96-r9/#entrance",
+    "pageErrors": []
+  },
+  "recorder": {
+    "pass": true,
+    "ready": true,
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "sameOriginFrameAccessible": true,
+    "requirements": {
+      "sequence": [
+        "Entrance",
+        "Living",
+        "Kitchen",
+        "Main Bedroom",
+        "Entrance"
+      ],
+      "minimumDistanceM": 40,
+      "minimumDurationS": 12,
+      "waypointRadiusM": 1.25,
+      "maxContinuousStepM": 1.6
+    },
+    "pageErrors": []
+  },
+  "pass": true
+}
