@@ -1,0 +1,91 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-10",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v96",
+    "sha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "bytes": 253348,
+    "policy": "REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v90",
+    "handoffSha256": "c4ba2510b0e65dfdf16db307e2f2bc70a008e7e1fdd2c657d765acaf5ac7d7d0",
+    "classificationSha256": "7feffcf0c3b34bee4c96a963db02fc1b18350d2f57db38e0d263730089a0acd2",
+    "level02Effect": "NONE",
+    "effectSource": "CLASSIFICATION_BRIDGE",
+    "geometryAuthorization": false,
+    "canonicalGeometryChanged": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "sourceOnlyQaBridge": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_GEOMETRY_AUTHORIZATION_FALSE",
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "source_effect_classification_bridge",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE",
+    "NO_STATUS_TRANSFER_BETWEEN_SEPARATE_CONDITIONS",
+    "NO_IMPLICIT_SOURCE_EFFECT_WHEN_HANDOFF_OMITS_EFFECT"
+  ],
+  "currentAction": "SOURCE_V90_LEVEL01_STAIR_SOFFIT_SEMANTIC_OWNERSHIP_ONLY__LEVEL02_PASS_UNCHANGED__NO_LEVEL02_GEOMETRY_PATCH__REUSE_EXACT_V96_BY_HASH",
+  "currentDecision": "NO_OP_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Locks": [
+    "Named CIRCULAR CEILING STEPPED BULKHEAD OVER TOILET CUBICLE: exact written curve/step construction.",
+    "VAULTED CEILING OVER ENTRANCE and VAULTED CEILING OVER NEW KITCHEN are named; explicit 2860/2860/2610 vaulted AFFL witnesses remain unmapped to named conditions; Michael/Archilab verbal vault conditions remain design-not-frozen.",
+    "Any other curved/unwitnessed Level02 ceiling transition lacking its own complete written construction witness."
+  ],
+  "sourceOnlyAdvance": {
+    "status": "L01_STAIR_SOFFIT_SEMANTIC_OWNERSHIP_ONLY",
+    "level": "L01",
+    "subject": "NO CEILING IN THIS AREA and LINE OF CEILING SLOPING DOWN FROM SOFFIT OF STAIRCASE",
+    "finding": "Source v90 closes the semantic no-ceiling zone and requirement for a sloping ceiling edge down from the stair soffit. Written angle, rise/run, start/end AFFLs and termination chain remain absent, so exact stair-soffit geometry is locked.",
+    "geometryAction": "NONE"
+  }
+}
