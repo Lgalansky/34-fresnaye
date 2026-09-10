@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T08:26:16+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume only explicit written Archilab dimensions, IDs, FFLs, sections/elevations, brickwork dimensions and schedules. Native PDF/vector coordinates may establish annotation ownership only; never convert page distances to architectural dimensions, visually scale drawings, repair tags by assumption, or invent missing geometry.",
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v90_stair_soffit_semantics",
+  "predecessor": "34_Fresnaye_SourceArchitect_handoff_v89_vault_affl_instances.json",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L01_STAIR_NO_CEILING_AND_SLOPING_EDGE_SEMANTICS_SOURCE_CLOSED__EXACT_STAIR_SOFFIT_GEOMETRY_STILL_LOCKED__NO_NEW_ARCHILAB_SECTION__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": "brickwork rough1790 / U-S2400; schedule component separately2685x2400",
+      "L02_D22_former_D21_physical_instance1": "corrected ID; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400; schedule1660x2100 separate",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / central leaf / 25mm side clearances; exact leaf thickness approximate only; schedule1300x2400 separate",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / central leaf / 20mm side clearances; exact leaf thickness approximate only; schedule955x2400 separate"
+    },
+    "current_locks": [
+      "Named CIRCULAR CEILING STEPPED BULKHEAD OVER TOILET CUBICLE: exact curve/step construction remains open.",
+      "VAULTED CEILING OVER ENTRANCE and VAULTED CEILING OVER NEW KITCHEN are named; explicit 2860/2860/2610 vaulted AFFL witnesses remain unmapped to named conditions.",
+      "Michael/Archilab 2026-09-09 verbal vault conditions remain design-not-frozen and are not paired to plan labels/AFFLs by inference.",
+      "Other curved/unwitnessed Level02 ceiling transitions lacking complete explicit construction witness."
+    ]
+  },
+  "v90_material_advance": {
+    "level": "L01",
+    "subject": "Stair soffit / no-ceiling condition semantic ownership",
+    "finding": "FRE_WD_211_REV_B explicitly states NO CEILING IN THIS AREA and LINE OF CEILING SLOPING DOWN FROM SOFFIT OF STAIRCASE. This closes the no-ceiling-zone and sloping-edge design intent, but no written angle, rise/run, owned start/end AFFLs or termination dimension chain is provided.",
+    "impact": "Narrows the old generic stair-soffit exception. Build stages may treat the annotated zone as no-ceiling and preserve a sloping edge requirement, but exact soffit/slope geometry remains locked. Nearby 2400/2200 AFFL tags and the separate 2910 shadow-line detail are not transferred."
+  },
+  "source_watch": "Fresh Outlook searches for Archilab and Michael Borgstrom received on/after 2026-09-10 returned no results. Latest known architect inbound remains 2026-09-09T16:41:59Z RE: Render with no attachment; promised quick section still not received.",
+  "later_stage_open_summary": [
+    "L01: exact stair-soffit slope/profile/endpoints remain open despite semantic closure; complex curved/stepped/nested ceiling boundaries; D11 brickwork tag/rough width; W06 rough width; W08 head; W04/W05/W06 25mm interface allocations.",
+    "L03: D02 duplicate schedule/system ownership; D04 component schedule omission; iD02 2100-vs-2150 conflict; skylight IDs/interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04: main Mazista written assembly conflict; main-roof numeric pitch/eaves/ridge extents; lean-to quantitative run/eave/ridge-edge geometry; quarantined 370mm parapet-adjacent condition. 3 degrees remains lean-to only."
+  ],
+  "chief_of_staff_action": "Adopt v90 as a source-safety refinement over v89. Keep Level02 priority five closed. For L01 stair zone, consume only the explicit no-ceiling condition and the requirement that the ceiling edge slopes down from the staircase soffit; keep exact slope/profile/endpoints locked until Archilab provides written construction. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level01_StairSoffit_WrittenConditionEvidenceRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level01_StairSoffit_ExactGeometryException_v1.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v73.json",
+    "34_Fresnaye_SourceArchitect_Run90_ArtifactManifest_v1.json"
+  ]
+}
