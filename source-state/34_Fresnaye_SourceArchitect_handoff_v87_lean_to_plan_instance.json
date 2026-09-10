@@ -29,7 +29,7 @@
   },
   "v87_material_advance": {
     "level": "L04",
-    "subject": "Separate 3-degree lean-to roof — FRE_WD_204 plan-instance ownership",
+    "subject": "Separate 3-degree lean-to roof \u2014 FRE_WD_204 plan-instance ownership",
     "finding": "Native-PDF ownership audit of FRE_WD_204 shows the written 3-degree lean-to construction note has its own vector leader terminating at a filled marker inside one distinct rectangular roof-plan element. This closes which plan instance the 3-degree condition belongs to without deriving any dimension from the page graphic.",
     "impact": "The prior 'plan extent not assigned' ambiguity is narrowed: exact plan-instance identity is now source-closed. Written run, eave projection and exact ridge/edge coordinates remain open. Domestic Quarters roof-plan overall 6515/9190 must not be transferred to the lean-to."
   },
