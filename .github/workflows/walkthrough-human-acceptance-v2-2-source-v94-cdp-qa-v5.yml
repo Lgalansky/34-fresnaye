@@ -1,0 +1,61 @@
+name: Walkthrough recorder v2.2 Source v94 real-touch QA v5
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-human-acceptance-v2-2-source-v94-cdp-qa-v5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify exact candidate with browser-native touch stream
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const URL=ROOT+'walkthrough-human-acceptance-v2-2.html';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const REC='06cd076b31795328f6e9bcfda22b5c02b98500a40eedef6350ae13535ea46885';
+          const out={artifact:'34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV94_RealTouch_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v94',recorderVersion:'v2',codeRevision:'v2.2-joystick-deflection-attestation',recorderSha256:REC,viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,failClosed:{},desktop:{},mobile:{},pass:false,stage:'init'};
+          const save=()=>fs.writeFileSync('qa.json',JSON.stringify(out,null,2)+'\n'); const ok=(v,m)=>{if(!v)throw Error(m)}; const viewer=p=>p.frames().find(f=>f.url().includes('/34-fresnaye/v96-r9/'));
+          (async()=>{let b;try{
+            out.stage='launch'; b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            const fc=await b.newContext({viewport:{width:1280,height:720}}),fp=await fc.newPage(),fe=[];fp.on('pageerror',e=>fe.push(String(e))); await fp.route('**/walkthrough-review.html?humanAcceptance=2**',r=>r.fulfill({status:200,contentType:'text/html',body:'<!doctype html><script>window.__FRESNAYE_STABLE_GATE_QA={pass:false,error:"synthetic gate failure"}</script>'})); await fp.goto(URL+'?fc='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000}); await fp.waitForFunction(()=>document.querySelector('#status')?.textContent.startsWith('BLOCKED'),{}, {timeout:30000}); const fqa=await fp.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA); ok(!fqa.ready&&!fqa.gateVerified&&(await fp.locator('#walk').getAttribute('src'))==='about:blank'&&!fe.length,'failclosed'); out.failClosed={pass:true,walkthroughRemainedBlank:true,pageErrors:fe}; await fc.close();
+            out.stage='desktop'; const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));let gates=0;p.on('request',r=>{if(r.url().includes('/walkthrough-review.html?humanAcceptance=2'))gates++}); await p.goto(URL+'?d='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000}); await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000}); let dq=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),df=viewer(p);ok(df,'desktop viewer');let dr=await df.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);ok(dq.sourceArchitect==='v94'&&dq.viewerSha256===V&&dq.modelSha256===M&&dq.codeRevision==='v2.2-joystick-deflection-attestation'&&dr==='WebGL2','desktop identity');await p.getByRole('button',{name:'Start human route'}).click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});await p.frameLocator('#walk').locator('#next').click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.invalid===true,{}, {timeout:10000});dq=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(gates>=2&&/shortcut/.test(dq.session.reason)&&!de.length,'desktop guards');out.desktop={pass:true,renderer:dr,gateRequests:gates,startFreshVerification:true,shortcutInvalidated:true,pageErrors:de};await dc.close();
+            out.stage='mobile'; const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await m.goto(URL+'?m='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});let mf=viewer(m);ok(mf,'mobile viewer');let mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),mr=await mf.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);ok(mq.sourceArchitect==='v94'&&mq.viewerSha256===V&&mq.modelSha256===M&&mq.requirements?.minimumJoystickDeflection===0.08&&mq.requirements?.joystickDeflectionAttestation===true&&mr==='WebGL2','mobile identity');await m.getByRole('button',{name:'Start human route'}).click();await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});
+            const iframeBox=await m.locator('#walk').boundingBox(); const local=await mf.locator('#stick').evaluate(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}});ok(iframeBox&&local,'touch geometry');const x=iframeBox.x+local.x+local.width/2,y=iframeBox.y+local.y+local.height/2; const cdp=await mc.newCDPSession(m); const pt=(px,py)=>[{x:px,y:py,radiusX:6,radiusY:6,force:1,id:1}];
+            await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pt(x,y)});await m.waitForTimeout(180);const center=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput);const knob0=await mf.locator('#knob').evaluate(el=>el.style.transform);await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:pt(x+30,y)});await m.waitForTimeout(180);const moved=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput);const knob1=await mf.locator('#knob').evaluate(el=>el.style.transform);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await m.waitForTimeout(100);const ended=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput);
+            ok(center.joystickDeflection<0.02&&center.touch===false&&center.direct===false,'center '+JSON.stringify(center));ok(moved.joystickDeflection>0.5&&moved.touch===true&&moved.direct===true&&moved.active===true,'moved '+JSON.stringify(moved));ok(ended.touch===false&&ended.direct===false,'end '+JSON.stringify(ended));ok(!me.length,'mobile errors '+JSON.stringify(me));out.mobile={pass:true,renderer:mr,gateVerified:true,sourceBound:'v94',inputMethod:'Chromium CDP Input.dispatchTouchEvent',frameOffset:{x:iframeBox.x,y:iframeBox.y},stickRectLocal:local,centerTouchDirect:false,centerDeflection:center.joystickDeflection,centerKnobTransform:knob0,deflectedTouchDirect:true,deflectedValue:moved.joystickDeflection,deflectedKnobTransform:knob1,endTouchDirect:false,pageErrors:me};await mc.close();out.pass=true;out.stage='complete';
+          }catch(e){out.error=String(e?.stack||e)}finally{try{await b?.close()}catch{}save();console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
+          JS
+          node qa.cjs
+      - name: Publish QA evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          test -s qa.json || printf '{"artifact":"34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV94_RealTouch_PublicBrowserQA_v1","pass":false,"error":"QA missing"}\n' > qa.json
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp qa.json /tmp/pages/human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.json
+          sha256sum qa.json | awk '{print $1}' > /tmp/pages/human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.sha256
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.json human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.sha256
+          git commit -m 'Publish Source v94 recorder v2.2 real-touch QA' || true
+          git push origin HEAD:gh-pages
