@@ -1,0 +1,73 @@
+name: Walkthrough v96 stable v88 r9.2 Gate Live QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-v88-r9-2-gate-liveqa-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify gate bytes and JavaScript
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          curl -fsSL --retry 5 --retry-delay 2 "$B/walkthrough-review.html?gate=$GITHUB_RUN_ID" -o /tmp/gate.html
+          test "$(sha256sum /tmp/gate.html | awk '{print $1}')" = 'ab64776d420004c638a8f2e88fb15a8c98c28d2377e55631cb2b537a1e0374a4'
+          grep -q 'v25-source-dynamic-classification-bridge-r9.2' /tmp/gate.html
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/gate.html').read(); m=re.search(r'<script>\n([\s\S]*?)\n</script>',t); assert m
+          open('/tmp/gate.js','w').write(m.group(1))
+          PY
+          node --check /tmp/gate.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify live gate, walkthrough and acceptance recorder
+        run: |
+          cat > gateqa.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV88R9_2_GateLiveQA_v1',timestampUtc:new Date().toISOString(),gateRevision:'v25',sourceArchitect:'v88',effectMode:'CLASSIFICATION_BRIDGE',planner:'34_Fresnaye_GeometryDeltaPlanner_v7',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,gate:{},walkthrough:{},acceptanceRecorder:{},pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const c=await b.newContext({viewport:{width:1365,height:768}}),p=await c.newPage(),errs=[];p.on('pageerror',e=>errs.push(String(e)));await p.goto(ROOT+'walkthrough-review.html?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__FRESNAYE_STABLE_GATE_QA&&typeof window.__FRESNAYE_STABLE_GATE_QA.pass==='boolean',{}, {timeout:120000});const g=await p.evaluate(()=>window.__FRESNAYE_STABLE_GATE_QA);ok(g.pass,'stable gate blocked '+JSON.stringify(g));ok(g.sourceArchitect==='v88'&&g.effectMode==='CLASSIFICATION_BRIDGE'&&g.planner==='34_Fresnaye_GeometryDeltaPlanner_v7','gate source/effect/planner mismatch');ok(g.viewerSha256===V&&g.modelSha256===M&&g.decision==='NO_OP_SHORT_CIRCUIT','gate identity/decision mismatch');ok(g.loaderOk&&g.swOk&&g.qaOk&&g.liveQaOk&&g.startResetOk&&g.identity&&g.sourceOk&&g.effectOk&&g.pipeOk&&!errs.length,'gate subcheck/page error');out.gate={pass:true,sourceArchitect:g.sourceArchitect,effectMode:g.effectMode,planner:g.planner,decision:g.decision,loaderOk:g.loaderOk,swOk:g.swOk,portableQaOk:g.qaOk,currentSourceLiveQaOk:g.liveQaOk,startResetOk:g.startResetOk,identityOk:g.identity,sourceOk:g.sourceOk,effectOk:g.effectOk,pipelineOk:g.pipeOk,liveBrowserQaSha256:g.liveBrowserQaSha256,pageErrors:errs};
+            const w=await c.newPage(),we=[];w.on('pageerror',e=>we.push(String(e)));await w.goto(ROOT+'v96-r9/?gateqa='+Date.now()+'#entrance',{waitUntil:'domcontentloaded',timeout:120000});await w.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:120000});const tm=await w.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await w.evaluate(()=>window.__FRESNAYE_LIVE_META),rr=await w.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(tm.viewerSha256===V&&tm.modelSha256===M&&tm.packageMode==='self-contained-static-host-r9.2-scope-isolated','walkthrough transport identity');ok(lm.renderer==='WebGL2'&&rr.pass&&rr.mainRoute.collisionValidated&&!we.length,'walkthrough readiness');out.walkthrough={pass:true,renderer:lm.renderer,loaderMode:tm.loaderMode,packageMode:tm.packageMode,collisionValidated:rr.mainRoute.collisionValidated,pageErrors:we};
+            const r=await c.newPage(),re=[];r.on('pageerror',e=>re.push(String(e)));await r.goto(ROOT+'walkthrough-human-acceptance.html?gateqa='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await r.waitForFunction(()=>window.__FRESNAYE_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});const aq=await r.evaluate(()=>window.__FRESNAYE_ACCEPTANCE_QA);ok(aq.viewerSha256===V&&aq.modelSha256===M&&!re.length,'acceptance recorder identity/errors');out.acceptanceRecorder={pass:true,ready:aq.ready,viewerSha256:aq.viewerSha256,modelSha256:aq.modelSha256,requirements:aq.requirements,pageErrors:re};await c.close();out.pass=true;
+          }catch(e){out.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('stable-v88-r9-2-gate-liveqa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
+          JS
+          node --check gateqa.cjs
+          node gateqa.cjs
+      - name: Persist gate QA evidence to gh-pages
+        if: always()
+        run: |
+          set -euo pipefail
+          test -s stable-v88-r9-2-gate-liveqa-v1.json
+          git fetch origin gh-pages
+          git worktree add /tmp/ghp origin/gh-pages
+          cp stable-v88-r9-2-gate-liveqa-v1.json /tmp/ghp/stable-v88-r9-2-gate-liveqa-v1.json
+          cd /tmp/ghp
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v88-r9-2-gate-liveqa-v1.json
+          git commit -m 'Persist Source v88 stable gate v25 QA' || true
+          git push origin HEAD:gh-pages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stable-v88-r9-2-gate-liveqa-v1
+          path: stable-v88-r9-2-gate-liveqa-v1.json
