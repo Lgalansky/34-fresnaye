@@ -1,0 +1,65 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v104_L03_S03_schedule_dimension_omission_hardening",
+  "source_architect_version": "v104",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T00:36:00+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L03_S03_CONFIRMED_AUTHORITATIVE_SCHEDULE_DIMENSION_OMISSION__S01_S02_SCHEDULE_1500x2100_RETAINED_COMPONENT_ONLY__WHOLE_HOUSE_REGISTERS_RECONCILED_THROUGH_V104__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": {
+        "rough_width_mm": 1790,
+        "u_s_opening_mm": 2400
+      },
+      "L02_D22_corrected_former_D21_physical_instance_1": {
+        "rough_width_mm": 2980,
+        "u_s_opening_mm": 2210,
+        "assembly_mm": {
+          "overall": 6240,
+          "inner": 3080,
+          "height": 2210
+        }
+      },
+      "L02_W11": {
+        "rough_width_mm": 1800,
+        "u_s_opening_mm": 2090,
+        "finished_wall_thickness_mm": 400
+      },
+      "L02_iD05": {
+        "rough_width_mm": 1200,
+        "u_s_opening_mm": 2400,
+        "pocket_mm": 100,
+        "side_clearance_mm_each": 25
+      },
+      "L02_iD08": {
+        "rough_width_mm": 855,
+        "u_s_opening_mm": 2400,
+        "pocket_mm": 90,
+        "side_clearance_mm_each": 20
+      }
+    }
+  },
+  "v104_material_advance": {
+    "level": "L03",
+    "subject": "S03 louvered-grille schedule dimension omission hardening",
+    "finding": "Exact native-text occurrence audit across all 17 tender pages finds L03_S03 on FRE_WD_204, 302, 303, 304 and 402. Identity/count/function are explicit, but none provides S03-owned width or height. FRE_WD_402 explicitly dimensions S01 and S02 at 1500x2100; those witnesses are not S03 dimensions.",
+    "impact": "Converts S03 from a generic missing-size exception into a confirmed authoritative schedule-dimension omission. No geometry can be released for S03 overall size until Archilab supplies written dimensions."
+  },
+  "current_L02_locks": [
+    "Entrance vault pair final/current post-workshop Archilab freeze/reissue remains open; preliminary 2900 AFFL sections are not final geometry.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy remain open.",
+    "Separate 2610 vaulted condition remains source-preserved but semantically unassigned if later build scope requires it."
+  ],
+  "later_stage_open_summary": [
+    "L01: D11 masonry rough width only; W06 masonry rough width; W08 masonry head; W04/W05/W06 25mm interface meanings; complex ceiling boundaries; stair soffit exact geometry.",
+    "L03: D02 duplicate schedule-system conflict; D04 confirmed component schedule omission; iD02 2100-vs-2150 conflict; skylight interfaces/IDs; S01/S02 masonry heads; S03 confirmed schedule dimension omission.",
+    "L04: Mazista/Klip-Lok assembly conflict; main-roof numeric pitch and horizontal eave/ridge geometry (vertical roof datums closed); lean-to quantitative run/eave/ridge-edge."
+  ],
+  "source_watch": "No newer Archilab inbound after 2026-09-10T12:24:08Z; latest vault source remains preliminary.",
+  "chief_of_staff_action": "Retain priority five as closed. Treat S03 width/height as a confirmed Archilab schedule omission and keep locked. Do not transfer S01/S02 1500x2100. Use whole-house readiness v2 and exceptions v3 as current source-state indexes. No canonical geometry edit.",
+  "geometry_action": "NONE"
+}
