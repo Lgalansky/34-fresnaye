@@ -1,0 +1,76 @@
+name: Walkthrough recorder v2.2 Source v94 diagnostic v4
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-human-acceptance-v2-2-source-v94-diagnostic-v4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run diagnostic
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const URL=ROOT+'walkthrough-human-acceptance-v2-2.html';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const out={artifact:'34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV94_DiagnosticQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v94',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,stage:'init',observations:{},pass:false};
+          const save=()=>fs.writeFileSync('diag.json',JSON.stringify(out,null,2)+'\n');
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const vf=p=>p.frames().find(fr=>fr.url().includes('/34-fresnaye/v96-r9/'));
+          (async()=>{let b;try{
+            out.stage='launch'; b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            out.stage='mobile-load'; const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));
+            await m.goto(URL+'?diag='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});
+            await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});
+            let q=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA); out.observations.initial={qa:q,pageErrors:me};
+            const mf=vf(m); ok(mf,'mobile viewer missing'); const renderer=await mf.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer); out.observations.renderer=renderer;
+            out.stage='start'; await m.getByRole('button',{name:'Start human route'}).click(); await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});
+            q=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA); out.observations.afterStart=q;
+            out.stage='center'; const stick=mf.locator('#stick'); const box=await stick.evaluate(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}}); out.observations.stickRectFrameLocal=box; ok(box&&box.width>20&&box.height>20,'stick bbox');
+            const cx=box.x+box.width/2,cy=box.y+box.height/2;
+            await stick.dispatchEvent('pointerdown',{pointerId:77,pointerType:'touch',isPrimary:true,clientX:cx,clientY:cy,bubbles:true}); await m.waitForTimeout(150);
+            const center=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput); out.observations.center=center;
+            out.stage='deflected'; await stick.dispatchEvent('pointermove',{pointerId:77,pointerType:'touch',isPrimary:true,clientX:cx+30,clientY:cy,bubbles:true}); await m.waitForTimeout(150);
+            const moved=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA.currentInput); out.observations.deflected=moved;
+            await stick.dispatchEvent('pointerup',{pointerId:77,pointerType:'touch',isPrimary:true,clientX:cx+30,clientY:cy,bubbles:true});
+            out.stage='assert';
+            ok(q.sourceArchitect==='v94','source '+q.sourceArchitect); ok(q.viewerSha256===V&&q.modelSha256===M,'identity'); ok(renderer==='WebGL2','renderer '+renderer);
+            ok(q.requirements?.joystickDeflectionAttestation===true,'deflection requirement missing');
+            ok(center&&center.joystickDeflection<0.02&&center.touch===false&&center.direct===false&&center.active===false,'center state '+JSON.stringify(center));
+            ok(moved&&moved.joystickDeflection>0.5&&moved.touch===true&&moved.direct===true&&moved.active===true,'deflected state '+JSON.stringify(moved));
+            ok(me.length===0,'page errors '+JSON.stringify(me)); out.pass=true; out.stage='complete'; await mc.close();
+          }catch(e){out.error=String(e?.stack||e)}finally{try{await b?.close()}catch{} save(); console.log(JSON.stringify(out,null,2));} if(!out.pass)process.exit(1)})();
+          JS
+          node qa.cjs
+      - name: Publish diagnostic evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          test -s diag.json || printf '{"artifact":"34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV94_DiagnosticQA_v1","pass":false,"error":"diagnostic missing"}\n' > diag.json
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp diag.json /tmp/pages/human-acceptance-recorder-v2-2-source-v94-diagnostic-v1.json
+          sha256sum diag.json | awk '{print $1}' > /tmp/pages/human-acceptance-recorder-v2-2-source-v94-diagnostic-v1.sha256
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add human-acceptance-recorder-v2-2-source-v94-diagnostic-v1.json human-acceptance-recorder-v2-2-source-v94-diagnostic-v1.sha256
+          git commit -m 'Publish recorder v2.2 Source v94 diagnostic' || true
+          git push origin HEAD:gh-pages
