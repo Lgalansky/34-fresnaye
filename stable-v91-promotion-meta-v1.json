@@ -1,0 +1,14 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_SourceV91_StablePromotionMeta_v1",
+  "timestampUtc": "2026-09-10T06:45:51.345115Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v91",
+  "sourceHandoffSha256": "0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522",
+  "sourceBrowserQaSha256": "e06996e97e8b68e818f41253aa5d540cce63cd9f96d310a392a93012c796d190",
+  "manifest": "34_Fresnaye_Walkthrough_StableReviewManifest_v30",
+  "manifestSha256": "2e3b459d9b819980aca7b62bdf4884c5c0b560998cee22aadbcf8d09aa06293f",
+  "stableGateRevision": "v26",
+  "stableGateSha256": "0fe8ca506f60503c41992e4f27a18d42ba701b4bdc008542afb0db28a5b9ba6a",
+  "launcherVersion": "v1",
+  "launcherSha256": "c1934e5c38abc1638311f7086eec83829dc063392e8e80e8cf48318d8d7497c7"
+}
