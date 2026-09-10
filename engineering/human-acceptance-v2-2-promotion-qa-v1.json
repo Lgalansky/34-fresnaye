@@ -1,0 +1,20 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_HumanAcceptance_v2_2_Promotion_QA_v1",
+  "timestampUtc": "2026-09-10T10:39:20.119680Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "canonicalModel": "v23",
+  "viewerVersion": "v96",
+  "recorderCodeRevision": "v2.2-joystick-deflection-attestation",
+  "recorderSha256": "06cd076b31795328f6e9bcfda22b5c02b98500a40eedef6350ae13535ea46885",
+  "payloadSha256": "e38bb204d0081c41ad6801b6547ecfb0efa094c4e796f17c2a7499da5e5acaf2",
+  "realTouchQaEvidence": "human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.json",
+  "realTouchQaSha256": "c63f1aecc0198e8e9d8bbfe7f756656d3cc4e46fed115af14e32e66620b74ef1",
+  "gateRevision": "v28",
+  "gateSha256": "8dcaa489a0371e99de01df2ca7e1d136d4ff330fad08d465ffe0a8e0efa1509f",
+  "centerTouchDirect": false,
+  "centerDeflection": 0,
+  "deflectedTouchDirect": true,
+  "deflectedValue": 0.698,
+  "pass": true
+}

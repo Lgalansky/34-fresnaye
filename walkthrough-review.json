@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v36",
-  "schemaVersion": 36,
-  "updatedUtc": "2026-09-10T10:18:27.886332Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v37",
+  "schemaVersion": 37,
+  "updatedUtc": "2026-09-10T10:39:20.119448Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -78,12 +78,12 @@
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "revision": "v27",
-    "sha256": "bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b",
-    "liveQaEvidence": "stable-v94-r9-2-gate-v27-liveqa-v1.json",
-    "liveQaSha256": "dfa407d690d460e7556160a2957f81ad2435267169680bad3262d276cbdd42ea",
-    "liveQaRun": 34465206390,
-    "liveQaJob": 102832046039
+    "revision": "v28",
+    "sha256": "8dcaa489a0371e99de01df2ca7e1d136d4ff330fad08d465ffe0a8e0efa1509f",
+    "liveQaEvidence": "stable-v94-r9-2-gate-v28-liveqa-v1.json",
+    "liveQaSha256": "PENDING",
+    "liveQaRun": 0,
+    "liveQaJob": 0
   },
   "acceptance": {
     "finalStatus": "OPEN",
@@ -95,12 +95,12 @@
     "stableTransportPromotedTo": "r9.2",
     "humanAcceptanceRecorderUrl": "walkthrough-human-acceptance.html",
     "humanAcceptanceRecorderRevision": "v2",
-    "humanAcceptanceRecorderCodeRevision": "v2.1-manual-control-attestation",
-    "humanAcceptanceRecorderSha256": "ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37",
-    "humanAcceptanceRecorderQaEvidence": "human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v2.json",
-    "humanAcceptanceRecorderQaSha256": "67dbb2da2531274446f876c49684e8a3a2ee7e3c355378705374332a6d41147a",
-    "humanAcceptanceRecorderQaRun": 34459475902,
-    "humanAcceptanceRecorderQaJob": 102813606337,
+    "humanAcceptanceRecorderCodeRevision": "v2.2-joystick-deflection-attestation",
+    "humanAcceptanceRecorderSha256": "06cd076b31795328f6e9bcfda22b5c02b98500a40eedef6350ae13535ea46885",
+    "humanAcceptanceRecorderQaEvidence": "human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.json",
+    "humanAcceptanceRecorderQaSha256": "c63f1aecc0198e8e9d8bbfe7f756656d3cc4e46fed115af14e32e66620b74ef1",
+    "humanAcceptanceRecorderQaRun": 34466880199,
+    "humanAcceptanceRecorderQaJob": 102837413391,
     "humanAcceptanceRecorderGuards": [
       "ordered waypoint sequence",
       "minimum 40 m distance",
@@ -112,7 +112,9 @@
       "active keyboard/touch movement attestation",
       "manual movement must be >=85% of recorded distance",
       "minimum 1 m manual movement on each route leg",
-      "uncontrolled movement >1 m invalidates"
+      "uncontrolled movement >1 m invalidates",
+      "touch locomotion requires measurable joystick deflection >=0.08",
+      "center/resting joystick touch does not attest movement"
     ],
     "humanAcceptanceRecorderFreshGateOnStart": true,
     "humanAcceptanceRecorderFailClosed": true,
@@ -122,13 +124,13 @@
     "minimumManualMovementPerLegM": 1,
     "maximumUncontrolledMovementM": 1,
     "sourceV94ManifestPromotionRun": 34465094827,
-    "quarantinedCandidate": {
-      "path": "walkthrough-human-acceptance-v2-2.html",
-      "codeRevision": "v2.2-joystick-deflection-attestation",
-      "status": "NOT_PROMOTED",
-      "reason": "Source-v93 v2.2-specific Playwright QA failed the center-touch deflection attestation; stable remains v2.1 until corrected and fully reverified."
-    },
     "sourceV94RealGateVerified": true,
-    "sourceV94RealGateLiveQaEvidence": "stable-v94-r9-2-gate-v27-liveqa-v1.json"
+    "sourceV94RealGateLiveQaEvidence": "stable-v94-r9-2-gate-v27-liveqa-v1.json",
+    "humanAcceptanceRecorderPayloadSha256": "e38bb204d0081c41ad6801b6547ecfb0efa094c4e796f17c2a7499da5e5acaf2",
+    "joystickDeflectionAttestation": true,
+    "minimumJoystickDeflection": 0.08,
+    "centerTouchDoesNotAttestMovement": true,
+    "sourceV94RealTouchRecorderVerified": true,
+    "sourceV94RealTouchRecorderEvidence": "human-acceptance-recorder-v2-2-source-v94-realtouch-publicbrowserqa-v1.json"
   }
 }
