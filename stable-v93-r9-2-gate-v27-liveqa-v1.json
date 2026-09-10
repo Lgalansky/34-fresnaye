@@ -1,0 +1,37 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_StableV93_GateV27_LiveQA_v1",
+  "timestampUtc": "2026-09-10T08:51:25.657Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v93",
+  "gateRevision": "v27",
+  "gateSha256": "bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b",
+  "manifestSha256": "e4b5fd69c233029cf47d9416ad81a1c43b72e4fc52078de3bdab14a286bd6bf7",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v93",
+    "effectMode": "CLASSIFICATION_BRIDGE",
+    "decision": "NO_OP_SHORT_CIRCUIT",
+    "humanOk": true,
+    "humanRecorderSha256": "ab56173d527aa523fad0e19fcf58ad72087a872cee8c7888bea54473e277f4dc",
+    "humanRecorderQaSha256": "f0c7af9e76e571183897736e4cb04098477eec13f766f9216bba80057c280157",
+    "pageErrors": []
+  },
+  "launcher": {
+    "pass": true,
+    "finalUrl": "https://lgalansky.github.io/34-fresnaye/v96-r9/#entrance",
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "pageErrors": []
+  },
+  "recorder": {
+    "pass": true,
+    "sourceArchitect": "v93",
+    "gateVerified": true,
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "pageErrors": []
+  },
+  "pass": true
+}
