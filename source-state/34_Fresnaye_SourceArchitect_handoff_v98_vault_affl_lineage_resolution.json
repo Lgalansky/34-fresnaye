@@ -1,0 +1,48 @@
+{
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T16:24:36+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Use explicit written Archilab dimensions, IDs, FFLs, section/elevation dimensions, brickwork drawings and schedules only. Page/vector/image position may establish annotation ownership only; never convert drawn distance to millimetres, visually scale, curve-fit, normalize conflicts, or invent missing construction.",
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v98_vault_affl_lineage_resolution",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__ENTRANCE_VAULT_HISTORICAL_2860_OWNERSHIP_RESOLVED__CURRENT_2900_PRELIMINARY__2610_REMOVED_FROM_ENTRANCE_RECONCILIATION__FINAL_FREEZE_OPEN__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "closed_values": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22_corrected_former_D21_physical_instance_1": "rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / 25mm side clearances",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / 20mm side clearances"
+    }
+  },
+  "v98_material_advance": {
+    "level": "L02",
+    "subject": "Entrance Lobby vaulted-ceiling AFFL lineage",
+    "finding": "The 2026-09-08 answer sheet and 2026-09-10 preliminary vault sheet use the same written local dimension-chain fingerprint around the same two vaulted fields. The older sheet labels both fields 2860mm AFFL; the new preliminary sheet labels both 2900mm AFFL. The historical ownership ambiguity is therefore resolved. The separate 2610mm vaulted annotation lies outside this local chain and is excluded from the entrance pair.",
+    "delta_boundary": "2900-2860 = +40mm for each entrance field is arithmetic lineage only, not a general build-up/tolerance rule.",
+    "design_status": "2900mm and the section geometry remain PRELIMINARY_SUBJECT_TO_CHANGE pending Michael/Laura refinement/final confirmation."
+  },
+  "current_level02_locks": [
+    "Final post-workshop/final-current freeze for both entrance-hall vaults.",
+    "Circular stepped toilet-cubicle bulkhead exact radius/diameter, vertical centre, stepped-ring widths/offsets, transitions/tangencies and outer-band AFFL hierarchy.",
+    "Any other Level02 curved/unwitnessed transition lacking written construction evidence."
+  ],
+  "later_stage_open_summary": [
+    "L01: exact stair-soffit slope/profile/endpoints; complex curved/stepped/nested ceiling boundaries; D11 brickwork tag/rough width; W06 rough width; W08 head; W04/W05/W06 25mm interface allocations.",
+    "L03: D02 duplicate schedule-ID/system conflict; D04 component schedule omission; iD02 2100-vs-2150 written conflict; skylight IDs/interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04: main Mazista/Klip-Lok assembly conflict; main-roof numeric pitch/eaves/ridge extents; lean-to quantitative run/eave/ridge-edge geometry. 370mm parapet rise remains source-closed."
+  ],
+  "chief_of_staff_action": "Adopt Level02 IntegratedStageReadinessRegister v4 and CeilingSourceRegister v1. Remove the 2610mm witness from the Entrance Lobby vault reconciliation list; retain it as a separate condition. Treat the two 2900mm values as current preliminary updates to the same fields previously labelled 2860mm, but keep geometry authorization blocked until Archilab freezes/reissues the design.",
+  "source_artifacts": [
+    "34_Fresnaye_SourceArchitect_Level02_VaultedCeiling_AFFLLineageEvidenceRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level02_VaultedCeiling_AFFLLineageException_v1.json",
+    "34_Fresnaye_SourceArchitect_Level02_CeilingSourceRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level02_IntegratedStageReadinessRegister_v4.json",
+    "34_Fresnaye_SourceArchitect_Level02_VaultedCeiling_AFFLLineage_Evidence_v1.png",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v81.json"
+  ],
+  "geometry_action": "NONE"
+}
