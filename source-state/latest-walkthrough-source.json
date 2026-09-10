@@ -1,0 +1,19 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_SourceLatest_v1",
+  "updatedUtc": "2026-09-10T05:34:00Z",
+  "sourceArchitect": "v90",
+  "handoffPath": "source-state/34_Fresnaye_SourceArchitect_handoff_v90_stair_soffit_semantics.json",
+  "handoffSha256": "c4ba2510b0e65dfdf16db307e2f2bc70a008e7e1fdd2c657d765acaf5ac7d7d0",
+  "classificationPath": "engineering/source-v90-walkthrough-classification-v1.json",
+  "classificationSha256": "7feffcf0c3b34bee4c96a963db02fc1b18350d2f57db38e0d263730089a0acd2",
+  "pipelinePath": "engineering/incremental-geometry-pipeline-v2-v90.json",
+  "pipelineSha256": "f4c2d8038de968acd80c6589e5a2671172aa963084341f3682af15901440323c",
+  "deltaPlanPath": "engineering/geometry-delta-plan-source-v90-v1.json",
+  "deltaPlanSha256": "669041390475c0a3f6daada411926d998f1b91cdc5262be9478967ed5be7f452",
+  "plannerQaPath": "engineering/geometry-delta-planner-qa-v23.json",
+  "plannerQaSha256": "05981b052b52256519131974519a87f86a6128f24c83fb8a7c96ee06e008d0d0",
+  "level02Effect": "NONE",
+  "geometryAuthorization": false,
+  "canonicalGeometryChanged": false,
+  "purpose": "Fail-closed source-freshness pointer. Stable gate must block if this pointer advances beyond the source version bound in walkthrough-review.json."
+}
