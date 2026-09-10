@@ -1,0 +1,59 @@
+name: Walkthrough r9.2 public QA
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/walkthrough-v96-portable-r9-2-publicqa-v1.yml']
+  workflow_dispatch:
+permissions: {contents: write}
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Wait for exact public r9.2
+        run: |
+          set -euo pipefail
+          B=https://lgalansky.github.io/34-fresnaye/v96-r9
+          for i in $(seq 1 50); do
+            curl -fsSL "$B/?q=$GITHUB_RUN_ID-$i" -o /tmp/index.html || true
+            curl -fsSL "$B/sw.js?q=$GITHUB_RUN_ID-$i" -o /tmp/sw.js || true
+            curl -fsSL "$B/manifest.webmanifest?q=$GITHUB_RUN_ID-$i" -o /tmp/manifest.webmanifest || true
+            curl -fsSL "$B/viewer.html?q=$GITHUB_RUN_ID-$i" -o /tmp/viewer.html || true
+            if python3 - <<'PY'
+          import hashlib, pathlib
+          def h(p): return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+          try:
+            assert h('/tmp/index.html')=='c6027e9a45c64d5b45ec1fac8389559bf86f9c46c52a2113dee62fcd33657512'
+            assert h('/tmp/sw.js')=='242f165b9614aff83f43d904bbba34645d64fa559d152ca9b3793358221f30ca'
+            assert h('/tmp/manifest.webmanifest')=='13e17c10e5f5e30829ea863a7beefac9efed008f75f086f65ef50ac16fb01880'
+            v=pathlib.Path('/tmp/viewer.html').read_bytes(); assert len(v)==253348 and hashlib.sha256(v).hexdigest()=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+          except Exception: raise SystemExit(1)
+          PY
+            then break; fi
+            sleep 3
+          done
+          python3 - <<'PY'
+          import hashlib, pathlib
+          def h(p): return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+          assert h('/tmp/index.html')=='c6027e9a45c64d5b45ec1fac8389559bf86f9c46c52a2113dee62fcd33657512'
+          assert h('/tmp/sw.js')=='242f165b9614aff83f43d904bbba34645d64fa559d152ca9b3793358221f30ca'
+          assert h('/tmp/manifest.webmanifest')=='13e17c10e5f5e30829ea863a7beefac9efed008f75f086f65ef50ac16fb01880'
+          PY
+      - name: Install Chromium
+        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Run public browser QA
+        run: node walkthrough-v96-portable-r9-2-publicqa-v1.cjs
+      - name: Persist public QA evidence
+        run: |
+          cp /tmp/portable-r9-2-scopeisolation-qa-v1.json /tmp/evidence.json
+          git fetch origin gh-pages
+          git checkout gh-pages
+          cp /tmp/evidence.json v96-r9/portable-r9-2-scopeisolation-qa-v1.json
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add v96-r9/portable-r9-2-scopeisolation-qa-v1.json
+          git commit -m 'Publish walkthrough r9.2 public QA evidence'
+          git push origin gh-pages
