@@ -1,0 +1,35 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_HumanAcceptanceRecorderV2_SourceV93_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-10T08:45:00.636Z",
+  "geometryChanged": false,
+  "recorderVersion": "v2",
+  "recorderSha256": "ab56173d527aa523fad0e19fcf58ad72087a872cee8c7888bea54473e277f4dc",
+  "sourceArchitect": "v93",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "failClosed": {
+    "pass": true,
+    "walkthroughRemainedBlank": true,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateRequests": 2,
+    "startFreshVerification": true,
+    "sourceBound": "v93",
+    "shortcutInvalidated": true,
+    "reason": "navigation shortcut/control used",
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateVerified": true,
+    "sourceBound": "v93",
+    "startVisible": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
