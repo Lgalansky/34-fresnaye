@@ -1,0 +1,27 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_HumanAcceptanceRecorder_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-10T03:36:09.933Z",
+  "geometryChanged": false,
+  "url": "https://lgalansky.github.io/34-fresnaye/walkthrough-human-acceptance.html",
+  "viewerVersion": "v96",
+  "canonicalModel": "v23",
+  "pass": true,
+  "requirements": {
+    "sequence": [
+      "Entrance",
+      "Living",
+      "Kitchen",
+      "Main Bedroom",
+      "Entrance"
+    ],
+    "minimumDistanceM": 40,
+    "minimumDurationS": 12,
+    "waypointRadiusM": 1.25,
+    "maxContinuousStepM": 1.6
+  },
+  "ready": true,
+  "sameOriginFrameAccessible": true,
+  "shortcutGuardInvalidated": true,
+  "invalidReason": "navigation shortcut/control used",
+  "pageErrors": []
+}
