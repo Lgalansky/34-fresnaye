@@ -1,0 +1,93 @@
+{
+  "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "date": "2026-09-10",
+  "status": "ADOPT_AS_DEFAULT",
+  "geometryChanged": false,
+  "canonical": {
+    "level02": "v23",
+    "vertices": 5769,
+    "triangles": 8907,
+    "policy": "READ_ONLY_UNTIL_PROMOTION"
+  },
+  "viewer": {
+    "version": "v96",
+    "sha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "bytes": 253348,
+    "policy": "REUSE_EXACT_VIEWER_WHEN_GEOMETRY_UNCHANGED"
+  },
+  "sourceObserved": {
+    "sourceArchitect": "v94",
+    "handoffSha256": "039180558f10a8517c02ecf89dd6e86f92c36fb7a0a60222cabbaca3407c32c3",
+    "classificationSha256": "e9ca33fba6899c4ca01eb342938d3f3e0380fbe068c5de627411486dc922bfeb",
+    "level02Effect": "NONE",
+    "effectSource": "CLASSIFICATION_BRIDGE",
+    "geometryAuthorization": false,
+    "canonicalGeometryChanged": false
+  },
+  "optimization": {
+    "strategy": "CONTENT_ADDRESSED_DELTA_BUILD",
+    "noOpShortCircuit": true,
+    "sourceOnlyQaBridge": true,
+    "parallelIndependentZones": true,
+    "fullModelRegenerationDefault": false,
+    "fullBrowserRegressionDefault": false,
+    "browserQaReuseRule": "ALLOW_ONLY_WHEN_VIEWER_AND_CANONICAL_HASHES_UNCHANGED_AND_GEOMETRY_AUTHORIZATION_FALSE",
+    "cacheKeys": [
+      "authoritative_source_sha256",
+      "source_version",
+      "element_id",
+      "zone",
+      "layer",
+      "canonical_parent_hash"
+    ]
+  },
+  "pipeline": [
+    "source_delta_fingerprint",
+    "source_effect_classification_bridge",
+    "dependency_graph_resolution",
+    "source_only_short_circuit",
+    "changed_element_set",
+    "parallel_zone_layer_patch_build",
+    "targeted_patch_QA",
+    "promotion_candidate_assembly",
+    "full_regression_if_triggered",
+    "canonical_promotion_gate",
+    "viewer_model_rebind",
+    "deployment_identity_QA"
+  ],
+  "layers": {
+    "A": "architectural_shell",
+    "B": "openings_architectural_details",
+    "C": "ceilings_bulkheads",
+    "D": "presentation_materials_lighting_furniture"
+  },
+  "failClosedRules": [
+    "NO_MISSING_DIMENSION_INFERENCE",
+    "NO_CANONICAL_IN_PLACE_EDIT",
+    "NO_GEOMETRY_PATCH_WITHOUT_AUTHORIZATION",
+    "NO_PATCH_WITHOUT_EXPLICIT_CHANGED_ELEMENT_IDS",
+    "NO_PROMOTION_WITHOUT_SOURCE_AUTHORIZATION_AND_QA",
+    "NO_PRESENTATION_GEOMETRY_AS_ARCHITECTURAL_EVIDENCE",
+    "NO_STATUS_TRANSFER_BETWEEN_SEPARATE_CONDITIONS",
+    "NO_IMPLICIT_SOURCE_EFFECT_WHEN_HANDOFF_OMITS_EFFECT"
+  ],
+  "currentAction": "SOURCE_V94_L03_D02_DUPLICATE_SCHEDULE_SYSTEM_CONFLICT_HARDENING__LEVEL02_PASS_UNCHANGED__NO_GEOMETRY_PATCH__REUSE_EXACT_V96_BY_HASH",
+  "currentDecision": "NO_OP_SHORT_CIRCUIT",
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "remainingLevel02Locks": [
+    "Circular stepped toilet-cubicle condition: radius/diameter, vertical centre, stepped-ring widths/offsets, exact transitions/tangencies and outer-band AFFL hierarchy remain open; 1500 is horizontal centreline offset only.",
+    "Two literal 'VAULTED CEILING OVER' plan instances: semantic ownership, AFFL/profile/section mapping and exact pairing to Michael's verbal conditions remain open.",
+    "Explicit vaulted AFFls 2860/2860/2610 remain unmapped to exact conditions.",
+    "Architect-described two vault conditions remain design-not-frozen pending workshop/current-final section.",
+    "Any other curved/unwitnessed Level02 transition lacking complete written construction evidence."
+  ],
+  "sourceOnlyAdvance": {
+    "status": "L03_D02_DUPLICATE_SCHEDULE_SYSTEM_CONFLICT_ONLY",
+    "level": "L03",
+    "subject": "L03_D02 schedule-system contradiction hardening",
+    "finding": "FRE_WD_401 carries two explicit L03_D02 records in different system families: 3000x2100 frameless glass and 1500x2100 aluminium. FRE_WD_207 separately owns the physical L03_D02 opening at rough3000/U-S2100. This establishes an internal duplicate-ID/system conflict in the authoritative schedule.",
+    "geometryAction": "NONE"
+  }
+}

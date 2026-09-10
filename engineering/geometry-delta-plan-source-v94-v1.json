@@ -1,0 +1,26 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlan_Source_v94_v1",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v7",
+  "sourceArchitect": "v94",
+  "sourceHandoffSha256": "039180558f10a8517c02ecf89dd6e86f92c36fb7a0a60222cabbaca3407c32c3",
+  "level02EffectSchemaPath": "walkthrough_classification.level02Effect",
+  "pipeline": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "pipelineSha256": "bf49f534973fde5ded8ef8930b845478232495e41e860f76ff92ae8d78617044",
+  "canonicalParent": "v23",
+  "viewerReuseCandidate": "v96",
+  "geometryAuthorization": false,
+  "level02Effect": "NONE",
+  "geometryChanged": false,
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "qa": [
+    "source_identity",
+    "source_effect_classification",
+    "canonical_identity",
+    "deployment_source_sync"
+  ],
+  "reason": "Source Architect v94 advances only Level03 schedule-conflict evidence and does not authorize Level02 geometry; preserve canonical model and reuse exact viewer/browser infrastructure."
+}

@@ -1,0 +1,49 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v94_d02_schedule_conflict_hardening",
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T12:27:39+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "predecessor": "34_Fresnaye_SourceArchitect_handoff_v93_tender_plan_callout_corroboration.json",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L03_D02_RECLASSIFIED_AS_DEMONSTRATED_AUTHORITATIVE_INTERNAL_DUPLICATE_ID_SYSTEM_CONFLICT__NO_NEW_ARCHILAB_SECTION__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": "rough1790 / U-S2400; schedule component2685x2400 separate",
+      "L02_D22_former_D21_physical_instance1": "corrected ID; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400; schedule1660x2100 separate",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / 25mm side clearances; exact leaf thickness approximate only",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / 20mm side clearances; exact leaf thickness approximate only"
+    }
+  },
+  "v94_material_advance": {
+    "level": "L03",
+    "subject": "L03_D02 schedule-system contradiction hardening",
+    "finding": "FRE_WD_401 carries two explicit L03_D02 records in different system families: 3000x2100 frameless glass and 1500x2100 aluminium. FRE_WD_207 separately owns the physical L03_D02 opening at rough3000/U-S2100. This establishes an internal duplicate-ID/system conflict in the authoritative schedule.",
+    "impact": "D02 structural opening remains source-closed; component/system ownership remains blocked. Downstream teams must not resolve the conflict from dimensional match or by doubling the 1500 aluminium record."
+  },
+  "current_level02_locks": [
+    "Circular stepped toilet-cubicle condition: radius/diameter, vertical centre, stepped-ring widths/offsets, exact transitions/tangencies and outer-band AFFL hierarchy remain open; 1500 is horizontal centreline offset only.",
+    "Two literal VAULTED CEILING OVER plan instances: semantic ownership, AFFL/profile/section mapping and exact pairing to Michael verbal conditions remain open.",
+    "Explicit vaulted AFFLs 2860/2860/2610 remain unmapped to exact conditions.",
+    "Architect-described two vault conditions remain design-not-frozen pending workshop/current-final section.",
+    "Any other curved/unwitnessed Level02 transition lacking complete written construction evidence."
+  ],
+  "later_stage_open_summary": [
+    "L01: exact stair-soffit slope/profile/endpoints; complex curved/stepped/nested ceiling boundaries; D11 brickwork tag/rough width; W06 rough width; W08 head; W04/W05/W06 25mm interface allocations.",
+    "L03: D02 demonstrated duplicate schedule-ID/system conflict; D04 component schedule omission; iD02 2100-vs-2150 conflict; skylight IDs/interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04: main Mazista written assembly conflict; main-roof numeric pitch/eaves/ridge extents; lean-to quantitative run/eave/ridge-edge geometry; quarantined 370mm parapet-adjacent condition."
+  ],
+  "source_watch": "Fresh Outlook search found no Archilab message received on 2026-09-10. Latest architect inbound remains 2026-09-09T16:41:59Z RE: Render from info@archilab.co.za, with no attachment; promised quick section still not received.",
+  "chief_of_staff_action": "Adopt Level03 IntegratedStageReadinessRegister v2 + IntegratedOpenExceptions v2. Treat L03_D02 as a demonstrated authoritative internal schedule-ID/system conflict. Preserve physical rough3000/U-S2100, but keep exact door system/component ownership locked until Archilab corrects the duplicate ID. Retain Level02 priority closure and all other listed exceptions. No canonical 3D model edit.",
+  "geometry_action": "NONE",
+  "source_artifacts": [
+    "34_Fresnaye_SourceArchitect_Level03_D02_DuplicateScheduleSystemEvidence_v1.json",
+    "34_Fresnaye_SourceArchitect_Level03_D02_DuplicateScheduleSystemEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level03_IntegratedStageReadinessRegister_v2.json",
+    "34_Fresnaye_SourceArchitect_Level03_IntegratedOpenExceptions_v2.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v77.json"
+  ]
+}
