@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="fresnaye-live-launcher" content="v1-stable-gate-backed">
+<title>34 Fresnaye — Verified Live Walkthrough</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#0e0e0e;color:#f5f5f5}
+body{min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(720px,100%);background:#181818;border:1px solid #333;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0008}
+h1{margin:0 0 8px;font-size:clamp(24px,5vw,36px)}p{color:#bbb;line-height:1.5}.status{padding:12px 0;font-weight:700}.ok{color:#9bedae}.warn{color:#ffd27a}.bad{color:#ff9d9d}
+a{display:inline-block;margin-top:12px;padding:11px 14px;border-radius:10px;background:#2a2a2a;color:#fff;text-decoration:none;font-weight:700}
+iframe{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;border:0;visibility:hidden}
+.small{font-size:12px;color:#888;margin-top:14px;word-break:break-word}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>34 Fresnaye walkthrough</h1>
+<p>This permanent launcher opens the latest QA-approved walkthrough only after the stable source/model/transport gate verifies.</p>
+<div id="status" class="status warn">Verifying current walkthrough…</div>
+<a id="review" href="./walkthrough-review.html">Open verification details</a>
+<div id="detail" class="small">Architectural geometry is never modified by this launcher.</div>
+</main>
+<iframe id="gate" src="./walkthrough-review.html?launcher=1" title="Walkthrough verification gate"></iframe>
+<script>
+(()=>{
+const VERSION='v1', ALLOWED=['entrance','living','kitchen','bedroom','second','service'];
+const frame=document.getElementById('gate'), status=document.getElementById('status'), detail=document.getElementById('detail');
+const requested=(()=>{const k=location.hash.replace(/^#/,'').toLowerCase();return ALLOWED.includes(k)?k:'entrance'})();
+let finished=false, ticks=0;
+function fail(msg){if(finished)return;finished=true;status.className='status bad';status.textContent='Walkthrough blocked';detail.textContent=msg+' Open verification details for the exact failing gate.';window.__FRESNAYE_LIVE_LAUNCHER_QA={version:VERSION,pass:false,requestedStart:requested,error:msg}}
+function poll(){
+ if(finished)return;
+ ticks++;
+ try{
+   const w=frame.contentWindow, q=w?.__FRESNAYE_STABLE_GATE_QA;
+   if(q?.pass===true){
+     const target=q.startLinks?.[requested]||q.preferredReviewUrl;
+     if(!target) return fail('Verified gate did not provide a start URL');
+     finished=true;status.className='status ok';status.textContent='Verified — opening '+requested+'…';
+     window.__FRESNAYE_LIVE_LAUNCHER_QA={version:VERSION,pass:true,requestedStart:requested,sourceArchitect:q.sourceArchitect,viewerSha256:q.viewerSha256,modelSha256:q.modelSha256,planner:q.planner,decision:q.decision,target};
+     const u=new URL(target,location.href);setTimeout(()=>location.replace(u.href),80);return;
+   }
+   if(q?.pass===false) return fail('Stable verification gate failed: '+(q.error||'integrity check failed'));
+ }catch(e){return fail('Stable verification gate could not be inspected: '+(e?.message||e))}
+ if(ticks>240)return fail('Stable verification gate timed out');
+ setTimeout(poll,125);
+}
+frame.addEventListener('load',poll,{once:true});
+setTimeout(poll,250);
+})();
+</script>
+</body>
+</html>
