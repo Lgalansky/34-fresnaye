@@ -1,0 +1,54 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v85_integrated_level01",
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T03:28:34+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Consume only explicit written Archilab dimensions, IDs, FFLs, sections/elevations, brickwork dimensions and schedules. Native PDF/vector coordinates may establish annotation ownership only; never convert page distances to architectural dimensions, visually scale drawings, repair tags by assumption, or invent missing geometry.",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__LEVEL01_INTEGRATED_SOURCE_CONTRACT_CREATED__LEVEL01_STALE_CANDIDATE_POOL_NOT_A_BUILD_SET__NO_NEW_ARCHILAB_SECTION__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "closed_values": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22_corrected_former_D21_physical_instance_1": "rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / central leaf with25mm side clearances; leaf thickness approximate only",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / central leaf with20mm side clearances; leaf thickness approximate only"
+    },
+    "current_locks": [
+      "named circular stepped toilet-cubicle bulkhead exact curve/step construction",
+      "two architect-described vaulted conditions: design not frozen and exact tag/condition mapping unassigned",
+      "other curved/unwitnessed Level02 ceiling transitions lacking complete explicit construction witness"
+    ],
+    "effect_of_v85": "NONE__LATER_LEVEL_SOURCE_INTEGRATION_ONLY"
+  },
+  "v85_material_advance": {
+    "level": "L01",
+    "subject": "Integrated Level01 build-facing source contract and exception consolidation",
+    "finding": "Previously dispersed Level01 window, D11 and ceiling evidence is consolidated without changing source values. Seven windows are closed for structural width/head; W06 and W08 remain partial. D11 identity/component is corroborated but brickwork tag and rough width remain open. Eleven ceiling rectilinear/inner fields have explicit written witness pairs; three complex fields and two exterior nested fields carry only their explicitly owned partial witnesses/envelopes. The old 70-number candidate pool / v55 48-unadjudicated count is explicitly non-consumable as a build set.",
+    "impact": "Creates one source-safe Level01 readiness contract for later build stages and prevents stale candidate-pool counts or schedule values from being promoted into missing geometry."
+  },
+  "source_watch": "Fresh Outlook search found no Archilab source newer than 2026-09-09T16:41:59Z; promised quick section not received.",
+  "unresolved_ambiguities": [
+    "L02 named circular stepped toilet-cubicle bulkhead exact curve/step construction.",
+    "L02 two architect-described vaulted conditions remain design-not-frozen and not explicitly mapped to plan tags.",
+    "L01 complex curved/stepped/nested ceiling full boundary completion.",
+    "L01 stair-soffit exact slope/line/termination.",
+    "L01 D11 brickwork tag drift and masonry rough width.",
+    "L01 W06 masonry rough width.",
+    "L01 W08 brickwork U/S/head.",
+    "L01 W04/W05/W06 25mm interface allocation.",
+    "L03 D02 duplicate schedule/system ownership; D04 component schedule omission; iD02 2100-vs-2150 written conflict.",
+    "L03 skylight persistent IDs and curb/upstand/structural rough-opening/frame-flashing interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04 main Mazista roof written assembly conflict plus numeric pitch/eaves/ridge extents; 370mm parapet-adjacent endpoint ownership quarantined. Separate 3-degree lean-to remains closed only for its own condition."
+  ],
+  "chief_of_staff_action": "Adopt the new Level01 integrated register as the build-facing Level01 source index. Do not reopen the Level02 priority five. Keep every listed Level01 exception locked until explicit Archilab evidence closes it. Treat any forthcoming pre-workshop vaulted-ceiling section as preliminary unless explicitly marked final/current.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level01_IntegratedStageReadinessRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level01_IntegratedOpenExceptions_v1.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v68.json",
+    "34_Fresnaye_SourceArchitect_Run85_ArtifactManifest_v1.json"
+  ]
+}
