@@ -1,0 +1,44 @@
+name: Walkthrough viewer v96 joystick inspection
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-viewer-v96-joystick-inspect.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Publish exact joystick implementation excerpt
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          V=/tmp/pages/v96-r9/viewer.html
+          echo '1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded  '"$V" | sha256sum -c -
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/pages/v96-r9/viewer.html')
+          lines=p.read_text().splitlines()
+          hits=[]
+          for i,line in enumerate(lines):
+              low=line.lower()
+              if 'knob' in low or "getelementbyid('stick')" in low or 'pointermove' in low and 'stick' in low:
+                  a=max(0,i-4); b=min(len(lines),i+7)
+                  hits.append('\n'.join(f'{j+1}: {lines[j]}' for j in range(a,b)))
+          out='\n\n--- HIT ---\n\n'.join(hits)
+          Path('/tmp/pages/engineering/viewer-v96-joystick-snippet.txt').write_text(out+'\n')
+          PY
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add engineering/viewer-v96-joystick-snippet.txt
+          git commit -m 'Publish v96 joystick source excerpt' || true
+          git push origin HEAD:gh-pages
