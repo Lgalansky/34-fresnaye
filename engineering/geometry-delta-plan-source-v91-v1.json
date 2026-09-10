@@ -1,0 +1,26 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlan_Source_v91_v1",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v7",
+  "sourceArchitect": "v91",
+  "sourceHandoffSha256": "0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522",
+  "level02EffectSchemaPath": "walkthrough_classification.level02Effect",
+  "pipeline": "34_Fresnaye_IncrementalGeometryPipeline_v2",
+  "pipelineSha256": "40ba76d0ea8677b208a10afdc784dfd211a1c0ba9bf85f76e30dd33520736a08",
+  "canonicalParent": "v23",
+  "viewerReuseCandidate": "v96",
+  "geometryAuthorization": false,
+  "level02Effect": "NONE",
+  "geometryChanged": false,
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "qa": [
+    "source_identity",
+    "source_effect_classification",
+    "canonical_identity",
+    "deployment_source_sync"
+  ],
+  "reason": "Source Architect does not authorize geometry; preserve canonical model and reuse exact viewer/browser QA."
+}
