@@ -1,0 +1,112 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_LiveLauncher_v1_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-10T06:37:24.162Z",
+  "geometryChanged": false,
+  "launcherVersion": "v1",
+  "launcherSha256": "c1934e5c38abc1638311f7086eec83829dc063392e8e80e8cf48318d8d7497c7",
+  "stableGate": "v26",
+  "sourceArchitect": "v90",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "routes": [
+    {
+      "key": "entrance",
+      "expected": [
+        7.9,
+        17.1
+      ],
+      "actual": [
+        7.9,
+        17.1
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "living",
+      "expected": [
+        3.6,
+        13
+      ],
+      "actual": [
+        3.6,
+        13
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "kitchen",
+      "expected": [
+        8,
+        8.2
+      ],
+      "actual": [
+        8,
+        8.2
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "bedroom",
+      "expected": [
+        3.5,
+        26.7
+      ],
+      "actual": [
+        3.5,
+        26.7
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "second",
+      "expected": [
+        -15.4,
+        5.2
+      ],
+      "actual": [
+        -15.4,
+        5.2
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "service",
+      "expected": [
+        -5.08,
+        2.11
+      ],
+      "actual": [
+        -5.08,
+        2.11
+      ],
+      "pass": true,
+      "pageErrors": []
+    }
+  ],
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "keyboardMovementM": 0.467,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickMovementM": 0.748,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "pass": true
+}
