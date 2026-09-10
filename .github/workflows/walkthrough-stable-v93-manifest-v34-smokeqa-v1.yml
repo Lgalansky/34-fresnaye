@@ -1,0 +1,70 @@
+name: Walkthrough stable Source v93 manifest v34 smoke QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-stable-v93-manifest-v34-smokeqa-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Wait for manifest v34 and exact public gate
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          OK=0
+          for I in $(seq 1 80); do
+            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.json?v34=$GITHUB_RUN_ID-$I" -o /tmp/manifest.json || true
+            curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.html?v34=$GITHUB_RUN_ID-$I" -o /tmp/gate.html || true
+            if python3 - <<'PY'
+          import hashlib,json,pathlib
+          try:
+            m=json.load(open('/tmp/manifest.json'))
+            assert m['artifact']=='34_Fresnaye_Walkthrough_StableReviewManifest_v34'
+            assert m['schemaVersion']==34
+            assert m['sourceState']['latestSourceArchitectObserved']=='v93'
+            assert m['reviewCandidate']['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+            assert m['reviewCandidate']['modelSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+            assert m['stableGate']['revision']=='v27'
+            assert m['stableGate']['sha256']=='bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b'
+            assert m['acceptance']['humanAcceptanceRecorderQaSourceArchitect']=='v93'
+            assert hashlib.sha256(pathlib.Path('/tmp/gate.html').read_bytes()).hexdigest()=='bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b'
+          except Exception:
+            raise SystemExit(1)
+          PY
+            then OK=1; break; fi
+            sleep 4
+          done
+          test "$OK" = 1
+          sha256sum /tmp/manifest.json /tmp/gate.html
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/gate.html').read(); m=re.search(r'<script>\n([\s\S]*?)\n</script>',t); assert m
+          open('/tmp/gate.js','w').write(m.group(1))
+          PY
+          node --check /tmp/gate.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify live v34 gate launcher and recorder
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright');
+          const R='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const c=await b.newContext({viewport:{width:1365,height:768}}),p=await c.newPage(),e=[];p.on('pageerror',x=>e.push(String(x)));await p.goto(R+'walkthrough-review.html?v34live='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__FRESNAYE_STABLE_GATE_QA?.pass===true,{}, {timeout:120000});const q=await p.evaluate(()=>window.__FRESNAYE_STABLE_GATE_QA);ok(q.sourceArchitect==='v93'&&q.viewerSha256===V&&q.modelSha256===M&&q.humanOk&&q.freshnessOk&&q.liveQaOk&&q.pipeOk&&!e.length,'gate');console.log('gate PASS source='+q.sourceArchitect+' human='+q.humanOk);await c.close();
+            const l=await b.newContext({viewport:{width:1365,height:768}}),lp=await l.newPage(),le=[];lp.on('pageerror',x=>le.push(String(x)));await lp.goto(R+'walkthrough-live.html#entrance',{waitUntil:'domcontentloaded',timeout:120000});await lp.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:120000});const t=await lp.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await lp.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(t.viewerSha256===V&&t.modelSha256===M&&lm.renderer==='WebGL2'&&!le.length,'launcher');console.log('launcher PASS '+lp.url()+' '+lm.renderer+' '+t.loaderMode);await l.close();
+            const m=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),mp=await m.newPage(),me=[];mp.on('pageerror',x=>me.push(String(x)));await mp.goto(R+'walkthrough-human-acceptance.html?v34='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await mp.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});const h=await mp.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(h.sourceArchitect==='v93'&&h.viewerSha256===V&&h.modelSha256===M&&h.gateVerified&&!me.length,'recorder');console.log('recorder PASS source='+h.sourceArchitect);await m.close();
+          }finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node qa.cjs
