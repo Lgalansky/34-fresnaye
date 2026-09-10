@@ -45,15 +45,15 @@ jobs:
       - name: Install Chromium
         run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
       - name: Run public browser QA
-        run: node walkthrough-v96-portable-r9-2-publicqa-v1.cjs
+        run: node walkthrough-v96-portable-r9-2-publicqa-v2.cjs
       - name: Persist public QA evidence
         run: |
-          cp /tmp/portable-r9-2-scopeisolation-qa-v1.json /tmp/evidence.json
+          cp /tmp/portable-r9-2-scopeisolation-qa-v2.json /tmp/evidence.json
           git fetch origin gh-pages
           git checkout gh-pages
-          cp /tmp/evidence.json v96-r9/portable-r9-2-scopeisolation-qa-v1.json
+          cp /tmp/evidence.json v96-r9/portable-r9-2-scopeisolation-qa-v2.json
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add v96-r9/portable-r9-2-scopeisolation-qa-v1.json
-          git commit -m 'Publish walkthrough r9.2 public QA evidence'
+          git add v96-r9/portable-r9-2-scopeisolation-qa-v2.json
+          git commit -m 'Publish walkthrough r9.2 public QA evidence v2'
           git push origin gh-pages
