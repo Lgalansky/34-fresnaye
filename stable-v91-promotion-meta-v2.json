@@ -1,0 +1,18 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_SourceV91_StablePromotionMeta_v2",
+  "timestampUtc": "2026-09-10T06:53:04.346413Z",
+  "pass": true,
+  "geometryChanged": false,
+  "sourceArchitect": "v91",
+  "sourceHandoffSha256": "0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522",
+  "sourceBrowserQaSha256": "e06996e97e8b68e818f41253aa5d540cce63cd9f96d310a392a93012c796d190",
+  "manifest": "34_Fresnaye_Walkthrough_StableReviewManifest_v31",
+  "manifestSha256": "eeddf544c4f57ce9123e8682ee5bf9f650bca3ea365e835e7a8726e44088560a",
+  "plannerQa": "34_Fresnaye_GeometryDeltaPlanner_QA_v24",
+  "plannerQaSha256": "68b1a9d58ea0a2ef8d440fbb41ae9a4f44b32509f26a8b53cf2c767d06f4f1ce",
+  "gateLiveQaPath": "stable-v91-r9-2-gate-liveqa-v2.json",
+  "gateLiveQaSha256": "94af15eec9bc916b6a63faecc96dd71c6ba274ec656d7b2764919d8a9ef75941",
+  "stableGateRevision": "v26",
+  "launcherVersion": "v1",
+  "launcherSha256": "c1934e5c38abc1638311f7086eec83829dc063392e8e80e8cf48318d8d7497c7"
+}

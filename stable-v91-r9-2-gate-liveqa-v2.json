@@ -1,0 +1,68 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableV91R9_2_GateLiveQA_v2",
+  "timestampUtc": "2026-09-10T06:52:52.084Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v91",
+  "sourceHandoffSha256": "0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522",
+  "stableManifest": "v31",
+  "stableManifestSha256": "eeddf544c4f57ce9123e8682ee5bf9f650bca3ea365e835e7a8726e44088560a",
+  "plannerQa": "v24",
+  "stableGate": "v26",
+  "launcher": "v1",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v91",
+    "effectMode": "CLASSIFICATION_BRIDGE",
+    "planner": "34_Fresnaye_GeometryDeltaPlanner_v7",
+    "decision": "NO_OP_SHORT_CIRCUIT",
+    "freshnessOk": true,
+    "sourceOk": true,
+    "pipelineOk": true,
+    "currentSourceLiveQaOk": true,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "keyboardMovementM": 0.502,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "joystickMovementM": 0.82,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "acceptanceRecorder": {
+    "pass": true,
+    "ready": true,
+    "version": "v1",
+    "requirements": {
+      "sequence": [
+        "Entrance",
+        "Living",
+        "Kitchen",
+        "Main Bedroom",
+        "Entrance"
+      ],
+      "minimumDistanceM": 40,
+      "minimumDurationS": 12,
+      "waypointRadiusM": 1.25,
+      "maxContinuousStepM": 1.6
+    },
+    "pageErrors": []
+  },
+  "pass": true
+}
