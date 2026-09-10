@@ -1,0 +1,42 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_StableV94_GateV28_RecorderV2_2_LiveQA_v1",
+  "timestampUtc": "2026-09-10T10:43:22.307Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "gateRevision": "v28",
+  "recorderCodeRevision": "v2.2-joystick-deflection-attestation",
+  "recorderSha256": "06cd076b31795328f6e9bcfda22b5c02b98500a40eedef6350ae13535ea46885",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v94",
+    "humanOk": true,
+    "humanRecorderSha256": "06cd076b31795328f6e9bcfda22b5c02b98500a40eedef6350ae13535ea46885",
+    "humanRecorderQaSha256": "c63f1aecc0198e8e9d8bbfe7f756656d3cc4e46fed115af14e32e66620b74ef1",
+    "liveBrowserQaSha256": "9bd593bfe9b247ef491dbcb93ff22c215f952b3d1abe4ceeca2e37539fe95400",
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateRequests": 2,
+    "startFreshVerification": true,
+    "shortcutInvalidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "sourceBound": "v94",
+    "inputMethod": "Chromium CDP Input.dispatchTouchEvent",
+    "centerTouchDirect": false,
+    "centerDeflection": 0,
+    "deflectedTouchDirect": true,
+    "deflectedValue": 0.698,
+    "endTouchDirect": false,
+    "pageErrors": []
+  },
+  "pass": true
+}

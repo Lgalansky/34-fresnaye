@@ -1,7 +1,7 @@
 {
   "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v37",
   "schemaVersion": 37,
-  "updatedUtc": "2026-09-10T10:39:20.119448Z",
+  "updatedUtc": "2026-09-10T10:43:28.660440Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -81,8 +81,8 @@
     "revision": "v28",
     "sha256": "8dcaa489a0371e99de01df2ca7e1d136d4ff330fad08d465ffe0a8e0efa1509f",
     "liveQaEvidence": "stable-v94-r9-2-gate-v28-liveqa-v1.json",
-    "liveQaSha256": "PENDING",
-    "liveQaRun": 0,
+    "liveQaSha256": "3e7d02956c45d5ea1b64eaa18cd64bdff707eee4a5e69d3a6cb2ec267ae19548",
+    "liveQaRun": 34467501569,
     "liveQaJob": 0
   },
   "acceptance": {
