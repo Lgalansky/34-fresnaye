@@ -1,0 +1,46 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_StableV94_GateV27_LiveQA_v1",
+  "timestampUtc": "2026-09-10T10:17:14.027Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "gateRevision": "v27",
+  "gateSha256": "bb32b7df273793d2c1bd95c76ac484ba9f394f24133ee94ca6c953763b6a713b",
+  "manifestSha256": "aac911f137e6f8be42143b182fa9b1280537a08b0b13aa78cc80f89d673d4e59",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v94",
+    "effectMode": "CLASSIFICATION_BRIDGE",
+    "decision": "NO_OP_SHORT_CIRCUIT",
+    "humanOk": true,
+    "humanRecorderSha256": "ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37",
+    "humanRecorderQaSha256": "67dbb2da2531274446f876c49684e8a3a2ee7e3c355378705374332a6d41147a",
+    "startLinks": [
+      "entrance",
+      "living",
+      "kitchen",
+      "bedroom",
+      "second",
+      "service"
+    ],
+    "pageErrors": []
+  },
+  "launcher": {
+    "pass": true,
+    "finalUrl": "https://lgalansky.github.io/34-fresnaye/v96-r9/#entrance",
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "pageErrors": []
+  },
+  "recorder": {
+    "pass": true,
+    "sourceArchitect": "v94",
+    "codeRevision": "v2.1-manual-control-attestation",
+    "gateVerified": true,
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "pageErrors": []
+  },
+  "pass": true
+}
