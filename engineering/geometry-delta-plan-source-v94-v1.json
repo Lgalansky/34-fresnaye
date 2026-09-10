@@ -22,5 +22,5 @@
     "canonical_identity",
     "deployment_source_sync"
   ],
-  "reason": "Source Architect v94 advances only Level03 schedule-conflict evidence and does not authorize Level02 geometry; preserve canonical model and reuse exact viewer/browser infrastructure."
+  "reason": "Source Architect v94 does not authorize Level02 geometry; preserve canonical model and reuse exact viewer/browser infrastructure."
 }

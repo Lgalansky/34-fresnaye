@@ -1,0 +1,17 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_SourceV94_ContentAddressedBindingRepair_QA_v1",
+  "timestampUtc": "2026-09-10T10:13:01.586648Z",
+  "pass": true,
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "canonicalModel": "v23",
+  "viewerVersion": "v96",
+  "hashes": {
+    "handoff": "039180558f10a8517c02ecf89dd6e86f92c36fb7a0a60222cabbaca3407c32c3",
+    "classification": "e9ca33fba6899c4ca01eb342938d3f3e0380fbe068c5de627411486dc922bfeb",
+    "pipeline": "bf49f534973fde5ded8ef8930b845478232495e41e860f76ff92ae8d78617044",
+    "deltaPlan": "4736d94acd3e12dd7d97cf97a35417fbf725e05c6ddf05f1fe904bf38d9c50ef",
+    "plannerQa": "71746a6bd8de89d609cea269c78fc1efab9922d769670354444762d4b77882db",
+    "latestPointer": "0ca07ded117de9751437bae1dcdf9c2056891dc64186d3c5655fbb539f46cad5"
+  }
+}
