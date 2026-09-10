@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v30",
-  "schemaVersion": 30,
-  "updatedUtc": "2026-09-10T06:45:51.344831Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v31",
+  "schemaVersion": 31,
+  "updatedUtc": "2026-09-10T06:51:06.944211Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -54,11 +54,11 @@
     "geometryAuthorization": false,
     "newerSourceSyncChangesCandidateGeometry": false,
     "browserQaCompatibilitySource": "v91",
-    "browserQaReuseReason": "Canonical Level02 v23 and exact viewer v96 remain byte-identical under Source v91. Fresh Source-v91 browser QA is bound to the exact v91 handoff, latest-source freshness pointer and geometry-neutral classification bridge.",
+    "browserQaReuseReason": "Canonical Level02 v23 and exact viewer v96 remain byte-identical under Source v91. Fresh Source-v91 browser QA is bound to the exact v91 handoff and geometry-neutral classification; planner QA v24 is separately rebound to the v91 handoff/classification/pipeline/delta hashes after stable gate v26 correctly blocked the stale v90 planner-QA dependency.",
     "materialLevel02SourceBlocker": "Circular stepped toilet-cubicle bulkhead now has a written 1500mm horizontal centreline witness, but radius/diameter, vertical centre, stepped-ring/profile dimensions/AFFLs and exact transitions remain open; VAULTED CEILING OVER ENTRANCE and VAULTED CEILING OVER NEW KITCHEN remain named but explicit 2860/2860/2610 AFFL witnesses are not safely mapped to named conditions; verbal vault conditions remain design-not-frozen; other unwitnessed curved Level02 transitions remain locked.",
     "laterLevelSourceConflict": "L01 stair zone semantic no-ceiling/sloping-edge intent is source-closed, but exact soffit slope/profile/endpoints remain locked. L04 main Mazista written assembly conflict remains open. No Level02 geometry effect.",
     "latestPointerPublicPath": "source-state/latest-walkthrough-source.json",
-    "latestPointerSha256": "2589881bfd3b2de026b603869a3c9ba3ffe627ff91afc794b5b68c6f83a107c4"
+    "latestPointerSha256": "ddd4be23236fa38d98d4cb4a2886a7d16e35486ec6990e3a7deb8e5e2e6dddff"
   },
   "geometryPipeline": {
     "artifact": "34_Fresnaye_IncrementalGeometryPipeline_v2",
@@ -67,8 +67,8 @@
     "planner": "34_Fresnaye_GeometryDeltaPlanner_v7",
     "plannerPublicPath": "engineering/geometry-delta-planner-v7.py",
     "plannerSha256": "91aff788368482e67df1ae26f004cf4ca3d6cefd44c101e0a9a2ada24233846e",
-    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v23.json",
-    "plannerQaSha256": "05981b052b52256519131974519a87f86a6128f24c83fb8a7c96ee06e008d0d0",
+    "plannerQaPublicPath": "engineering/geometry-delta-planner-qa-v24.json",
+    "plannerQaSha256": "68b1a9d58ea0a2ef8d440fbb41ae9a4f44b32509f26a8b53cf2c767d06f4f1ce",
     "currentDeltaPlanPublicPath": "engineering/geometry-delta-plan-source-v91-v1.json",
     "currentDeltaPlanSha256": "91426ddd65ee42257a318297e250c94e30c91be0091e4fee18a8ff93ff5a9332",
     "currentDecision": "NO_OP_SHORT_CIRCUIT",
