@@ -1,0 +1,62 @@
+name: Walkthrough human acceptance v2.1 Source v94 candidate QA v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-human-acceptance-v2-1-source-v94-qa-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify stable recorder v2.1 exact bytes
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'; WANT='ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37'
+          curl -fsSL "$B/walkthrough-human-acceptance.html?v=$GITHUB_RUN_ID" -o /tmp/recorder.html
+          test "$(sha256sum /tmp/recorder.html|awk '{print $1}')" = "$WANT"
+          grep -q 'v2.1-manual-control-attestation' /tmp/recorder.html
+          grep -q 'MIN_MANUAL_RATIO=.85' /tmp/recorder.html
+          grep -q 'MIN_MANUAL_LEG_M=1' /tmp/recorder.html
+          grep -q 'MAX_UNCONTROLLED_M=1' /tmp/recorder.html
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify Source v94 binding and manual movement attestation
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/',URL=ROOT+'walkthrough-human-acceptance.html';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5',REC='ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37';
+          const ok=(v,m)=>{if(!v)throw Error(m)},vf=p=>p.frames().find(fr=>fr.url().includes('/34-fresnaye/v96-r9/'));
+          const gateHtml=pass=>`<!doctype html><script>window.__FRESNAYE_STABLE_GATE_QA=${JSON.stringify(pass?{pass:true,sourceArchitect:'v94',viewerSha256:V,modelSha256:M,liveBrowserQaSha256:'candidate-source-v94',startLinks:{entrance:'v96-r9/#entrance'},preferredReviewUrl:'v96-r9/#entrance'}:{pass:false,error:'synthetic fail-closed test'})}</script>`;
+          const out={artifact:'34_Fresnaye_Walkthrough_HumanAcceptanceV2_1_SourceV94_PublicBrowserQA_v2',timestampUtc:new Date().toISOString(),geometryChanged:false,recorderVersion:'v2',codeRevision:'v2.1-manual-control-attestation',recorderSha256:REC,sourceArchitect:'v94',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,gateBinding:'synthetic-source-v94-candidate; final real gate QA required after manifest promotion',failClosed:{},desktop:{},mobile:{},pass:false};
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const fc=await b.newContext({viewport:{width:1280,height:720}}),fp=await fc.newPage(),fe=[];fp.on('pageerror',e=>fe.push(String(e)));await fp.route('**/walkthrough-review.html?humanAcceptance=2**',r=>r.fulfill({status:200,contentType:'text/html',body:gateHtml(false)}));await fp.goto(URL+'?fail='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await fp.waitForFunction(()=>document.querySelector('#status')?.textContent.startsWith('BLOCKED'),{}, {timeout:30000});let fq=await fp.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),src=await fp.locator('#walk').getAttribute('src');ok(fq?.version==='v2'&&!fq.ready&&!fq.gateVerified&&src==='about:blank'&&!fe.length,'fail closed');out.failClosed={pass:true,walkthroughRemainedBlank:true,pageErrors:fe};await fc.close();
+            const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));let gates=0;p.on('request',r=>{if(r.url().includes('/walkthrough-review.html?humanAcceptance=2'))gates++});await p.route('**/walkthrough-review.html?humanAcceptance=2**',r=>r.fulfill({status:200,contentType:'text/html',body:gateHtml(true)}));await p.goto(URL+'?desktop='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});let q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),f=vf(p);ok(f,'desktop viewer');let rend=await f.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);ok(q.codeRevision==='v2.1-manual-control-attestation'&&q.gateVerified&&q.sourceArchitect==='v94'&&q.viewerSha256===V&&q.modelSha256===M&&rend==='WebGL2','desktop identity');await p.getByRole('button',{name:'Start human route'}).click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});ok(gates>=2,'fresh gate');await p.frameLocator('#walk').locator('#c').click({position:{x:250,y:200}});await p.keyboard.down('w');await p.waitForTimeout(800);await p.keyboard.up('w');await p.waitForTimeout(150);q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(q.session.distanceM>.15&&q.session.manualMovementM>.15&&q.session.manualMovementRatio>.9,'desktop manual '+JSON.stringify(q.session));await p.frameLocator('#walk').locator('#next').click();await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.invalid===true,{}, {timeout:10000});q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(/shortcut/.test(q.session.reason)&&!de.length,'shortcut');out.desktop={pass:true,renderer:rend,gateRequests:gates,startFreshVerification:true,sourceBound:'v94',manualMovementM:q.session.manualMovementM,manualControlRatio:q.session.manualMovementRatio,shortcutInvalidated:true,reason:q.session.reason,pageErrors:de};await dc.close();
+            const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await m.route('**/walkthrough-review.html?humanAcceptance=2**',r=>r.fulfill({status:200,contentType:'text/html',body:gateHtml(true)}));await m.goto(URL+'?mobile='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});let mf=vf(m),mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA),mr=await mf.evaluate(()=>window.__FRESNAYE_LIVE_META?.renderer);ok(mq.gateVerified&&mq.sourceArchitect==='v94'&&mq.viewerSha256===V&&mq.modelSha256===M&&mr==='WebGL2'&&!me.length,'mobile identity');let sv=await m.getByRole('button',{name:'Start human route'}).isVisible();ok(sv,'start visible');await m.getByRole('button',{name:'Start human route'}).click();await m.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true,{}, {timeout:120000});const stick=mf.locator('#stick'),box=await stick.boundingBox();ok(box,'stick');const cx=box.x+box.width/2,cy=box.y+box.height/2;await stick.dispatchEvent('pointerdown',{pointerId:91,pointerType:'touch',isPrimary:true,clientX:cx,clientY:cy,bubbles:true});await stick.dispatchEvent('pointermove',{pointerId:91,pointerType:'touch',isPrimary:true,clientX:cx,clientY:cy-48,bubbles:true});await m.waitForTimeout(1100);await stick.dispatchEvent('pointerup',{pointerId:91,pointerType:'touch',isPrimary:true,clientX:cx,clientY:cy-48,bubbles:true});await m.waitForTimeout(150);mq=await m.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(mq.session.distanceM>.15&&mq.session.manualMovementM>.15&&mq.session.manualMovementRatio>.9&&!me.length,'mobile manual '+JSON.stringify(mq.session));out.mobile={pass:true,renderer:mr,gateVerified:true,sourceBound:'v94',startVisible:sv,manualMovementM:mq.session.manualMovementM,manualControlRatio:mq.session.manualMovementRatio,pageErrors:me};await mc.close();out.pass=out.failClosed.pass&&out.desktop.pass&&out.mobile.pass;ok(out.pass,'aggregate');fs.writeFileSync('human-v94-v2.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          }finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node qa.cjs
+      - name: Publish evidence
+        run: |
+          set -euo pipefail
+          git worktree add /tmp/pages gh-pages
+          cp human-v94-v2.json /tmp/pages/human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v2.json
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add human-acceptance-recorder-v2-1-source-v94-publicbrowserqa-v2.json
+          git commit -m 'Publish Source v94 recorder v2.1 QA v2'
+          git push origin gh-pages
