@@ -1,0 +1,121 @@
+name: Walkthrough v96 stable v88 r9.2 LiveBrowser QA v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-v88-r9-2-livebrowser-qa-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify exact public Source v88, pipeline and viewer bytes
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          declare -A H
+          H[source-state/34_Fresnaye_SourceArchitect_handoff_v88_vault_plan_labels.json]='2b58d19400ea5786ff914b3b88f5e2d07b8f7f8030cdcec3b603055c754d86fe'
+          H[engineering/source-v88-walkthrough-classification-v1.json]='974b72f41e933c2fa1256b59c762b52f76e7e6f6bc22fcc86eb6110bc0a88d4f'
+          H[engineering/incremental-geometry-pipeline-v2-v88.json]='18e39c588d8edc1675faace31da6717b7c78de4d08ce61c9e75d83295d513078'
+          H[engineering/geometry-delta-plan-source-v88-v2.json]='6d72e0c4744b831b8c000d589b945ec7066dc148a560d0bbe6375873ee8ab395'
+          H[engineering/geometry-delta-planner-qa-v22.json]='09545a639c877de583a2d5defc6b286a03720a650c0ae06246cf8ca114107c68'
+          H[engineering/geometry-delta-planner-v7.py]='91aff788368482e67df1ae26f004cf4ca3d6cefd44c101e0a9a2ada24233846e'
+          H[v96-r9/index.html]='c6027e9a45c64d5b45ec1fac8389559bf86f9c46c52a2113dee62fcd33657512'
+          H[v96-r9/sw.js]='242f165b9614aff83f43d904bbba34645d64fa559d152ca9b3793358221f30ca'
+          H[v96-r9/viewer.html]='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+          : > public-hashes-v88.txt
+          fail=0
+          for p in "${!H[@]}"; do
+            out="/tmp/$(basename "$p").$RANDOM"
+            curl -fsSL --retry 5 --retry-delay 2 "$B/$p?qa=$GITHUB_RUN_ID" -o "$out"
+            got=$(sha256sum "$out" | awk '{print $1}')
+            printf '%s expected=%s observed=%s\n' "$p" "${H[$p]}" "$got" | tee -a public-hashes-v88.txt
+            if [ "$got" != "${H[$p]}" ]; then fail=1; fi
+          done
+          test "$fail" = 0
+          curl -fsSL "$B/v96-r9/index.html?jscheck=$GITHUB_RUN_ID" -o /tmp/index.html
+          python3 - <<'PY'
+          import re
+          t=open('/tmp/index.html').read(); m=re.search(r'<script>\n([\s\S]*?)\n</script>',t); assert m
+          open('/tmp/loader.js','w').write(m.group(1))
+          PY
+          node --check /tmp/loader.js
+      - name: Execute v7 classification bridge fail-closed planner
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          curl -fsSL "$B/source-state/34_Fresnaye_SourceArchitect_handoff_v88_vault_plan_labels.json?planner=$GITHUB_RUN_ID" -o /tmp/handoff.json
+          curl -fsSL "$B/engineering/source-v88-walkthrough-classification-v1.json?planner=$GITHUB_RUN_ID" -o /tmp/classification.json
+          curl -fsSL "$B/engineering/incremental-geometry-pipeline-v2-v88.json?planner=$GITHUB_RUN_ID" -o /tmp/pipeline.json
+          curl -fsSL "$B/engineering/geometry-delta-planner-v7.py?planner=$GITHUB_RUN_ID" -o /tmp/planner.py
+          python3 /tmp/planner.py --handoff /tmp/handoff.json --pipeline /tmp/pipeline.json --classification /tmp/classification.json --out /tmp/planned.json
+          python3 - <<'PY'
+          import json
+          h=json.load(open('/tmp/handoff.json')); c=json.load(open('/tmp/classification.json')); p=json.load(open('/tmp/planned.json'))
+          assert 'effect_of_v88' not in h['level02_priority_state']
+          assert h['canonical_geometry_changed'] is False and h['geometry_authorization'] is False and h['level02_priority_state']['status']=='PASS_UNCHANGED'
+          assert c['effectSource']=='CLASSIFICATION_BRIDGE' and c['level02Effect']=='NONE' and c['canonicalGeometryChanged'] is False and c['geometryAuthorization'] is False
+          assert p['sourceArchitect']=='v88' and p['level02Effect']=='NONE' and p['level02EffectSchemaPath']=='walkthrough_classification.level02Effect'
+          assert p['planner']=='34_Fresnaye_GeometryDeltaPlanner_v7'
+          assert p['decision']=='NO_OP_SHORT_CIRCUIT' and p['geometryBuildRequired'] is False and p['fullModelRegenerationRequired'] is False
+          PY
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Fresh public Source v88 desktop mobile navigation QA
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const B='https://lgalansky.github.io/34-fresnaye/v96-r9/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const starts={entrance:[7.9,17.1],living:[3.6,13.0],kitchen:[8.0,8.2],bedroom:[3.5,26.7],second:[-15.4,5.2],service:[-5.08,2.11]};
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV88R9_2_PublicBrowserQA_v2',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v88',sourceHandoffSha256:'2b58d19400ea5786ff914b3b88f5e2d07b8f7f8030cdcec3b603055c754d86fe',sourceEffect:'NONE',effectSource:'CLASSIFICATION_BRIDGE',planner:'34_Fresnaye_GeometryDeltaPlanner_v7',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,loaderRevision:'r9.2',plannerBridgePass:true,starts:[],deepLinks:[],desktop:{},mobile:{},navigation:{},pass:false};
+          const ok=(v,m)=>{if(!v)throw Error(m)};
+          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]};
+          const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          async function ready(p,u){await p.goto(u,{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:120000})}
+          async function stickMove(p,dy,id){const sb=await p.locator('#stick').boundingBox();ok(sb&&sb.width>20&&sb.height>20,'stick bounds');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2,a=xy(await p.locator('#coords').textContent());await p.dispatchEvent('#stick','pointerdown',{pointerId:id,pointerType:'touch',clientX:sx,clientY:sy,isPrimary:true,bubbles:true});await p.dispatchEvent('#stick','pointermove',{pointerId:id,pointerType:'touch',clientX:sx,clientY:sy+dy,isPrimary:true,bubbles:true});await p.waitForTimeout(850);await p.dispatchEvent('#stick','pointerup',{pointerId:id,pointerType:'touch',clientX:sx,clientY:sy+dy,isPrimary:true,bubbles:true});await p.waitForTimeout(100);return dist(a,xy(await p.locator('#coords').textContent()))}
+          (async()=>{const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));await ready(p,B+'?source88='+Date.now()+'#entrance');let t=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META),rr=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(t.viewerSha256===V&&t.modelSha256===M&&t.packageMode==='self-contained-static-host-r9.2-scope-isolated'&&lm.renderer==='WebGL2'&&rr.pass&&rr.mainRoute.collisionValidated,'desktop identity/readiness');
+            for(const [key,exp] of Object.entries(starts)){await p.evaluate(k=>document.querySelector(`[data-start="${k}"]`)?.click(),key);await p.waitForTimeout(80);const got=xy(await p.locator('#coords').textContent()),pass=dist(got,exp)<.14;out.starts.push({key,expected:exp,actual:got,pass});ok(pass,'start '+key)}
+            await p.evaluate(()=>document.querySelector('[data-start="living"]').click());await p.waitForTimeout(80);const rb=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(450);await p.keyboard.up('w');await p.waitForTimeout(80);const rm=xy(await p.locator('#coords').textContent());ok(dist(rb,rm)>.1,'keyboard did not move before reset');await p.locator('#reset').click();await p.waitForTimeout(80);const ra=xy(await p.locator('#coords').textContent());const resetPass=dist(ra,starts.living)<.12;ok(resetPass,'reset did not restore Living');await p.locator('#next').click();await p.waitForTimeout(80);const nx=xy(await p.locator('#coords').textContent());const nextRoomPass=dist(nx,starts.kitchen)<.12;ok(nextRoomPass,'next room Living -> Kitchen failed');out.navigation={keyboardMovedBeforeResetM:+dist(rb,rm).toFixed(3),resetPass,resetStart:'living',nextRoomPass,nextRoomFrom:'living',nextRoomTo:'kitchen'};
+            await p.evaluate(()=>document.querySelector('[data-start="entrance"]').click());await p.waitForTimeout(100);const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(650);await p.keyboard.up('w');await p.waitForTimeout(100);const b=xy(await p.locator('#coords').textContent());ok(dist(a,b)>.15,'desktop keyboard');await p.locator('#enter').click();await p.waitForTimeout(150);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,bubbles:true})));await p.waitForTimeout(80);const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&!de.length,'desktop mouse/errors');out.desktop={pass:true,renderer:lm.renderer,loaderMode:t.loaderMode,keyboardMovementM:+dist(a,b).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),collisionValidated:rr.mainRoute.collisionValidated,pageErrors:de};await dc.close();
+            const hc=await browser.newContext({viewport:{width:1280,height:720}});for(const [key,exp] of Object.entries(starts)){const hp=await hc.newPage(),he=[];hp.on('pageerror',e=>he.push(String(e)));await ready(hp,B+'?deep88='+Date.now()+'#'+key);await hp.waitForTimeout(100);const got=xy(await hp.locator('#coords').textContent()),pass=dist(got,exp)<.14;out.deepLinks.push({key,expected:exp,actual:got,pass,pageErrors:he});ok(pass&&!he.length,'deep link '+key);await hp.close()}await hc.close();
+            const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await ready(m,B+'?mobile88='+Date.now()+'#living');let mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),ml=await m.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(mt.viewerSha256===V&&mt.modelSha256===M&&mt.packageMode==='self-contained-static-host-r9.2-scope-isolated'&&ml.renderer==='WebGL2','mobile identity');await m.evaluate(()=>document.querySelector('[data-start="living"]').click());await m.waitForTimeout(100);let jm=await stickMove(m,-48,61);if(jm<=.15){await m.evaluate(()=>document.querySelector('[data-start="living"]').click());await m.waitForTimeout(100);jm=await stickMove(m,48,62)}ok(jm>.15,'joystick movement '+jm);const lb=await m.locator('#look').boundingBox();ok(lb&&lb.width>50&&lb.height>50,'look bounds');const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,my0=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:63,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:63,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:63,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});const my1=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(my1-my0)>.04,'touch look');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok(dist(xy(await m.locator('#coords').textContent()),starts.living)<.12,'mobile reset living');let mr=await m.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(mr.mainRoute.collisionValidated&&!me.length,'mobile collision/errors');out.mobile={pass:true,renderer:ml.renderer,loaderMode:mt.loaderMode,joystickMovementM:+jm.toFixed(3),touchLookYawRad:+Math.abs(my1-my0).toFixed(3),reset:true,resetStart:'living',collisionValidated:mr.mainRoute.collisionValidated,pageErrors:me};await mc.close();
+            out.pass=out.starts.every(x=>x.pass)&&out.deepLinks.every(x=>x.pass&&x.pageErrors.length===0)&&out.navigation.resetPass&&out.navigation.nextRoomPass&&out.desktop.pass&&out.mobile.pass;
+          }catch(e){out.error=String(e?.stack||e)}finally{await browser.close();fs.writeFileSync('stable-v88-r9-2-publicbrowserqa-v2.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
+          JS
+          node --check qa.cjs
+          node qa.cjs
+      - name: Persist Source v88 QA evidence to gh-pages
+        if: always()
+        run: |
+          set -euo pipefail
+          test -s stable-v88-r9-2-publicbrowserqa-v2.json
+          git fetch origin gh-pages
+          git worktree add /tmp/ghp origin/gh-pages
+          cp stable-v88-r9-2-publicbrowserqa-v2.json /tmp/ghp/stable-v88-r9-2-publicbrowserqa-v2.json
+          cd /tmp/ghp
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add stable-v88-r9-2-publicbrowserqa-v2.json
+          git commit -m 'Persist Source v88 planner-v7 walkthrough public QA' || true
+          git push origin HEAD:gh-pages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stable-v88-r9-2-publicbrowserqa-v2
+          path: stable-v88-r9-2-publicbrowserqa-v2.json
