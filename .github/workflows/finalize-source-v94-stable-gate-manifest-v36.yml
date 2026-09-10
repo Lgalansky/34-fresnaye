@@ -1,0 +1,47 @@
+name: Finalize Source v94 stable gate manifest evidence
+
+on:
+  push:
+    paths:
+      - '.github/workflows/finalize-source-v94-stable-gate-manifest-v36.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Bind fresh Source v94 gate QA into stable manifest
+        run: |
+          set -euo pipefail
+          git worktree add /tmp/pages gh-pages
+          cd /tmp/pages
+          test -f stable-v94-r9-2-gate-v27-liveqa-v1.json
+          python3 - <<'PY'
+          import json,hashlib,pathlib,datetime
+          def sha(p): return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+          q=json.load(open('stable-v94-r9-2-gate-v27-liveqa-v1.json'))
+          assert q['pass'] is True and q['sourceArchitect']=='v94' and q['gate']['pass'] and q['launcher']['pass'] and q['recorder']['pass']
+          m=json.load(open('walkthrough-review.json'))
+          assert m['schemaVersion']==36 and m['sourceState']['latestSourceArchitectObserved']=='v94'
+          g=m['stableGate']; g['path']='walkthrough-review.html'; g['revision']='v27'; g['sha256']=q['gateSha256']; g['liveQaEvidence']='stable-v94-r9-2-gate-v27-liveqa-v1.json'; g['liveQaSha256']=sha('stable-v94-r9-2-gate-v27-liveqa-v1.json'); g['liveQaRun']=34465206390; g['liveQaJob']=102832046039
+          m['updatedUtc']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          m['acceptance']['sourceV94RealGateVerified']=True
+          m['acceptance']['sourceV94RealGateLiveQaEvidence']='stable-v94-r9-2-gate-v27-liveqa-v1.json'
+          out=json.dumps(m,indent=2,ensure_ascii=False)+'\n'
+          pathlib.Path('walkthrough-review.json').write_text(out)
+          pathlib.Path('34_Fresnaye_Walkthrough_StableReviewManifest_v36.json').write_text(out)
+          report={'artifact':'34_Fresnaye_Walkthrough_SourceV94_StableGateManifestBinding_QA_v1','timestampUtc':datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),'pass':True,'geometryChanged':False,'sourceArchitect':'v94','canonicalModel':'v23','viewerVersion':'v96','gateRevision':'v27','gateQaEvidence':'stable-v94-r9-2-gate-v27-liveqa-v1.json','gateQaSha256':g['liveQaSha256'],'gateQaRun':34465206390,'gateQaJob':102832046039,'manifestSha256':sha('walkthrough-review.json')}
+          pathlib.Path('engineering/source-v94-stable-gate-manifest-binding-qa-v1.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-review.json 34_Fresnaye_Walkthrough_StableReviewManifest_v36.json engineering/source-v94-stable-gate-manifest-binding-qa-v1.json
+          git commit -m 'Bind Source v94 gate QA into stable manifest v36'
+          git push origin gh-pages
