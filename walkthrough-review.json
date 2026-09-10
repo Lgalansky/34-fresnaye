@@ -1,7 +1,7 @@
 {
-  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v32",
-  "schemaVersion": 32,
-  "updatedUtc": "2026-09-10T08:42:00Z",
+  "artifact": "34_Fresnaye_Walkthrough_StableReviewManifest_v33",
+  "schemaVersion": 33,
+  "updatedUtc": "2026-09-10T08:46:30Z",
   "reviewCandidate": {
     "viewerVersion": "v96",
     "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
@@ -78,8 +78,8 @@
   },
   "stableGate": {
     "path": "walkthrough-review.html",
-    "revision": "v26",
-    "sha256": "0fe8ca506f60503c41992e4f27a18d42ba701b4bdc008542afb0db28a5b9ba6a"
+    "revision": "v27",
+    "sha256": "3e9787000a5562a69a697f6f940dc7339e85384fe6da19470f5ea13cf0bbfe16"
   },
   "acceptance": {
     "finalStatus": "OPEN",
@@ -92,10 +92,10 @@
     "humanAcceptanceRecorderUrl": "walkthrough-human-acceptance.html",
     "humanAcceptanceRecorderRevision": "v2",
     "humanAcceptanceRecorderSha256": "ab56173d527aa523fad0e19fcf58ad72087a872cee8c7888bea54473e277f4dc",
-    "humanAcceptanceRecorderQaEvidence": "human-acceptance-recorder-v2-publicbrowserqa-v1.json",
-    "humanAcceptanceRecorderQaSha256": "33cbffe39622b27f5f560b0f8a81eef18bec89eb31535c93dbc683530ae9e780",
-    "humanAcceptanceRecorderQaRun": 34451086187,
-    "humanAcceptanceRecorderQaJob": 102786760501,
+    "humanAcceptanceRecorderQaEvidence": "human-acceptance-recorder-v2-source-v93-publicbrowserqa-v1.json",
+    "humanAcceptanceRecorderQaSha256": "f0c7af9e76e571183897736e4cb04098477eec13f766f9216bba80057c280157",
+    "humanAcceptanceRecorderQaRun": 34456802250,
+    "humanAcceptanceRecorderQaJob": 102804983868,
     "humanAcceptanceRecorderGuards": [
       "ordered waypoint sequence",
       "minimum 40 m distance",
@@ -106,6 +106,7 @@
       "active-run visibility loss invalidates"
     ],
     "humanAcceptanceRecorderFreshGateOnStart": true,
-    "humanAcceptanceRecorderFailClosed": true
+    "humanAcceptanceRecorderFailClosed": true,
+    "humanAcceptanceRecorderQaSourceArchitect": "v93"
   }
 }
