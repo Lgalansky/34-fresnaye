@@ -1,0 +1,197 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_v96_StableV86R9_2_PublicBrowserQA_v2",
+  "timestampUtc": "2026-09-10T02:38:29.228Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v86",
+  "sourceHandoffSha256": "5529ebd1fa3eba196fd8d792b84fb8230c25f343b4ad2962c40e2cb4c59f7703",
+  "sourceEffect": "NONE__SOURCE_CONTRACT_INTEGRATION_ONLY",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "loaderRevision": "r9.2",
+  "starts": [
+    {
+      "key": "entrance",
+      "expected": [
+        7.9,
+        17.1
+      ],
+      "actual": [
+        7.9,
+        17.1
+      ],
+      "pass": true
+    },
+    {
+      "key": "living",
+      "expected": [
+        3.6,
+        13
+      ],
+      "actual": [
+        3.6,
+        13
+      ],
+      "pass": true
+    },
+    {
+      "key": "kitchen",
+      "expected": [
+        8,
+        8.2
+      ],
+      "actual": [
+        8,
+        8.2
+      ],
+      "pass": true
+    },
+    {
+      "key": "bedroom",
+      "expected": [
+        3.5,
+        26.7
+      ],
+      "actual": [
+        3.5,
+        26.7
+      ],
+      "pass": true
+    },
+    {
+      "key": "second",
+      "expected": [
+        -15.4,
+        5.2
+      ],
+      "actual": [
+        -15.4,
+        5.2
+      ],
+      "pass": true
+    },
+    {
+      "key": "service",
+      "expected": [
+        -5.08,
+        2.11
+      ],
+      "actual": [
+        -5.08,
+        2.11
+      ],
+      "pass": true
+    }
+  ],
+  "deepLinks": [
+    {
+      "key": "entrance",
+      "expected": [
+        7.9,
+        17.1
+      ],
+      "actual": [
+        7.9,
+        17.1
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "living",
+      "expected": [
+        3.6,
+        13
+      ],
+      "actual": [
+        3.6,
+        13
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "kitchen",
+      "expected": [
+        8,
+        8.2
+      ],
+      "actual": [
+        8,
+        8.2
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "bedroom",
+      "expected": [
+        3.5,
+        26.7
+      ],
+      "actual": [
+        3.5,
+        26.7
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "second",
+      "expected": [
+        -15.4,
+        5.2
+      ],
+      "actual": [
+        -15.4,
+        5.2
+      ],
+      "pass": true,
+      "pageErrors": []
+    },
+    {
+      "key": "service",
+      "expected": [
+        -5.08,
+        2.11
+      ],
+      "actual": [
+        -5.08,
+        2.11
+      ],
+      "pass": true,
+      "pageErrors": []
+    }
+  ],
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "keyboardMovementM": 0.537,
+    "pointerLock": true,
+    "mouseLookYawRad": 0.25,
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "loaderMode": "direct-v9.2",
+    "joystickMovementM": 0.461,
+    "touchLookYawRad": 0.3,
+    "reset": true,
+    "resetStart": "living",
+    "collisionValidated": true,
+    "pageErrors": []
+  },
+  "navigation": {
+    "keyboardMovedBeforeResetM": 0.103,
+    "resetPass": true,
+    "resetStart": "living",
+    "nextRoomPass": true,
+    "nextRoomFrom": "living",
+    "nextRoomTo": "kitchen"
+  },
+  "pass": true
+}
