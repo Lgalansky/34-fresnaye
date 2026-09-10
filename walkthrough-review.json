@@ -76,7 +76,7 @@
   "stableGate": {
     "path": "walkthrough-review.html",
     "revision": "v24",
-    "sha256": "a56c800b48f772bdef48cb3257d71ec4b798c821c2c37c0c377defe0e93d6e0d"
+    "sha256": "77a5a6f0caa515748e37ccc8a6b6978c9794e0218c46cc458fd508e3f8d9fadd"
   },
   "acceptance": {
     "finalStatus": "OPEN",
