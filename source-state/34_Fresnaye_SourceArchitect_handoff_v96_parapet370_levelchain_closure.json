@@ -1,0 +1,67 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v96_parapet370_levelchain_closure",
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T14:29:45+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "level02_priority_five": {
+    "status": "PASS_UNCHANGED",
+    "L02_D09": {
+      "rough_width_mm": 1790,
+      "underside_mm": 2400
+    },
+    "L02_D22_former_D21_physical_instance1": {
+      "corrected_identity": "L02_D22",
+      "rough_width_mm": 2980,
+      "underside_mm": 2210,
+      "assembly_mm": {
+        "overall": 6240,
+        "inner": 3080,
+        "height": 2210
+      }
+    },
+    "L02_W11": {
+      "rough_width_mm": 1800,
+      "underside_mm": 2090,
+      "finished_wall_thickness_mm": 400
+    },
+    "L02_iD05": {
+      "rough_width_mm": 1200,
+      "underside_mm": 2400,
+      "pocket_mm": 100,
+      "side_clearance_mm_each": 25
+    },
+    "L02_iD08": {
+      "rough_width_mm": 855,
+      "underside_mm": 2400,
+      "pocket_mm": 90,
+      "side_clearance_mm_each": 20
+    }
+  },
+  "v96_material_advance": {
+    "level": "L04",
+    "subject": "370mm parapet-adjacent level-chain ownership",
+    "finding": "FRE_WD_302_REV_B explicitly owns Domestic Quarters second-storey FFL at 88 380, TOP OF PARAPET at 88 750, and a direct 370mm vertical dimension between those datums. The previously quarantined 370mm condition is therefore source-closed.",
+    "impact": "Remove the 370mm parapet condition from the Level04 unresolved list. This closure does not resolve parapet thickness, roof pitch/eaves/ridge or roof assembly conflicts."
+  },
+  "current_level02_locks": [
+    "Circular stepped toilet-cubicle bulkhead radius/diameter, vertical centre, stepped-ring widths/offsets, exact transitions/tangencies and outer-band AFFL hierarchy.",
+    "Two literal VAULTED CEILING OVER plan instances: semantic ownership plus AFFL/profile/section mapping; explicit 2860/2860/2610 AFFLs remain unmapped; architect-described vaults remain design-not-frozen.",
+    "Any other curved/unwitnessed Level02 transition lacking complete written construction evidence."
+  ],
+  "later_stage_open_summary": [
+    "L01: exact stair-soffit slope/profile/endpoints; complex curved/stepped/nested ceiling boundaries; D11 brickwork tag/rough width; W06 rough width; W08 head; W04/W05/W06 25mm interface allocations.",
+    "L03: D02 duplicate schedule-ID/system conflict; D04 component schedule omission; iD02 2100-vs-2150 conflict; skylight IDs/interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04: main Mazista/Klip-Lok written assembly conflict; main-roof numeric pitch/eaves/ridge extents; lean-to quantitative run/eave/ridge-edge geometry. 370mm parapet condition is now CLOSED."
+  ],
+  "source_watch": "No Archilab message received on 2026-09-10 from info@archilab.co.za. Latest known architect inbound remains 2026-09-09T16:41:59Z RE: Render with no attachment; promised quick section still not received.",
+  "chief_of_staff_action": "Adopt Level04 IntegratedStageReadinessRegister v1 and IntegratedOpenExceptions v1. Remove the 370mm parapet-adjacent condition from unresolved items; preserve it only as a source-owned vertical rise between 88 380 Domestic Quarters second-storey FFL and 88 750 TOP OF PARAPET. Keep all other Level02/L01/L03/L04 locks unchanged. No canonical 3D model edit.",
+  "source_artifacts": [
+    "34_Fresnaye_SourceArchitect_Level04_Parapet370_LevelChainEvidence_v1.json",
+    "34_Fresnaye_SourceArchitect_Level04_Parapet370_LevelChainEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level04_IntegratedStageReadinessRegister_v1.json",
+    "34_Fresnaye_SourceArchitect_Level04_IntegratedOpenExceptions_v1.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v79.json"
+  ],
+  "geometry_action": "NONE"
+}
