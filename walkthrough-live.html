@@ -4,53 +4,57 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="fresnaye-live-launcher" content="v1-stable-gate-backed">
+<meta name="fresnaye-live-launcher" content="v2-stable-gate-backed-retry">
 <title>34 Fresnaye — Verified Live Walkthrough</title>
 <style>
 :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#0e0e0e;color:#f5f5f5}
 body{min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(720px,100%);background:#181818;border:1px solid #333;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0008}
 h1{margin:0 0 8px;font-size:clamp(24px,5vw,36px)}p{color:#bbb;line-height:1.5}.status{padding:12px 0;font-weight:700}.ok{color:#9bedae}.warn{color:#ffd27a}.bad{color:#ff9d9d}
-a{display:inline-block;margin-top:12px;padding:11px 14px;border-radius:10px;background:#2a2a2a;color:#fff;text-decoration:none;font-weight:700}
-iframe{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;border:0;visibility:hidden}
-.small{font-size:12px;color:#888;margin-top:14px;word-break:break-word}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}a,button{display:inline-block;padding:11px 14px;border-radius:10px;background:#2a2a2a;color:#fff;text-decoration:none;font-weight:700;border:0;font:inherit;cursor:pointer}button[hidden]{display:none}button:disabled{opacity:.45;cursor:not-allowed}
+iframe{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;border:0;visibility:hidden}.small{font-size:12px;color:#888;margin-top:14px;word-break:break-word}
 </style>
 </head>
 <body>
 <main class="card">
 <h1>34 Fresnaye walkthrough</h1>
 <p>This permanent launcher opens the latest QA-approved walkthrough only after the stable source/model/transport gate verifies.</p>
-<div id="status" class="status warn">Verifying current walkthrough…</div>
-<a id="review" href="./walkthrough-review.html">Open verification details</a>
+<div id="status" class="status warn" role="status" aria-live="polite">Verifying current walkthrough…</div>
+<div class="actions"><button id="retry" hidden type="button">Retry verification</button><a id="review" href="./walkthrough-review.html">Open verification details</a></div>
 <div id="detail" class="small">Architectural geometry is never modified by this launcher.</div>
 </main>
-<iframe id="gate" src="./walkthrough-review.html?launcher=1" title="Walkthrough verification gate"></iframe>
+<iframe id="gate" title="Walkthrough verification gate"></iframe>
 <script>
 (()=>{
-const VERSION='v1', ALLOWED=['entrance','living','kitchen','bedroom','second','service'];
-const frame=document.getElementById('gate'), status=document.getElementById('status'), detail=document.getElementById('detail');
-const requested=(()=>{const k=location.hash.replace(/^#/,'').toLowerCase();return ALLOWED.includes(k)?k:'entrance'})();
-let finished=false, ticks=0;
-function fail(msg){if(finished)return;finished=true;status.className='status bad';status.textContent='Walkthrough blocked';detail.textContent=msg+' Open verification details for the exact failing gate.';window.__FRESNAYE_LIVE_LAUNCHER_QA={version:VERSION,pass:false,requestedStart:requested,error:msg}}
+const VERSION='v2', ALLOWED=['entrance','living','kitchen','bedroom','second','service'];
+const frame=document.getElementById('gate'),status=document.getElementById('status'),detail=document.getElementById('detail'),retry=document.getElementById('retry');
+const requested=(()=>{const h=location.hash.replace(/^#/,'').toLowerCase(),q=new URLSearchParams(location.search).get('start')?.toLowerCase();return ALLOWED.includes(h)?h:(ALLOWED.includes(q)?q:'entrance')})();
+let finished=false,ticks=0,attempts=0,pollTimer=null;
+function expose(data={}){window.__FRESNAYE_LIVE_LAUNCHER_QA={version:VERSION,pass:null,state:'VERIFYING',requestedStart:requested,attempts,...data}}
+function safeTarget(raw){try{const u=new URL(raw,location.href),base=new URL('./',location.href);if(u.origin!==location.origin||!u.pathname.startsWith(base.pathname))throw Error('verified target left the 34 Fresnaye site');return u}catch(e){throw Error('invalid verified start URL: '+(e?.message||e))}}
+function fail(msg){if(finished)return;finished=true;clearTimeout(pollTimer);status.className='status bad';status.textContent='Walkthrough blocked';detail.textContent=msg+' Nothing unverified was opened.';retry.hidden=false;retry.disabled=false;expose({pass:false,state:'BLOCKED',error:msg})}
 function poll(){
- if(finished)return;
- ticks++;
+ if(finished)return;ticks++;
  try{
-   const w=frame.contentWindow, q=w?.__FRESNAYE_STABLE_GATE_QA;
+   const q=frame.contentWindow?.__FRESNAYE_STABLE_GATE_QA;
    if(q?.pass===true){
-     const target=q.startLinks?.[requested]||q.preferredReviewUrl;
-     if(!target) return fail('Verified gate did not provide a start URL');
-     finished=true;status.className='status ok';status.textContent='Verified — opening '+requested+'…';
-     window.__FRESNAYE_LIVE_LAUNCHER_QA={version:VERSION,pass:true,requestedStart:requested,sourceArchitect:q.sourceArchitect,viewerSha256:q.viewerSha256,modelSha256:q.modelSha256,planner:q.planner,decision:q.decision,target};
-     const u=new URL(target,location.href);setTimeout(()=>location.replace(u.href),80);return;
+     const raw=q.startLinks?.[requested]||q.preferredReviewUrl;if(!raw)return fail('Verified gate did not provide a start URL');
+     let u;try{u=safeTarget(raw)}catch(e){return fail(e.message)}
+     finished=true;clearTimeout(pollTimer);retry.hidden=true;status.className='status ok';status.textContent='Verified — opening '+requested+'…';detail.textContent='Source '+(q.sourceArchitect||'verified')+' · viewer/model hashes verified by the stable gate.';
+     expose({pass:true,state:'VERIFIED',sourceArchitect:q.sourceArchitect,viewerSha256:q.viewerSha256,modelSha256:q.modelSha256,planner:q.planner,decision:q.decision,target:u.href});
+     setTimeout(()=>location.replace(u.href),120);return;
    }
-   if(q?.pass===false) return fail('Stable verification gate failed: '+(q.error||'integrity check failed'));
+   if(q?.pass===false)return fail('Stable verification gate failed: '+(q.error||'integrity check failed'));
  }catch(e){return fail('Stable verification gate could not be inspected: '+(e?.message||e))}
  if(ticks>240)return fail('Stable verification gate timed out');
- setTimeout(poll,125);
+ pollTimer=setTimeout(poll,125);
 }
-frame.addEventListener('load',poll,{once:true});
-setTimeout(poll,250);
+function verify(){
+ attempts++;finished=false;ticks=0;clearTimeout(pollTimer);retry.hidden=true;retry.disabled=true;status.className='status warn';status.textContent='Verifying current walkthrough…';detail.textContent='Checking current source, model, viewer and deployment integrity. Attempt '+attempts+'.';expose();
+ frame.src='./walkthrough-review.html?launcher=2&attempt='+attempts+'&t='+Date.now();
+ pollTimer=setTimeout(poll,250);
+}
+frame.addEventListener('load',()=>{if(!finished)poll()});retry.addEventListener('click',verify);window.addEventListener('online',()=>{if(finished&&window.__FRESNAYE_LIVE_LAUNCHER_QA?.pass===false)retry.disabled=false});verify();
 })();
 </script>
 </body>
