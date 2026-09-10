@@ -1,0 +1,47 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v103_D11_brickwork_tag_correction",
+  "source_architect_version": "v103",
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T23:30:39+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L01_D11_BRICKWORK_TAG_DRIFT_RESOLVED__D11_U-S2100_RETAINED__D11_ROUGH_WIDTH_STILL_OPEN__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22_former_D21_physical_instance1": "corrected ID; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / side clearance25 each",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / side clearance20 each"
+    }
+  },
+  "v103_material_advance": {
+    "level": "L01",
+    "subject": "L01_D11 brickwork tag correction",
+    "finding": "Cross-sheet registered-position audit proves that FRE_WD_205 labels the architectural L01_D11 physical instance as L01_D08. FRE_WD_205 duplicates L01_D08 elsewhere and omits L01_D11, while FRE_WD_401 explicitly schedules L01_D11. The co-located brickwork tag is therefore adjudicated as a drafting ID error for this instance. Its directly associated U/S opening 2100 mm is retained; masonry rough width remains open.",
+    "impact": "Removes D11 brickwork tag drift from the Level01 unresolved list without inventing a width or changing geometry."
+  },
+  "current_L02_locks": [
+    "Entrance vault pair: final/current post-workshop Archilab freeze/reissue remains open; preliminary 2900 AFFL sections are not final geometry.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy remain open.",
+    "Separate 2610 vaulted condition remains source-preserved but semantically unassigned if later build scope requires it."
+  ],
+  "later_stage_open_summary": [
+    "L01: D11 masonry rough width only (tag drift now resolved); W06 masonry rough width; W08 masonry U/S/head; W04/W05/W06 25mm interface meanings; complex curved/stepped/nested ceilings; stair soffit exact geometry.",
+    "L03: D02 duplicate schedule-system conflict; D04 confirmed schedule omission; iD02 2100-vs-2150 conflict; skylight interfaces/IDs; S01/S02 masonry heads; S03 grille overall size.",
+    "L04: Mazista/Klip-Lok written assembly conflict; main-roof numeric pitch and horizontal eave/ridge geometry; lean-to quantitative run/eave/ridge-edge."
+  ],
+  "source_watch": "No newer Archilab inbound after 2026-09-10T12:24:08Z; latest vault source remains preliminary.",
+  "chief_of_staff_action": "Adopt the L01_D11 tag correction for source identity and retain D11 brickwork U/S 2100. Keep D11 rough width locked; do not substitute scheduled 5100. Keep all L02 locks and other later-stage exceptions unchanged. No canonical geometry edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level01_D11_BrickworkTagCorrectionEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level01_D11_BrickworkTagCorrectionEvidence_v1.json",
+    "34_Fresnaye_SourceArchitect_Level01_D11_RemainingException_v1.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v86.json",
+    "34_Fresnaye_SourceArchitect_Run103_SourceArtifactManifest_v1.json"
+  ],
+  "geometry_action": "NONE"
+}
