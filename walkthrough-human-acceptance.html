@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="fresnaye-human-acceptance" content="v1">
+<title>34 Fresnaye — Human Walk Acceptance</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#0d0d0d;color:#fff;overflow:hidden}
+#app{height:100%;display:grid;grid-template-rows:auto 1fr}
+#hud{background:#141414;border-bottom:1px solid #333;padding:10px 12px;display:grid;gap:8px;z-index:10}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.title{font-weight:800}.status{font-size:13px;color:#bbb}
+.metrics{display:flex;gap:14px;font-variant-numeric:tabular-nums;font-size:13px}.route{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:5px 8px;border-radius:999px;background:#2a2a2a;color:#aaa;font-size:12px}.chip.done{background:#17351f;color:#9bedae}.chip.active{outline:1px solid #ddd;color:#fff}
+button{appearance:none;border:0;border-radius:9px;padding:8px 12px;font-weight:750;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+#start{background:#f2f2f2;color:#111}#download{background:#2a2a2a;color:#fff}#resetSession{background:#3a2323;color:#ffd0d0}
+#frameWrap{position:relative;min-height:0}iframe{width:100%;height:100%;border:0;background:#111}
+#banner{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);max-width:min(92vw,760px);padding:9px 12px;border-radius:10px;background:#111d;border:1px solid #444;color:#eee;font-size:13px;pointer-events:none}
+.pass{color:#9bedae}.fail{color:#ff9d9d}.warn{color:#ffd27a}
+@media(max-width:600px){#hud{padding:8px}.metrics{gap:9px}.status{font-size:12px}.chip{font-size:11px;padding:4px 7px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div class="top"><span class="title">34 Fresnaye human acceptance</span><span id="status" class="status">Loading verified walkthrough…</span><button id="start" disabled>Start human route</button><button id="resetSession" disabled>Restart session</button><button id="download" disabled>Download evidence</button></div>
+    <div class="metrics"><span>Distance <b id="distance">0.0 m</b> / 40 m</span><span>Time <b id="duration">0.0 s</b> / 12 s</span><span>Human inputs <b id="inputs">0</b></span></div>
+    <div id="route" class="route"></div>
+  </header>
+  <div id="frameWrap"><iframe id="walk" src="./v96-r9/#entrance" allow="fullscreen; pointer-lock"></iframe><div id="banner">This records a real manual walk only. Reset, Next Room, start shortcuts, teleports or discontinuities invalidate the session.</div></div>
+</div>
+<script>
+(()=>{
+const VERSION='v1', VIEWER='v96', MODEL='v23', VIEWER_SHA='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded', MODEL_SHA='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+const route=[['entrance','Entrance',[7.9,17.1]],['living','Living',[3.6,13.0]],['kitchen','Kitchen',[8.0,8.2]],['bedroom','Main Bedroom',[3.5,26.7]],['entrance2','Entrance',[7.9,17.1]]];
+const RADIUS=1.25, MAX_STEP=1.6, MIN_DISTANCE=40, MIN_SECONDS=12;
+const f=document.getElementById('walk'),status=document.getElementById('status'),start=document.getElementById('start'),restart=document.getElementById('resetSession'),download=document.getElementById('download'),distanceEl=document.getElementById('distance'),durationEl=document.getElementById('duration'),inputsEl=document.getElementById('inputs'),routeEl=document.getElementById('route'),banner=document.getElementById('banner');
+let ready=false,session=null,timer=null,attachedDoc=null;
+const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+const parseXY=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);return m?[+m[1],+m[2]]:null};
+function renderRoute(){routeEl.innerHTML='';route.forEach((r,i)=>{const s=document.createElement('span');s.className='chip'+(session&&i<session.nextIndex?' done':'')+(session&&i===session.nextIndex?' active':'');s.textContent=(i+1)+'. '+r[1];routeEl.appendChild(s)})}
+function state(){return session?{active:session.active,invalid:session.invalid,passed:session.passed,nextIndex:session.nextIndex,distanceM:+session.distance.toFixed(3),durationS:+session.duration.toFixed(3),humanInputs:session.inputs,reason:session.reason||null}:null}
+function expose(){window.__FRESNAYE_HUMAN_ACCEPTANCE_QA={version:VERSION,ready,viewerVersion:VIEWER,canonicalModel:MODEL,viewerSha256:VIEWER_SHA,modelSha256:MODEL_SHA,requirements:{sequence:route.map(x=>x[1]),minimumDistanceM:MIN_DISTANCE,minimumDurationS:MIN_SECONDS,waypointRadiusM:RADIUS,maxContinuousStepM:MAX_STEP},session:state(),sameOriginFrameAccessible:!!attachedDoc}}
+function setStatus(msg,cls=''){status.className='status '+cls;status.textContent=msg}
+function invalidate(reason){if(!session||!session.active||session.invalid||session.passed)return;session.invalid=true;session.active=false;session.reason=reason;setStatus('INVALID — '+reason,'fail');banner.textContent='Session invalidated. Restart and complete the route manually without shortcuts.';restart.disabled=false;download.disabled=true;renderRoute();expose()}
+function attachGuards(doc){
+ if(attachedDoc===doc)return;attachedDoc=doc;
+ doc.addEventListener('keydown',()=>{if(session?.active){session.inputs++;inputsEl.textContent=session.inputs;expose()}},true);
+ doc.addEventListener('pointerdown',()=>{if(session?.active){session.inputs++;inputsEl.textContent=session.inputs;expose()}},true);
+ doc.addEventListener('touchstart',()=>{if(session?.active){session.inputs++;inputsEl.textContent=session.inputs;expose()}},{capture:true,passive:true});
+ doc.addEventListener('click',e=>{if(!session?.active)return;const t=e.target?.closest?.('#reset,#mobileReset,#next,[data-start]');if(t)invalidate('navigation shortcut/control used')},true);
+}
+function readFrame(){
+ try{
+  const w=f.contentWindow,d=f.contentDocument;if(!w||!d)return null;
+  attachGuards(d);
+  const tm=w.__FRESNAYE_TRANSPORT_META,lm=w.__FRESNAYE_LIVE_META,q=w.__FRESNAYE_QA;
+  const xy=parseXY(d.querySelector('#coords')?.textContent);
+  return {w,d,tm,lm,q,xy};
+ }catch{return null}
+}
+function resetUi(){session=null;distanceEl.textContent='0.0 m';durationEl.textContent='0.0 s';inputsEl.textContent='0';download.disabled=true;restart.disabled=true;banner.textContent='This records a real manual walk only. Reset, Next Room, start shortcuts, teleports or discontinuities invalidate the session.';renderRoute();expose()}
+function startSession(){
+ const x=readFrame();if(!ready||!x?.xy)return;
+ if(dist(x.xy,route[0][2])>RADIUS){setStatus('Move/reset to Entrance before starting','warn');return}
+ session={active:true,invalid:false,passed:false,startedAt:performance.now(),lastAt:performance.now(),last:x.xy,distance:0,duration:0,inputs:0,nextIndex:1,reason:null,samples:1,viewerSha256:x.tm.viewerSha256,modelSha256:x.tm.modelSha256,renderer:x.lm.renderer};
+ distanceEl.textContent='0.0 m';durationEl.textContent='0.0 s';inputsEl.textContent='0';restart.disabled=false;start.disabled=true;setStatus('RECORDING — walk Entrance → Living → Kitchen → Main Bedroom → Entrance','warn');banner.textContent='Walk continuously. Manual keyboard/mouse or touch controls only.';renderRoute();expose()
+}
+function tick(){
+ const x=readFrame();
+ if(!ready&&x?.tm?.pass===true&&x?.q?.status==='READY'&&x?.tm?.viewerSha256===VIEWER_SHA&&x?.tm?.modelSha256===MODEL_SHA&&x?.lm?.renderer==='WebGL2'){
+   ready=true;start.disabled=false;setStatus('Verified walkthrough ready — manual acceptance recorder armed','pass');expose()
+ }
+ if(!session?.active||!x?.xy)return;
+ const now=performance.now(),step=dist(session.last,x.xy),dt=(now-session.lastAt)/1000;
+ if(step>MAX_STEP){invalidate('position discontinuity '+step.toFixed(2)+' m');return}
+ if(step>0.002)session.distance+=step;
+ session.last=x.xy;session.lastAt=now;session.duration=(now-session.startedAt)/1000;session.samples++;
+ if(session.nextIndex<route.length&&dist(x.xy,route[session.nextIndex][2])<=RADIUS){session.nextIndex++;renderRoute()}
+ distanceEl.textContent=session.distance.toFixed(1)+' m';durationEl.textContent=session.duration.toFixed(1)+' s';
+ if(session.nextIndex===route.length&&session.distance>=MIN_DISTANCE&&session.duration>=MIN_SECONDS&&session.inputs>0){
+   session.active=false;session.passed=true;session.completedAt=new Date().toISOString();setStatus('HUMAN ROUTE RECORDED — acceptance evidence ready','pass');banner.textContent='Route, duration, distance and manual-input requirements passed. Download the evidence JSON.';download.disabled=false;start.disabled=true;renderRoute();expose()
+ } else expose()
+}
+function evidence(){if(!session?.passed)return null;return {artifact:'34_Fresnaye_Walkthrough_HumanAcceptance_Evidence_v1',recordedAtUtc:session.completedAt,recorderVersion:VERSION,geometryChanged:false,viewerVersion:VIEWER,viewerSha256:VIEWER_SHA,canonicalModel:MODEL,canonicalObjSha256:MODEL_SHA,renderer:session.renderer,route:route.map(x=>x[1]),minimumDistanceM:MIN_DISTANCE,minimumDurationS:MIN_SECONDS,actualDistanceM:+session.distance.toFixed(3),actualDurationS:+session.duration.toFixed(3),humanInputs:session.inputs,samples:session.samples,shortcutGuard:true,discontinuityGuardM:MAX_STEP,pass:true,note:'Evidence records client-side manual interaction. Final project sign-off remains a human review decision.'}}
+download.addEventListener('click',()=>{const e=evidence();if(!e)return;const b=new Blob([JSON.stringify(e,null,2)+'\n'],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='34_Fresnaye_Walkthrough_HumanAcceptance_Evidence_v1.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+restart.addEventListener('click',()=>{resetUi();const x=readFrame();try{x?.d.querySelector('[data-start="entrance"]')?.click()}catch{}start.disabled=!ready;setStatus(ready?'Recorder reset — start again at Entrance':'Loading verified walkthrough…',ready?'pass':'')});
+start.addEventListener('click',startSession);
+f.addEventListener('load',()=>{attachedDoc=null;ready=false;start.disabled=true;resetUi();setStatus('Loading verified walkthrough…')});
+resetUi();timer=setInterval(tick,250);
+})();
+</script>
+</body>
+</html>
