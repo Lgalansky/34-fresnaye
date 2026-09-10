@@ -1,0 +1,40 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_SourceV93_RecorderV2_1_StableLiveQA_v1",
+  "timestampUtc": "2026-09-10T09:18:03.354Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v93",
+  "viewerVersion": "v96",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "recorderSha256": "ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37",
+  "gate": {
+    "pass": true,
+    "sourceArchitect": "v93",
+    "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+    "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+    "humanOk": true,
+    "liveQaOk": true,
+    "pipeOk": true,
+    "freshnessOk": true,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "freshGateRequests": 2,
+    "keyboardManualMovementM": 0.537,
+    "manualMovementRatio": 1,
+    "humanInputs": 2,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "joystickManualMovementM": 1.294,
+    "manualMovementRatio": 1,
+    "humanInputs": 1,
+    "pageErrors": []
+  },
+  "pass": true
+}
