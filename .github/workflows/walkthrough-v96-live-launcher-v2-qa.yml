@@ -1,0 +1,93 @@
+name: Walkthrough v96 live launcher v2 QA
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-live-launcher-v2-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Wait for public launcher v2
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          ok=0
+          for i in $(seq 1 60); do
+            if curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-live.html?launcherv2=$GITHUB_RUN_ID-$i" -o /tmp/live.html; then
+              got=$(sha256sum /tmp/live.html|awk '{print $1}')
+              if [ "$got" = '65e0c784d0ccfa1761015b94b056708edb8c111bfd7777a6e2d1ee15a0c94a03' ] && grep -q 'v2-stable-gate-backed-retry' /tmp/live.html; then ok=1; break; fi
+            fi
+            sleep 5
+          done
+          echo "launcher observed=${got:-missing}"
+          test "$ok" = 1
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify launcher retry starts desktop mobile and exact simulator identity
+        run: |
+          cat > qa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
+          const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const expected={entrance:[7.9,17.1],living:[3.6,13.0],kitchen:[8.0,8.2],bedroom:[3.5,26.7],second:[15.6,17.0],service:[13.2,9.0]};
+          const ok=(v,m)=>{if(!v)throw Error(m)}, dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]};
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_LiveLauncherV2_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v91',launcher:'v2',launcherSha256:'65e0c784d0ccfa1761015b94b056708edb8c111bfd7777a6e2d1ee15a0c94a03',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,transport:'r9.2',retry:{},starts:{},desktop:{},mobile:{},pass:false};
+          async function launch(p,key){
+            await p.goto(ROOT+'walkthrough-live.html?qa='+Date.now()+'#'+key,{waitUntil:'domcontentloaded',timeout:120000});
+            await p.waitForURL(new RegExp('/34-fresnaye/v96-r9/.*#'+key+'$'),{timeout:120000});
+            await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:120000});
+          }
+          async function stick(p,dy,id){const b=await p.locator('#stick').boundingBox();ok(b,'stick bounds');const x=b.x+b.width/2,y=b.y+b.height/2,a=xy(await p.locator('#coords').textContent());await p.dispatchEvent('#stick','pointerdown',{pointerId:id,pointerType:'touch',clientX:x,clientY:y,isPrimary:true,bubbles:true});await p.dispatchEvent('#stick','pointermove',{pointerId:id,pointerType:'touch',clientX:x,clientY:y+dy,isPrimary:true,bubbles:true});await p.waitForTimeout(900);await p.dispatchEvent('#stick','pointerup',{pointerId:id,pointerType:'touch',clientX:x,clientY:y+dy,isPrimary:true,bubbles:true});return dist(a,xy(await p.locator('#coords').textContent()))}
+          (async()=>{
+            const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
+            try{
+              const rc=await b.newContext({viewport:{width:1280,height:720}}),rp=await rc.newPage(),re=[];rp.on('pageerror',e=>re.push(String(e)));let first=true;
+              await rp.route('**/walkthrough-review.html?launcher=2**',async route=>{if(first){first=false;await route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><script>window.__FRESNAYE_STABLE_GATE_QA={pass:false,error:"synthetic first-attempt failure"}</script>'})}else await route.continue()});
+              await rp.goto(ROOT+'walkthrough-live.html?retryqa='+Date.now()+'#entrance',{waitUntil:'domcontentloaded',timeout:120000});
+              await rp.waitForFunction(()=>window.__FRESNAYE_LIVE_LAUNCHER_QA?.state==='BLOCKED',{}, {timeout:30000});
+              const blocked=await rp.evaluate(()=>window.__FRESNAYE_LIVE_LAUNCHER_QA);ok(blocked.version==='v2'&&blocked.pass===false&&blocked.attempts===1,'first attempt did not fail recoverably');
+              ok(await rp.getByRole('button',{name:'Retry verification'}).isVisible(),'retry button not visible');
+              await rp.getByRole('button',{name:'Retry verification'}).click();
+              await rp.waitForFunction(()=>window.__FRESNAYE_LIVE_LAUNCHER_QA?.state==='VERIFIED',{}, {timeout:120000});
+              const recovered=await rp.evaluate(()=>window.__FRESNAYE_LIVE_LAUNCHER_QA);ok(recovered.pass===true&&recovered.attempts===2&&recovered.viewerSha256===V&&recovered.modelSha256===M,'retry did not recover to exact identity');
+              await rp.waitForURL(/\/34-fresnaye\/v96-r9\/.*#entrance$/,{timeout:120000});ok(!re.length,'retry page errors '+re);out.retry={pass:true,firstAttemptBlocked:true,retryVisible:true,recovered:true,attempts:2,pageErrors:re};await rc.close();
+
+              const sc=await b.newContext({viewport:{width:1100,height:720}});
+              for(const [key,pos] of Object.entries(expected)){const p=await sc.newPage(),errs=[];p.on('pageerror',e=>errs.push(String(e)));await launch(p,key);const at=xy(await p.locator('#coords').textContent()),tm=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(dist(at,pos)<.16&&tm.viewerSha256===V&&tm.modelSha256===M&&lm.renderer==='WebGL2'&&!errs.length,'start '+key);out.starts[key]={pass:true,actual:at,expected:pos,pageErrors:errs};await p.close()}await sc.close();
+
+              const dc=await b.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));await launch(p,'entrance');const tm=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META),rr=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());const a=xy(await p.locator('#coords').textContent());await p.keyboard.down('w');await p.waitForTimeout(700);await p.keyboard.up('w');const c=xy(await p.locator('#coords').textContent());ok(dist(a,c)>.15,'desktop keyboard');await p.locator('#enter').click();await p.waitForTimeout(150);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,bubbles:true})));const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&rr.mainRoute.collisionValidated&&!de.length,'desktop mouse/collision/errors');out.desktop={pass:true,renderer:lm.renderer,loaderMode:tm.loaderMode,keyboardMovementM:+dist(a,c).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),collisionValidated:rr.mainRoute.collisionValidated,pageErrors:de};await dc.close();
+
+              const mc=await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await launch(m,'living');const mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),ml=await m.evaluate(()=>window.__FRESNAYE_LIVE_META);let jm=await stick(m,-48,91);if(jm<=.15){await m.evaluate(()=>document.querySelector('[data-start="living"]').click());await m.waitForTimeout(100);jm=await stick(m,48,92)}ok(jm>.15,'mobile joystick '+jm);const lb=await m.locator('#look').boundingBox();ok(lb,'look bounds');const lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,y2=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:93,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:93,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:93,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});const y3=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y3-y2)>.04,'touch look');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok(dist(xy(await m.locator('#coords').textContent()),expected.living)<.12&&!me.length,'mobile reset/errors');const mr=await m.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());ok(mr.mainRoute.collisionValidated,'mobile collision');out.mobile={pass:true,renderer:ml.renderer,loaderMode:mt.loaderMode,joystickMovementM:+jm.toFixed(3),touchLookYawRad:+Math.abs(y3-y2).toFixed(3),reset:true,collisionValidated:mr.mainRoute.collisionValidated,pageErrors:me};await mc.close();
+              out.pass=out.retry.pass&&Object.values(out.starts).every(x=>x.pass)&&out.desktop.pass&&out.mobile.pass;ok(out.pass,'aggregate');fs.writeFileSync('launcher-v2-qa.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+            } finally {await b.close()}
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node qa.cjs
+      - name: Publish permanent launcher v2 QA evidence
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/pages origin/gh-pages
+          cp launcher-v2-qa.json /tmp/pages/walkthrough-live-v2-browserqa-v1.json
+          cd /tmp/pages
+          git checkout -B gh-pages origin/gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-live-v2-browserqa-v1.json
+          git commit -m 'Publish walkthrough live launcher v2 browser QA evidence'
+          git push origin gh-pages
