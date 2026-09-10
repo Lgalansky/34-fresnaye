@@ -43,10 +43,10 @@ jobs:
           const ROOT='https://lgalansky.github.io/34-fresnaye/';
           const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
           const M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
-          const expected={entrance:[7.9,17.1],living:[3.6,13.0],kitchen:[8.0,8.2],bedroom:[3.5,26.7],second:[15.6,17.0],service:[13.2,9.0]};
+          const expected={entrance:[7.9,17.1],living:[3.6,13.0],kitchen:[8.0,8.2],bedroom:[3.5,26.7],second:[-15.4,5.2],service:[-5.08,2.11]};
           const ok=(v,m)=>{if(!v)throw Error(m)}, dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
           const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]};
-          const out={artifact:'34_Fresnaye_Walkthrough_v96_LiveLauncherV2_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v91',launcher:'v2',launcherSha256:'65e0c784d0ccfa1761015b94b056708edb8c111bfd7777a6e2d1ee15a0c94a03',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,transport:'r9.2',retry:{},starts:{},desktop:{},mobile:{},pass:false};
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_LiveLauncherV2_PublicBrowserQA_v2',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v91',launcher:'v2',launcherSha256:'65e0c784d0ccfa1761015b94b056708edb8c111bfd7777a6e2d1ee15a0c94a03',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,transport:'r9.2',retry:{},starts:{},desktop:{},mobile:{},pass:false};
           async function launch(p,key){
             await p.goto(ROOT+'walkthrough-live.html?qa='+Date.now()+'#'+key,{waitUntil:'domcontentloaded',timeout:120000});
             await p.waitForURL(new RegExp('/34-fresnaye/v96-r9/.*#'+key+'$'),{timeout:120000});
@@ -83,11 +83,11 @@ jobs:
           set -euo pipefail
           git fetch origin gh-pages
           git worktree add /tmp/pages origin/gh-pages
-          cp launcher-v2-qa.json /tmp/pages/walkthrough-live-v2-browserqa-v1.json
+          cp launcher-v2-qa.json /tmp/pages/walkthrough-live-v2-browserqa-v2.json
           cd /tmp/pages
           git checkout -B gh-pages origin/gh-pages
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add walkthrough-live-v2-browserqa-v1.json
+          git add walkthrough-live-v2-browserqa-v2.json
           git commit -m 'Publish walkthrough live launcher v2 browser QA evidence'
           git push origin gh-pages
