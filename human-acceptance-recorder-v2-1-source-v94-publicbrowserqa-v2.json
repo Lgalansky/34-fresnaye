@@ -1,0 +1,41 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_HumanAcceptanceV2_1_SourceV94_PublicBrowserQA_v2",
+  "timestampUtc": "2026-09-10T10:15:20.239Z",
+  "geometryChanged": false,
+  "recorderVersion": "v2",
+  "codeRevision": "v2.1-manual-control-attestation",
+  "recorderSha256": "ff7e8f3cc13908b52e8f389f4f391fe4692cbaab04d68502131fe39a439a8f37",
+  "sourceArchitect": "v94",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "gateBinding": "synthetic-source-v94-candidate; final real gate QA required after manifest promotion",
+  "failClosed": {
+    "pass": true,
+    "walkthroughRemainedBlank": true,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateRequests": 2,
+    "startFreshVerification": true,
+    "sourceBound": "v94",
+    "manualMovementM": 0.75,
+    "manualControlRatio": 1,
+    "shortcutInvalidated": true,
+    "reason": "navigation shortcut/control used",
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateVerified": true,
+    "sourceBound": "v94",
+    "startVisible": true,
+    "manualMovementM": 1.93,
+    "manualControlRatio": 1,
+    "pageErrors": []
+  },
+  "pass": true
+}
