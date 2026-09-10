@@ -1,0 +1,44 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v101_authoritative_source_package_index",
+  "source_architect_version": "v101",
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T20:23:47+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__AUTHORITATIVE_TENDER_17_SHEET_INDEX_AND_SINGLE_DWG_ARCHIVE_PROVENANCE_REGISTERED__NO_NEW_ARCHILAB_SOURCE__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": "rough1790 / U-S2400",
+      "L02_D22_former_D21_physical_instance1": "corrected ID; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall400",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / side clearance25 each",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / side clearance20 each"
+    }
+  },
+  "v101_material_advance": {
+    "subject": "Authoritative source-package navigation/provenance hardening for later-stage extraction",
+    "finding": "The June tender PDF is indexed as 17 named Archilab sheets from FRE_WD_101 through FRE_WD_402. The paired authoritative working-drawings ZIP is confirmed to contain exactly one DWG member, not separate sheet files. A level-by-level source-lane register is now available for subsequent L01/L03/L04 and remaining L02 extraction.",
+    "impact": "Reduces source-navigation ambiguity and prevents false sheet/file assumptions without releasing any geometry."
+  },
+  "current_L02_locks": [
+    "Entrance vault pair: final/current post-workshop Archilab freeze/reissue remains open; preliminary 2900 AFFL sections are not final geometry.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy remain open.",
+    "Separate 2610 vaulted condition remains source-preserved but semantically unassigned if later build scope requires it."
+  ],
+  "later_stage_open_summary": [
+    "L01: complex curved/stepped/nested ceilings; stair soffit exact geometry; D11 masonry tag/rough width; W06 rough width; W08 masonry head; W04/W05/W06 25mm interface meanings.",
+    "L03: D02 duplicate schedule-system conflict; D04 confirmed schedule omission; iD02 2100-vs-2150 conflict; skylight interfaces/IDs; S01/S02 masonry heads; S03 grille overall size.",
+    "L04: Mazista/Klip-Lok written assembly conflict; main-roof numeric pitch/eaves/ridge; lean-to quantitative run/eave/ridge-edge. Parapet 370 remains source-closed."
+  ],
+  "source_watch": "No newer architect inbound after 2026-09-10T12:24:08Z; latest source remains preliminary.",
+  "chief_of_staff_action": "Adopt the v101 source index/provenance register for subsequent evidence extraction. Keep all current open exceptions locked and do not modify canonical geometry.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_AuthoritativeTenderSheetIndex_v1.json",
+    "34_Fresnaye_SourceArchitect_WorkingDrawingsArchive_ProvenanceException_v1.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v84.json",
+    "34_Fresnaye_SourceArchitect_Run101_SourceArtifactManifest_v1.json"
+  ]
+}
