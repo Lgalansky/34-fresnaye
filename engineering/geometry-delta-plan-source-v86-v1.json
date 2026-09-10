@@ -1,0 +1,18 @@
+{
+  "artifact": "34_Fresnaye_GeometryDeltaPlan_SourceV86_v1",
+  "date": "2026-09-10",
+  "sourceArchitect": "v86",
+  "sourceHandoffSha256": "5529ebd1fa3eba196fd8d792b84fb8230c25f343b4ad2962c40e2cb4c59f7703",
+  "classificationSha256": "02f94e9180b6a1f418f868b6af0edc6bb53e071eabe45fc8b6eb6a66df2fccb0",
+  "planner": "34_Fresnaye_GeometryDeltaPlanner_v6",
+  "plannerSha256": "74ca3fa68e83d4473154a9c09de144d155386598fa04c64d42b2cd8fb16833db",
+  "pipelineSha256": "69476af885c45bd8e9ae906d737548f6ab4d409322b40cd6bd11ca5f3f45ab81",
+  "decision": "NO_OP_SHORT_CIRCUIT",
+  "changedElementIds": [],
+  "geometryBuildRequired": false,
+  "fullModelRegenerationRequired": false,
+  "fullBrowserRegressionRequired": false,
+  "canonicalModel": "v23",
+  "viewerVersion": "v96",
+  "reason": "Source v86 is an integrated Level02 source-contract consolidation only; Level02 is PASS_UNCHANGED and geometry authorization is false."
+}
