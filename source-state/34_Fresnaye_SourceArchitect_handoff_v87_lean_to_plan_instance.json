@@ -1,0 +1,51 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v87_lean_to_plan_instance",
+  "date": "2026-09-10",
+  "created_local": "2026-09-10T05:38:18+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "source_rule": "Written dimensions, IDs, FFLs, sections/elevations, brickwork and schedules only. Native vector coordinates may prove annotation ownership only; no visual scaling or coordinate-distance conversion into dimensions.",
+  "predecessor": {
+    "artifact": "34_Fresnaye_SourceArchitect_handoff_v86_integrated_level02.json",
+    "sha256": "5529ebd1fa3eba196fd8d792b84fb8230c25f343b4ad2962c40e2cb4c59f7703"
+  },
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "source_closed": {
+      "L02_D09": "rough1790 / U-S2400; schedule component2685x2400 separate",
+      "L02_D22_former_D21_physical_instance1": "corrected ID; rough2980 / U-S2210; assembly6240 overall / 3080 inner / 2210 high",
+      "L02_W11": "rough1800 / U-S2090 / finished wall thickness400; schedule1660x2100 separate",
+      "L02_iD05": "rough1200 / U-S2400 / pocket100 / 25mm side clearances; exact leaf thickness approximate only; schedule1300x2400 separate",
+      "L02_iD08": "rough855 / U-S2400 / pocket90 / 20mm side clearances; exact leaf thickness approximate only; schedule955x2400 separate"
+    },
+    "current_locks": [
+      "Named circular stepped toilet-cubicle bulkhead exact curve/step construction.",
+      "Two architect-described vaulted conditions remain design-not-frozen and exact tag/section/AFFL mapping unassigned.",
+      "Other curved/unwitnessed Level02 ceiling transitions lacking complete explicit construction witness."
+    ],
+    "effect_of_v87": "NONE"
+  },
+  "v87_material_advance": {
+    "level": "L04",
+    "subject": "Separate 3-degree lean-to roof — FRE_WD_204 plan-instance ownership",
+    "finding": "Native-PDF ownership audit of FRE_WD_204 shows the written 3-degree lean-to construction note has its own vector leader terminating at a filled marker inside one distinct rectangular roof-plan element. This closes which plan instance the 3-degree condition belongs to without deriving any dimension from the page graphic.",
+    "impact": "The prior 'plan extent not assigned' ambiguity is narrowed: exact plan-instance identity is now source-closed. Written run, eave projection and exact ridge/edge coordinates remain open. Domestic Quarters roof-plan overall 6515/9190 must not be transferred to the lean-to."
+  },
+  "source_watch": "No new Archilab inbound after Michael's 2026-09-09T16:41:59Z RE: Render. A later 17:20:06Z mailbox hit is Larry's reply to Archilab, not a new architect source. No promised section attachment received.",
+  "later_stage_open_summary": [
+    "L01: complex curved/stepped/nested ceiling boundaries; stair soffit; D11 brickwork tag/rough width; W06 rough width; W08 head; W04/W05/W06 25mm interface allocations.",
+    "L03: D02 duplicate schedule/system ownership; D04 component schedule omission; iD02 2100-vs-2150 conflict; skylight IDs/interfaces; S01/S02 masonry heads; S03 overall grille size.",
+    "L04: main Mazista written assembly conflict; main-roof numeric pitch/eaves/ridge extents; lean-to quantitative run/eave/ridge-edge geometry; quarantined 370mm parapet-adjacent condition. 3 degrees remains lean-to only."
+  ],
+  "chief_of_staff_action": "Adopt v87 as additive Level04 source hardening. Treat the FRE_WD_204 target element as the identified plan instance of the source-closed 3-degree lean-to condition, but do not trace/scale it or consume 6515/9190 as its dimensions. Retain all Level02 locks and the v86 integrated Level02 contract. No canonical model edit.",
+  "artifacts": [
+    "34_Fresnaye_SourceArchitect_Level04_LeanTo3deg_PlanInstanceOwnershipAudit_v1.json",
+    "34_Fresnaye_SourceArchitect_Level04_LeanTo3deg_PlanInstanceOwnershipEvidence_v1.png",
+    "34_Fresnaye_SourceArchitect_Level04_RoofStorey_SourcePreparationRegister_v6.json",
+    "34_Fresnaye_SourceArchitect_Level04_RoofPitchRemainingExceptions_v3.json",
+    "34_Fresnaye_SourceArchitect_SourceRevisionWatch_v70.json",
+    "34_Fresnaye_SourceArchitect_Run87_ArtifactManifest_v1.json"
+  ]
+}
