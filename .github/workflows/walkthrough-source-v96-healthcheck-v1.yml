@@ -25,7 +25,7 @@ jobs:
         env:
           RUN_ID: ${{ github.run_id }}
         run: |
-          cat > /tmp/health.cjs <<'JS'
+          cat > health.cjs <<'JS'
           const {chromium}=require('playwright');
           const ROOT='https://lgalansky.github.io/34-fresnaye/';
           const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded';
@@ -64,4 +64,4 @@ jobs:
             } finally { await b.close(); }
           })().catch(e=>{console.error('FRESNAYE_HEALTHCHECK_ERROR='+String(e?.stack||e));process.exit(1)});
           JS
-          node /tmp/health.cjs
+          node health.cjs
