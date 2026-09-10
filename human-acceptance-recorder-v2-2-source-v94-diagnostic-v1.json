@@ -1,0 +1,142 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV94_DiagnosticQA_v1",
+  "timestampUtc": "2026-09-10T10:32:36.744Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "stage": "assert",
+  "observations": {
+    "initial": {
+      "qa": {
+        "version": "v2",
+        "ready": true,
+        "gateVerified": true,
+        "sourceArchitect": "v94",
+        "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+        "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+        "canonicalModel": "v23",
+        "liveBrowserQaSha256": "9bd593bfe9b247ef491dbcb93ff22c215f952b3d1abe4ceeca2e37539fe95400",
+        "codeRevision": "v2.2-joystick-deflection-attestation",
+        "requirements": {
+          "sequence": [
+            "Entrance",
+            "Living",
+            "Kitchen",
+            "Main Bedroom",
+            "Entrance"
+          ],
+          "minimumDistanceM": 40,
+          "minimumDurationS": 12,
+          "waypointRadiusM": 1.25,
+          "maxContinuousStepM": 1.6,
+          "minimumManualMovementRatio": 0.85,
+          "minimumManualMovementPerLegM": 1,
+          "maximumUncontrolledMovementM": 1,
+          "minimumJoystickDeflection": 0.08,
+          "stableGateRequired": true,
+          "visibilityGuard": true,
+          "movementControlAttestation": true,
+          "joystickDeflectionAttestation": true
+        },
+        "currentInput": {
+          "key": false,
+          "touch": false,
+          "joystickDeflection": 0,
+          "direct": false,
+          "grace": false,
+          "active": false
+        },
+        "session": null,
+        "sameOriginFrameAccessible": true
+      },
+      "pageErrors": []
+    },
+    "renderer": "WebGL2",
+    "afterStart": {
+      "version": "v2",
+      "ready": true,
+      "gateVerified": true,
+      "sourceArchitect": "v94",
+      "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+      "modelSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+      "canonicalModel": "v23",
+      "liveBrowserQaSha256": "9bd593bfe9b247ef491dbcb93ff22c215f952b3d1abe4ceeca2e37539fe95400",
+      "codeRevision": "v2.2-joystick-deflection-attestation",
+      "requirements": {
+        "sequence": [
+          "Entrance",
+          "Living",
+          "Kitchen",
+          "Main Bedroom",
+          "Entrance"
+        ],
+        "minimumDistanceM": 40,
+        "minimumDurationS": 12,
+        "waypointRadiusM": 1.25,
+        "maxContinuousStepM": 1.6,
+        "minimumManualMovementRatio": 0.85,
+        "minimumManualMovementPerLegM": 1,
+        "maximumUncontrolledMovementM": 1,
+        "minimumJoystickDeflection": 0.08,
+        "stableGateRequired": true,
+        "visibilityGuard": true,
+        "movementControlAttestation": true,
+        "joystickDeflectionAttestation": true
+      },
+      "currentInput": {
+        "key": false,
+        "touch": false,
+        "joystickDeflection": 0,
+        "direct": false,
+        "grace": false,
+        "active": false
+      },
+      "session": {
+        "active": true,
+        "invalid": false,
+        "passed": false,
+        "nextIndex": 1,
+        "distanceM": 0,
+        "durationS": 0,
+        "humanInputs": 0,
+        "manualMovementM": 0,
+        "manualMovementRatio": 0,
+        "uncontrolledMovementM": 0,
+        "legManualM": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "reason": null
+      },
+      "sameOriginFrameAccessible": true
+    },
+    "stickRectFrameLocal": {
+      "x": 18,
+      "y": 411,
+      "width": 128,
+      "height": 128
+    },
+    "center": {
+      "key": false,
+      "touch": false,
+      "joystickDeflection": 0,
+      "direct": false,
+      "grace": false,
+      "active": false
+    },
+    "deflected": {
+      "key": false,
+      "touch": false,
+      "joystickDeflection": 0,
+      "direct": false,
+      "grace": false,
+      "active": false
+    }
+  },
+  "pass": false,
+  "error": "Error: deflected state {\"key\":false,\"touch\":false,\"joystickDeflection\":0,\"direct\":false,\"grace\":false,\"active\":false}\n    at ok (/home/runner/work/34-fresnaye/34-fresnaye/qa.cjs:8:30)\n    at /home/runner/work/34-fresnaye/34-fresnaye/qa.cjs:30:3"
+}
