@@ -1,0 +1,128 @@
+name: Walkthrough v96 stable v91 promote gate v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-v96-stable-v91-promote-gate-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote-and-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Promote stable manifest from v90 to source v91
+        run: |
+          set -euo pipefail
+          git worktree add /tmp/pages gh-pages
+          python3 - <<'PY'
+          import json,hashlib,datetime,pathlib
+          root=pathlib.Path('/tmp/pages')
+          evidence=root/'stable-v91-r9-2-publicbrowserqa-v1.json'
+          eb=evidence.read_bytes(); e=json.loads(eb); esha=hashlib.sha256(eb).hexdigest()
+          assert e['pass'] is True and e['sourceArchitect']=='v91'
+          assert e['viewerSha256']=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'
+          assert e['canonicalObjSha256']=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'
+          p=root/'walkthrough-review.json'; m=json.loads(p.read_text())
+          m['artifact']='34_Fresnaye_Walkthrough_StableReviewManifest_v30'
+          m['schemaVersion']=30
+          m['updatedUtc']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          c=m['reviewCandidate']
+          c['liveBrowserQaEvidence']='stable-v91-r9-2-publicbrowserqa-v1.json'; c['liveBrowserQaSha256']=esha
+          c['preferredPermanentLauncher']='walkthrough-live.html#entrance'
+          s=m['sourceState']
+          s.update({
+            'latestSourceArchitectObserved':'v91',
+            'sourceArchitectHandoffArtifact':'34_Fresnaye_SourceArchitect_handoff_v91_circular_partial_centre_witness.json',
+            'sourceArchitectHandoffPublicPath':'source-state/34_Fresnaye_SourceArchitect_handoff_v91_circular_partial_centre_witness.json',
+            'sourceArchitectHandoffSha256':'0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522',
+            'sourceArchitectChiefOfStaffStatus':'LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__CIRCULAR_FEATURE_HORIZONTAL_CENTRELINE_1500_WITNESS_SOURCE_CLOSED__RADIUS_VERTICAL_CENTRE_AND_STEP_CONSTRUCTION_STILL_LOCKED__NO_NEW_ARCHILAB_SECTION__NO_MODEL_EDIT',
+            'level02Effect':'NONE',
+            'effectClassificationPublicPath':'engineering/source-v91-walkthrough-classification-v1.json',
+            'effectClassificationSha256':'bc07e59de0e2d3fe4ed743a80cb2cd67375a455bc94e973b2c9c43d105eeae76',
+            'geometryAuthorization':False,
+            'newerSourceSyncChangesCandidateGeometry':False,
+            'browserQaCompatibilitySource':'v91',
+            'browserQaReuseReason':'Canonical Level02 v23 and exact viewer v96 remain byte-identical under Source v91. Fresh Source-v91 browser QA is bound to the exact v91 handoff, latest-source freshness pointer and geometry-neutral classification bridge.',
+            'materialLevel02SourceBlocker':'Circular stepped toilet-cubicle bulkhead now has a written 1500mm horizontal centreline witness, but radius/diameter, vertical centre, stepped-ring/profile dimensions/AFFLs and exact transitions remain open; VAULTED CEILING OVER ENTRANCE and VAULTED CEILING OVER NEW KITCHEN remain named but explicit 2860/2860/2610 AFFL witnesses are not safely mapped to named conditions; verbal vault conditions remain design-not-frozen; other unwitnessed curved Level02 transitions remain locked.',
+            'laterLevelSourceConflict':'L01 stair zone semantic no-ceiling/sloping-edge intent is source-closed, but exact soffit slope/profile/endpoints remain locked. L04 main Mazista written assembly conflict remains open. No Level02 geometry effect.',
+            'latestPointerPublicPath':'source-state/latest-walkthrough-source.json',
+            'latestPointerSha256':'2589881bfd3b2de026b603869a3c9ba3ffe627ff91afc794b5b68c6f83a107c4'
+          })
+          g=m['geometryPipeline']
+          g.update({'publicPath':'engineering/incremental-geometry-pipeline-v2-v91.json','sha256':'40ba76d0ea8677b208a10afdc784dfd211a1c0ba9bf85f76e30dd33520736a08','currentDeltaPlanPublicPath':'engineering/geometry-delta-plan-source-v91-v1.json','currentDeltaPlanSha256':'91426ddd65ee42257a318297e250c94e30c91be0091e4fee18a8ff93ff5a9332','currentDecision':'NO_OP_SHORT_CIRCUIT','geometryBuildRequired':False,'fullModelRegenerationRequired':False,'fullBrowserRegressionRequired':False})
+          p.write_text(json.dumps(m,indent=2)+'\n')
+          mb=p.read_bytes(); msha=hashlib.sha256(mb).hexdigest()
+          meta={'artifact':'34_Fresnaye_Walkthrough_v96_SourceV91_StablePromotionMeta_v1','timestampUtc':datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),'geometryChanged':False,'sourceArchitect':'v91','sourceHandoffSha256':'0eaee5b72bed8055a06e41f605c4cbd59fedacbc8493fe2ca98948557ea79522','sourceBrowserQaSha256':esha,'manifest':'34_Fresnaye_Walkthrough_StableReviewManifest_v30','manifestSha256':msha,'stableGateRevision':'v26','stableGateSha256':'0fe8ca506f60503c41992e4f27a18d42ba701b4bdc008542afb0db28a5b9ba6a','launcherVersion':'v1','launcherSha256':'c1934e5c38abc1638311f7086eec83829dc063392e8e80e8cf48318d8d7497c7'}
+          (root/'stable-v91-promotion-meta-v1.json').write_text(json.dumps(meta,indent=2)+'\n')
+          print(json.dumps(meta,indent=2))
+          PY
+          cd /tmp/pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add walkthrough-review.json stable-v91-promotion-meta-v1.json
+          git commit -m 'Promote stable walkthrough trust chain to Source v91'
+          git push origin gh-pages
+      - name: Wait for exact public manifest and launcher
+        run: |
+          set -euo pipefail
+          B='https://lgalansky.github.io/34-fresnaye'
+          EXPECTED=$(python3 -c "import json;print(json.load(open('/tmp/pages/stable-v91-promotion-meta-v1.json'))['manifestSha256'])")
+          ok=0
+          for i in $(seq 1 40); do
+            if curl -fsSL --retry 2 --retry-delay 1 "$B/walkthrough-review.json?promote=$GITHUB_RUN_ID-$i" -o /tmp/public-manifest.json; then
+              got=$(sha256sum /tmp/public-manifest.json | awk '{print $1}')
+              if [ "$got" = "$EXPECTED" ]; then ok=1; break; fi
+            fi
+            sleep 5
+          done
+          echo "manifest expected=$EXPECTED observed=${got:-missing}"
+          test "$ok" = 1
+          curl -fsSL "$B/walkthrough-live.html?promote=$GITHUB_RUN_ID" -o /tmp/public-launcher.html
+          test "$(sha256sum /tmp/public-launcher.html | awk '{print $1}')" = 'c1934e5c38abc1638311f7086eec83829dc063392e8e80e8cf48318d8d7497c7'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify stable gate and permanent launcher against Source v91
+        run: |
+          cat > gateqa.cjs <<'JS'
+          const {chromium,devices}=require('playwright'),fs=require('fs');
+          const ROOT='https://lgalansky.github.io/34-fresnaye/';
+          const V='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded',M='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5';
+          const xy=t=>{const m=(t||'').match(/x\s+(-?\d+(?:\.\d+)?)\s+m\s+·\s+y\s+(-?\d+(?:\.\d+)?)\s+m/);if(!m)throw Error('coords '+t);return[+m[1],+m[2]]},dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),ok=(v,m)=>{if(!v)throw Error(m)};
+          const out={artifact:'34_Fresnaye_Walkthrough_v96_StableV91R9_2_GateLiveQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,sourceArchitect:'v91',gateRevision:'v26',launcherVersion:'v1',viewerVersion:'v96',viewerSha256:V,canonicalModel:'v23',canonicalObjSha256:M,gate:{},launcherDesktop:{},launcherMobile:{},acceptanceRecorder:{},pass:false};
+          async function launcherReady(p,key){await p.goto(ROOT+'walkthrough-live.html?gate91='+Date.now()+'#'+key,{waitUntil:'domcontentloaded',timeout:120000});await p.waitForURL(new RegExp('/34-fresnaye/v96-r9/.*#'+key+'$'),{timeout:120000});await p.waitForFunction(()=>window.__FRESNAYE_TRANSPORT_META?.pass===true&&window.__FRESNAYE_QA?.status==='READY',{}, {timeout:120000})}
+          (async()=>{const browser=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const gc=await browser.newContext({viewport:{width:1280,height:720}}),g=await gc.newPage(),ge=[];g.on('pageerror',e=>ge.push(String(e)));await g.goto(ROOT+'walkthrough-review.html?gate91='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await g.waitForFunction(()=>window.__FRESNAYE_STABLE_GATE_QA?.pass===true,{}, {timeout:120000});const q=await g.evaluate(()=>window.__FRESNAYE_STABLE_GATE_QA);ok(q.sourceArchitect==='v91'&&q.viewerSha256===V&&q.modelSha256===M&&q.freshnessOk&&q.sourceOk&&q.pipeOk&&q.liveQaOk&&!ge.length,'stable gate');out.gate={pass:true,sourceArchitect:q.sourceArchitect,effectMode:q.effectMode,planner:q.planner,decision:q.decision,freshnessOk:q.freshnessOk,sourceOk:q.sourceOk,pipelineOk:q.pipeOk,currentSourceLiveQaOk:q.liveQaOk,pageErrors:ge};await gc.close();
+            const dc=await browser.newContext({viewport:{width:1365,height:768}}),p=await dc.newPage(),de=[];p.on('pageerror',e=>de.push(String(e)));await launcherReady(p,'entrance');const tm=await p.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),lm=await p.evaluate(()=>window.__FRESNAYE_LIVE_META),rr=await p.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());const a=xy(await p.locator('#coords').textContent());ok(dist(a,[7.9,17.1])<.14&&tm.viewerSha256===V&&tm.modelSha256===M&&lm.renderer==='WebGL2'&&rr.mainRoute.collisionValidated,'launcher desktop identity');await p.keyboard.down('w');await p.waitForTimeout(650);await p.keyboard.up('w');const b=xy(await p.locator('#coords').textContent());ok(dist(a,b)>.15,'desktop move');await p.locator('#enter').click();await p.waitForTimeout(150);ok(await p.evaluate(()=>document.pointerLockElement===document.getElementById('c')),'pointer lock');const y0=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await p.evaluate(()=>document.dispatchEvent(new MouseEvent('mousemove',{movementX:100,bubbles:true})));const y1=(await p.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y1-y0)>.02&&!de.length,'desktop mouse/errors');out.launcherDesktop={pass:true,renderer:lm.renderer,keyboardMovementM:+dist(a,b).toFixed(3),pointerLock:true,mouseLookYawRad:+Math.abs(y1-y0).toFixed(3),collisionValidated:rr.mainRoute.collisionValidated,pageErrors:de};await dc.close();
+            const mc=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844}}),m=await mc.newPage(),me=[];m.on('pageerror',e=>me.push(String(e)));await launcherReady(m,'living');const mt=await m.evaluate(()=>window.__FRESNAYE_TRANSPORT_META),ml=await m.evaluate(()=>window.__FRESNAYE_LIVE_META);ok(dist(xy(await m.locator('#coords').textContent()),[3.6,13])<.14&&mt.viewerSha256===V&&mt.modelSha256===M&&ml.renderer==='WebGL2','mobile identity');const sb=await m.locator('#stick').boundingBox();ok(sb,'stick');const sx=sb.x+sb.width/2,sy=sb.y+sb.height/2,ma=xy(await m.locator('#coords').textContent());await m.dispatchEvent('#stick','pointerdown',{pointerId:91,pointerType:'touch',clientX:sx,clientY:sy,isPrimary:true,bubbles:true});await m.dispatchEvent('#stick','pointermove',{pointerId:91,pointerType:'touch',clientX:sx,clientY:sy-48,isPrimary:true,bubbles:true});await m.waitForTimeout(900);await m.dispatchEvent('#stick','pointerup',{pointerId:91,pointerType:'touch',clientX:sx,clientY:sy-48,isPrimary:true,bubbles:true});const mb=xy(await m.locator('#coords').textContent());ok(dist(ma,mb)>.15,'mobile move');const lb=await m.locator('#look').boundingBox(),lx=lb.x+lb.width*.6,ly=lb.y+lb.height*.5,y2=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;await m.dispatchEvent('#look','pointerdown',{pointerId:92,pointerType:'touch',clientX:lx,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointermove',{pointerId:92,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});await m.dispatchEvent('#look','pointerup',{pointerId:92,pointerType:'touch',clientX:lx+60,clientY:ly,isPrimary:true,bubbles:true});const y3=(await m.evaluate(()=>window.__FRESNAYE_QA.cameraState())).yaw;ok(Math.abs(y3-y2)>.04,'mobile look');await m.locator('#mobileReset').click();await m.waitForTimeout(100);ok(dist(xy(await m.locator('#coords').textContent()),[3.6,13])<.12&&!me.length,'mobile reset/errors');const mr=await m.evaluate(()=>window.__FRESNAYE_QA.runReviewReadinessQA());out.launcherMobile={pass:true,renderer:ml.renderer,joystickMovementM:+dist(ma,mb).toFixed(3),touchLookYawRad:+Math.abs(y3-y2).toFixed(3),reset:true,collisionValidated:mr.mainRoute.collisionValidated,pageErrors:me};await mc.close();
+            const ac=await browser.newContext({viewport:{width:1280,height:720}}),ap=await ac.newPage(),ae=[];ap.on('pageerror',e=>ae.push(String(e)));await ap.goto(ROOT+'walkthrough-human-acceptance.html?source91='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});await ap.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});const aq=await ap.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);ok(aq.viewerSha256===V&&aq.modelSha256===M&&!ae.length,'recorder');out.acceptanceRecorder={pass:true,ready:aq.ready,version:aq.version,requirements:aq.requirements,pageErrors:ae};await ac.close();
+            out.pass=out.gate.pass&&out.launcherDesktop.pass&&out.launcherMobile.pass&&out.acceptanceRecorder.pass;ok(out.pass,'aggregate');fs.writeFileSync('gate-v91-qa.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          }finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node gateqa.cjs
+      - name: Publish permanent gate QA and promotion metadata
+        run: |
+          set -euo pipefail
+          cd /tmp/pages
+          git pull --ff-only origin gh-pages
+          cd "$GITHUB_WORKSPACE"
+          cp gate-v91-qa.json /tmp/pages/stable-v91-r9-2-gate-liveqa-v1.json
+          python3 - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path('/tmp/pages'); p=root/'stable-v91-promotion-meta-v1.json'; m=json.loads(p.read_text()); q=root/'stable-v91-r9-2-gate-liveqa-v1.json'; m['gateLiveQaSha256']=hashlib.sha256(q.read_bytes()).hexdigest(); m['gateLiveQaPath']=q.name; m['pass']=True; p.write_text(json.dumps(m,indent=2)+'\n')
+          PY
+          cd /tmp/pages
+          git add stable-v91-r9-2-gate-liveqa-v1.json stable-v91-promotion-meta-v1.json
+          git commit -m 'Publish Source v91 stable gate and launcher QA evidence'
+          git push origin gh-pages
