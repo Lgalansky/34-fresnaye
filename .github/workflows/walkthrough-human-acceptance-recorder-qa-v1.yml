@@ -1,0 +1,70 @@
+name: Walkthrough human acceptance recorder QA v1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walkthrough-human-acceptance-recorder-qa-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify live recorder fail-closed behavior
+        run: |
+          cat > recorder-qa.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          const URL='https://lgalansky.github.io/34-fresnaye/walkthrough-human-acceptance.html';
+          const out={artifact:'34_Fresnaye_Walkthrough_HumanAcceptanceRecorder_PublicBrowserQA_v1',timestampUtc:new Date().toISOString(),geometryChanged:false,url:URL,viewerVersion:'v96',canonicalModel:'v23',pass:false};
+          (async()=>{const b=await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});try{
+            const c=await b.newContext({viewport:{width:1440,height:900}}),p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(String(e)));
+            await p.goto(URL+'?qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:120000});
+            await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.ready===true,{}, {timeout:120000});
+            let q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);
+            if(q.viewerVersion!=='v96'||q.canonicalModel!=='v23'||q.viewerSha256!=='1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded'||q.modelSha256!=='c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5'||!q.sameOriginFrameAccessible)throw Error('recorder identity/access failed');
+            await p.locator('#start').click();
+            await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.active===true);
+            const frame=p.frameLocator('#walk');
+            await frame.locator('#next').click();
+            await p.waitForFunction(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA?.session?.invalid===true);
+            q=await p.evaluate(()=>window.__FRESNAYE_HUMAN_ACCEPTANCE_QA);
+            if(q.session.passed||!String(q.session.reason).includes('shortcut'))throw Error('shortcut guard failed');
+            out.requirements=q.requirements;out.ready=q.ready;out.sameOriginFrameAccessible=q.sameOriginFrameAccessible;out.shortcutGuardInvalidated=true;out.invalidReason=q.session.reason;out.pageErrors=errors;out.pass=errors.length===0;
+            await c.close();
+          }catch(e){out.error=String(e?.stack||e)}finally{await b.close();fs.writeFileSync('human-acceptance-recorder-publicbrowserqa-v1.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2))}if(!out.pass)process.exit(1)})();
+          JS
+          node --check recorder-qa.cjs
+          node recorder-qa.cjs
+      - name: Persist recorder QA evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          test -s human-acceptance-recorder-publicbrowserqa-v1.json
+          git fetch origin gh-pages
+          git worktree add /tmp/ghp origin/gh-pages
+          cp human-acceptance-recorder-publicbrowserqa-v1.json /tmp/ghp/human-acceptance-recorder-publicbrowserqa-v1.json
+          cd /tmp/ghp
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add human-acceptance-recorder-publicbrowserqa-v1.json
+          git commit -m 'Persist human acceptance recorder QA v1' || true
+          git push origin HEAD:gh-pages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: human-acceptance-recorder-publicbrowserqa-v1
+          path: human-acceptance-recorder-publicbrowserqa-v1.json
