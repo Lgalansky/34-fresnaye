@@ -1,0 +1,52 @@
+{
+  "artifact": "34_Fresnaye_Walkthrough_HumanAcceptanceV2_2_SourceV94_RealTouch_PublicBrowserQA_v1",
+  "timestampUtc": "2026-09-10T10:36:14.022Z",
+  "geometryChanged": false,
+  "sourceArchitect": "v94",
+  "recorderVersion": "v2",
+  "codeRevision": "v2.2-joystick-deflection-attestation",
+  "recorderSha256": "06cd076b31795328f6e9bcfda22b5c02b98500a40eedef6350ae13535ea46885",
+  "viewerSha256": "1540afe2fa89196264dcc1ed078f57b132a8a68399e45c2eb9bd9a85df8a3ded",
+  "canonicalModel": "v23",
+  "canonicalObjSha256": "c7e943b4e4c9cf0220fefd11d7c42d4951873fc956d0d56977863c57bbb2bda5",
+  "failClosed": {
+    "pass": true,
+    "walkthroughRemainedBlank": true,
+    "pageErrors": []
+  },
+  "desktop": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateRequests": 2,
+    "startFreshVerification": true,
+    "shortcutInvalidated": true,
+    "pageErrors": []
+  },
+  "mobile": {
+    "pass": true,
+    "renderer": "WebGL2",
+    "gateVerified": true,
+    "sourceBound": "v94",
+    "inputMethod": "Chromium CDP Input.dispatchTouchEvent",
+    "frameOffset": {
+      "x": 0,
+      "y": 283
+    },
+    "stickRectLocal": {
+      "x": 18,
+      "y": 411,
+      "width": 128,
+      "height": 128
+    },
+    "centerTouchDirect": false,
+    "centerDeflection": 0,
+    "centerKnobTransform": "translate(0px, 0px)",
+    "deflectedTouchDirect": true,
+    "deflectedValue": 0.698,
+    "deflectedKnobTransform": "translate(30px, 0px)",
+    "endTouchDirect": false,
+    "pageErrors": []
+  },
+  "pass": true,
+  "stage": "complete"
+}
