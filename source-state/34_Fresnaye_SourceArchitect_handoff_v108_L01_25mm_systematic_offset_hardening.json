@@ -1,0 +1,58 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v108_L01_25mm_systematic_offset_hardening",
+  "source_architect_version": "v108",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T04:28:07+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L01_W04_W05_W06_REPEATED_25MM_REFERENCE_PATTERN_HARDENED__PHYSICAL_ALLOCATION_STILL_OPEN__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "L02_D09": {
+      "rough_width_mm": 1790,
+      "u_s_opening_mm": 2400
+    },
+    "L02_D22_corrected_former_D21_physical_instance_1": {
+      "rough_width_mm": 2980,
+      "u_s_opening_mm": 2210,
+      "assembly_mm": {
+        "overall": 6240,
+        "inner": 3080,
+        "height": 2210
+      }
+    },
+    "L02_W11": {
+      "rough_width_mm": 1800,
+      "u_s_opening_mm": 2090,
+      "finished_wall_thickness_mm": 400
+    },
+    "L02_iD05": {
+      "rough_width_mm": 1200,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 100,
+      "side_clearance_mm_each": 25
+    },
+    "L02_iD08": {
+      "rough_width_mm": 855,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 90,
+      "side_clearance_mm_each": 20
+    },
+    "boundary": "Structural/brickwork opening values remain separate from scheduled component envelopes."
+  },
+  "v108_material_advance": {
+    "level": "L01 later-stage source preparation",
+    "subject": "W04/W05/W06 25 mm interface offsets",
+    "finding": "The tender written set repeats the same +25 mm arithmetic difference at four independently owned comparisons: W04 head, W05 head, W06 sill and W06 head.",
+    "adjudication": "Classify the offset as a systematic repeated written-reference pattern, not a one-off discrepancy. Keep its physical construction meaning unassigned.",
+    "impact": "Downstream modelling may preserve the separate brickwork and schedule values consistently, but may not create a 25 mm layer/clearance/packing/reveal by inference."
+  },
+  "current_L02_locks": [
+    "Entrance vault pair final/current post-workshop Archilab freeze/reissue remains open; preliminary 2900 AFFL sections are not final geometry.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy remain open.",
+    "Separate 2610 vaulted condition remains source-preserved but semantically unassigned if later build scope requires it."
+  ],
+  "source_watch": "No Archilab inbound on or after 11 September; latest authoritative Library source remains the 10 September Model PDF.",
+  "chief_of_staff_action": "Keep the Level 02 priority five closed. For L01 W04/W05/W06, preserve brickwork and schedule references separately and retain the 25 mm physical allocation as an explicit exception pending Archilab detail.",
+  "geometry_action": "NONE"
+}
