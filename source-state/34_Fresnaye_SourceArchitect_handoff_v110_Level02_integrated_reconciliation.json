@@ -1,0 +1,62 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v110_Level02_integrated_reconciliation",
+  "source_architect_version": "v110",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T06:35:23+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "construction_certification": false,
+  "site_verification_required": true,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__DEDICATED_LEVEL02_INTEGRATED_REGISTER_RECONCILED_TO_CURRENT_SOURCE__W09_SCOPE_NARROWED_TO_WIDTH_ONLY900__PRELIMINARY_VAULT_SECTION_RECEIVED_BUT_FINAL_FREEZE_OPEN__NO_MODEL_EDIT",
+  "level02_effect": "NONE__SOURCE_REGISTER_CORRECTION_ONLY",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "L02_D09": {
+      "rough_width_mm": 1790,
+      "u_s_opening_mm": 2400
+    },
+    "L02_D22_corrected_former_D21_physical_instance_1": {
+      "rough_width_mm": 2980,
+      "u_s_opening_mm": 2210,
+      "assembly_mm": {
+        "overall": 6240,
+        "inner": 3080,
+        "height": 2210
+      }
+    },
+    "L02_W11": {
+      "rough_width_mm": 1800,
+      "u_s_opening_mm": 2090,
+      "finished_wall_thickness_mm": 400
+    },
+    "L02_iD05": {
+      "rough_width_mm": 1200,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 100,
+      "side_clearance_mm_each": 25
+    },
+    "L02_iD08": {
+      "rough_width_mm": 855,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 90,
+      "side_clearance_mm_each": 20
+    },
+    "boundary": "Structural/brickwork opening values remain separate from scheduled component envelopes."
+  },
+  "v110_material_advance": {
+    "subject": "Level02 integrated build-facing source contract reconciliation",
+    "finding": "Earlier Level02 integrated registers had become stale in two important ways: the original contract said the promised vault section had not arrived, and it over-owned W09 vertical/sill fields. Current IntegratedStageReadinessRegister v5 now registers the 10 Sep vault section as preliminary explicit evidence, preserves the v4 field lineage and v2 generic-plan-callout semantic guard, and retires W09 1500/2400/derived-sill claims, retaining only the explicitly owned 900 mm masonry width.",
+    "additional_current_evidence": "IntegratedStageReadinessRegister v5 also incorporates the five exact 8 Sep ceiling AFFL revisions and the circular stepped toilet-bulkhead partial witnesses without converting any unresolved curve/design status into geometry.",
+    "impact": "Chief of Staff/build agents now have one current Level02 intake contract and will not accidentally consume stale W09 or pre-section vault states."
+  },
+  "current_level02_unresolved_ambiguities": [
+    "Final/current post-workshop Archilab freeze/reissue of the two preliminary 2900 mm entrance vault conditions.",
+    "Circular stepped toilet-cubicle bulkhead radius/diameter, vertical centre, stepped-ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy.",
+    "Separate 2610 mm vaulted-condition semantic/component ownership if later required.",
+    "Any other curved/unwitnessed Level02 ceiling/bulkhead transition without complete explicit written construction evidence."
+  ],
+  "source_watch": "Fresh Outlook search found no Archilab inbound on/after 11 Sep; latest remains 10 Sep 12:24:08Z. Library contains no authoritative architectural PDF/ZIP newer than the 10 Sep Model PDF.",
+  "chief_of_staff_action": "Adopt Level02_IntegratedStageReadinessRegister_v5 and IntegratedOpenExceptions_v2. Keep D09/corrected D22/W11/iD05/iD08 closed. Treat W09 as width-only900. Preserve v4 vault-field lineage and the v2 generic VAULTED CEILING OVER semantic guard; keep the preliminary 2900 pair and exact circular bulkhead geometry locked pending Archilab final/current evidence.",
+  "geometry_action": "NONE",
+  "v110_semantic_guard": "The earlier v2 correction is retained: the Level02 plan has two generic literal VAULTED CEILING OVER callouts, not the previously invented extended labels. The preliminary 2900/2900 section lineage is additive and does not assign the generic plan callouts by count/proximity."
+}
