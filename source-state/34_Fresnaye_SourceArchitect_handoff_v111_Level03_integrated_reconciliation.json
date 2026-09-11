@@ -1,0 +1,139 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v111_Level03_integrated_reconciliation",
+  "source_architect_version": "v111",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T07:28:50+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__DEDICATED_LEVEL03_CONTRACT_RECONCILED__S03_CONFIRMED_SCHEDULE_DIMENSION_OMISSION_INTEGRATED__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASSED_SOURCE_EVIDENCE__UNCHANGED_THROUGH_V110",
+    "entries": {
+      "L02_D09": {
+        "brickwork_rough_width_mm": 1790,
+        "brickwork_u_s_opening_mm": 2400,
+        "schedule_component": {
+          "system": "frameless glass in-line sliding door",
+          "overall_mm": [
+            2685,
+            2400
+          ],
+          "top_chain_mm": [
+            1840,
+            845
+          ],
+          "lower_local_span_mm": 1740,
+          "lower_local_span_semantics": "UNASSIGNED"
+        },
+        "status": "STRUCTURAL_OPENING_SOURCE_CLOSED__SCHEDULE_COMPONENT_SEPARATE__INTERFACE_OPEN",
+        "prohibited": "Do not substitute 2685 or 1740 for the 1790 masonry aperture or allocate arithmetic deltas by inference."
+      },
+      "former_L02_D21_physical_instance_1": {
+        "corrected_id": "L02_D22",
+        "brickwork_rough_width_mm": 2980,
+        "brickwork_u_s_opening_mm": 2210,
+        "assembly_overall_width_mm": 6240,
+        "assembly_inner_dimension_mm": 3080,
+        "assembly_height_mm": 2210,
+        "status": "SOURCE_CLOSED_AS_CORRECTED_L02_D22",
+        "prohibited": "Do not reuse L02_D21 for this bay or merge D21 and D22."
+      },
+      "L02_W11": {
+        "brickwork_rough_width_mm": 1800,
+        "brickwork_u_s_opening_mm": 2090,
+        "finished_overall_wall_thickness_mm": 400,
+        "schedule_component_mm": [
+          1660,
+          2100
+        ],
+        "status": "SOURCE_CLOSED_OVERALL__SCHEDULE_COMPONENT_SEPARATE",
+        "remaining": "Material-layer decomposition and exact frame/reveal interface remain unissued."
+      },
+      "L02_iD05": {
+        "brickwork_rough_width_mm": 1200,
+        "brickwork_u_s_opening_mm": 2400,
+        "pocket_opening_mm": 100,
+        "schedule_component_mm": [
+          1300,
+          2400
+        ],
+        "central_leaf_intent": true,
+        "pocket_side_clearance_each_mm": 25,
+        "architect_leaf_thickness_wording": "roughly 50mm",
+        "exact_manufactured_leaf_thickness_mm": null,
+        "status": "ROUGH_OPENING_AND_POCKET_CLEARANCE_SOURCE_CLOSED__COMPONENT_SEPARATE",
+        "remaining": "Exact leaf thickness and cassette/frame/profile/track/hardware/reveal detail."
+      },
+      "L02_iD08": {
+        "brickwork_rough_width_mm": 855,
+        "brickwork_u_s_opening_mm": 2400,
+        "pocket_opening_mm": 90,
+        "schedule_component_mm": [
+          955,
+          2400
+        ],
+        "central_leaf_intent": true,
+        "pocket_side_clearance_each_mm": 20,
+        "architect_leaf_thickness_wording": "roughly 50mm",
+        "exact_manufactured_leaf_thickness_mm": null,
+        "status": "ROUGH_OPENING_AND_POCKET_CLEARANCE_SOURCE_CLOSED__COMPONENT_SEPARATE",
+        "remaining": "Exact leaf thickness and cassette/frame/profile/track/hardware/reveal detail."
+      }
+    }
+  },
+  "v111_material_advance": {
+    "level": "L03 later-stage source preparation",
+    "subject": "Dedicated Level03 integrated contract reconciliation",
+    "finding": "The dedicated Level03 v4 register predated v104 and still inherited S03 as generic overall-size-open. v111 promotes the later v104 occurrence audit into the dedicated contract: S03 count/function are explicit, but its width/height are a confirmed authoritative schedule-dimension omission. D04 remains token-audited omission; D02 duplicate-ID/system conflict and iD02 2100/2150 conflict remain unchanged.",
+    "impact": "Downstream Level03 work now has one self-contained current source contract. S03 cannot be assigned S01/S02 1500x2100 or any graphically derived triangular dimension."
+  },
+  "current_level02_unresolved_ambiguities": {
+    "entrance_vault_pair": {
+      "status": "PRELIMINARY_EXPLICIT_SECTION_AND_HEIGHT_EVIDENCE__FINAL_ARCHITECT_FREEZE_OPEN",
+      "historical_affl_mm": [
+        2860,
+        2860
+      ],
+      "current_preliminary_affl_mm": [
+        2900,
+        2900
+      ],
+      "central_bulkhead_affl_mm": 2910,
+      "perimeter_shadow_line_mm": 20,
+      "numeric_exception": "Preserve separately written 975 overall and 488+488=976 arithmetic; do not normalize the 1 mm difference.",
+      "final_build_authorization": false
+    },
+    "circular_stepped_toilet_bulkhead": {
+      "status": "PARTIAL_SOURCE_CLOSED__EXACT_CURVE_AND_STEP_CONSTRUCTION_OPEN",
+      "written_local_field_mm": [
+        3080,
+        3100
+      ],
+      "written_horizontal_centreline_offset_mm": 1500,
+      "written_inner_field_affl_mm": 3110,
+      "open": [
+        "radius/diameter",
+        "vertical centre",
+        "stepped-ring widths/offsets",
+        "exact transitions/tangencies",
+        "complete outer-band AFFL hierarchy"
+      ],
+      "boundary": "1500 mm is a horizontal centreline offset only; not a radius/diameter."
+    },
+    "separate_2610_vaulted_condition": {
+      "written_affl_mm": 2610,
+      "status": "SOURCE_PRESERVED_SEPARATE_FROM_ENTRANCE_PAIR__SEMANTIC_OWNERSHIP_DEFERRED"
+    }
+  },
+  "level03_material_exceptions": [
+    "D02: duplicate authoritative schedule ID across 3000x2100 frameless and 1500x2100 aluminium systems.",
+    "D04: manufactured component/system omitted from authoritative schedules.",
+    "iD02: brickwork U/S2100 versus scheduled door-graphic vertical2150; physical allocation unresolved.",
+    "S01/S02: masonry heads remain unissued; scheduled 2100 must not be transferred.",
+    "S03: confirmed authoritative schedule-dimension omission for overall width/height.",
+    "Skylights: symbol envelopes closed; IDs and curb/rough-opening/frame/flashing interfaces remain open."
+  ],
+  "source_watch": "No Archilab message received on 2026-09-11 and no newer authoritative architectural Library source than the 2026-09-10 Model PDF.",
+  "chief_of_staff_action": "Adopt Level03 IntegratedStageReadinessRegister v5 + IntegratedOpenExceptions v5 for later Level03 work. Keep Level02 priority five closed; do not modify canonical geometry from this source-only reconciliation.",
+  "geometry_action": "NONE"
+}
