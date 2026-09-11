@@ -1,0 +1,60 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v109_L04_same_primary_roof_assembly_conflict_hardening",
+  "source_architect_version": "v109",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T05:35:56+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "level02_effect": "NONE__PRIORITY_FIVE_RETAINED_SOURCE_CLOSED",
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L04_PRIMARY_ROOF_ASSEMBLY_CONFLICT_HARDENED_TO_SAME_ZONE__ZONE_SEPARATION_NOT_A_VALID_RESOLUTION__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "L02_D09": {
+      "rough_width_mm": 1790,
+      "u_s_opening_mm": 2400
+    },
+    "L02_D22_corrected_former_D21_physical_instance_1": {
+      "rough_width_mm": 2980,
+      "u_s_opening_mm": 2210,
+      "assembly_mm": {
+        "overall": 6240,
+        "inner": 3080,
+        "height": 2210
+      }
+    },
+    "L02_W11": {
+      "rough_width_mm": 1800,
+      "u_s_opening_mm": 2090,
+      "finished_wall_thickness_mm": 400
+    },
+    "L02_iD05": {
+      "rough_width_mm": 1200,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 100,
+      "side_clearance_mm_each": 25
+    },
+    "L02_iD08": {
+      "rough_width_mm": 855,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 90,
+      "side_clearance_mm_each": 20
+    },
+    "boundary": "Structural/brickwork opening values remain separate from scheduled component envelopes."
+  },
+  "v109_material_advance": {
+    "level": "L04 later-stage source preparation",
+    "subject": "Primary Dwelling main-roof assembly ownership conflict",
+    "finding": "FRE_WD_303 same-sheet ownership proves Variant A Klip-Lok and Variant B new Mazista slate/Peter-Louw are both assigned to the Primary Dwelling roof. The conflict is therefore not explained by Primary-vs-Domestic zone separation.",
+    "later_source": "2026-09-08 Archilab Elevations repeats the Klip-Lok instruction for the Primary Dwelling elevation but contains no explicit cancellation/supersession statement for the tender-section Mazista instruction.",
+    "decision": "Keep assembly OPEN. Require explicit Archilab governing system/cancellation. No geometry authorization."
+  },
+  "current_level02_unresolved_ambiguities": [
+    "Final/current Archilab freeze/reissue of the preliminary 2900 mm Entrance vault pair.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy.",
+    "Separate 2610 mm vaulted condition semantic/component ownership if later required."
+  ],
+  "later_stage_material_ambiguity": "Primary Dwelling main-roof covering/build-up remains blocked by same-zone Klip-Lok versus Mazista/Peter-Louw written conflict; numeric main-roof pitch and horizontal eave/ridge geometry also remain open.",
+  "source_watch": "No Archilab inbound dated 2026-09-11; latest known inbound remains 2026-09-10T12:24:08Z.",
+  "chief_of_staff_action": "Do not let downstream modelling resolve the L04 assembly conflict by assigning Klip-Lok to one building zone and Mazista to another. For the Primary Dwelling roof, both are explicitly source-owned; wait for Archilab supersession/clarification.",
+  "geometry_action": "NONE"
+}
