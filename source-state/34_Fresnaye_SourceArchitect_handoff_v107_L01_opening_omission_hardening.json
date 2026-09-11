@@ -1,0 +1,58 @@
+{
+  "artifact": "34_Fresnaye_SourceArchitect_handoff_v107_L01_opening_omission_hardening",
+  "source_architect_version": "v107",
+  "date": "2026-09-11",
+  "created_local": "2026-09-11T03:25:53+03:00",
+  "canonical_geometry_changed": false,
+  "geometry_authorization": false,
+  "chief_of_staff_status": "LEVEL02_PRIORITY_FIVE_RETAINED_CLOSED__L01_D11_W06_W08_MISSING_MASONRY_FIELDS_HARDENED_AS_CURRENT_WRITTEN_SOURCE_OMISSIONS__NO_MODEL_EDIT",
+  "level02_priority_state": {
+    "status": "PASS_UNCHANGED",
+    "L02_D09": {
+      "rough_width_mm": 1790,
+      "u_s_opening_mm": 2400
+    },
+    "L02_D22_corrected_former_D21_physical_instance_1": {
+      "rough_width_mm": 2980,
+      "u_s_opening_mm": 2210,
+      "assembly_mm": {
+        "overall": 6240,
+        "inner": 3080,
+        "height": 2210
+      }
+    },
+    "L02_W11": {
+      "rough_width_mm": 1800,
+      "u_s_opening_mm": 2090,
+      "finished_wall_thickness_mm": 400
+    },
+    "L02_iD05": {
+      "rough_width_mm": 1200,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 100,
+      "side_clearance_mm_each": 25
+    },
+    "L02_iD08": {
+      "rough_width_mm": 855,
+      "u_s_opening_mm": 2400,
+      "pocket_mm": 90,
+      "side_clearance_mm_each": 20
+    },
+    "boundary": "Structural/brickwork opening values remain separate from scheduled component envelopes."
+  },
+  "v107_material_advance": {
+    "level": "L01 later-stage preparation",
+    "subject": "D11/W06/W08 masonry-source audit",
+    "finding": "Current authoritative written-source set does not provide owner-written closure dimensions for D11 rough width, W06 rough width or W08 brickwork head.",
+    "adjudication": "Keep all three open as confirmed written-source omissions; quarantine schedule and adjacent/local values.",
+    "impact": "Prevents false closure by schedule-width/head substitution during later L01 opening modelling."
+  },
+  "current_L02_locks": [
+    "Entrance vault pair final/current post-workshop Archilab freeze/reissue remains open; preliminary 2900 AFFL sections are not final geometry.",
+    "Circular stepped toilet-cubicle bulkhead: radius/diameter, vertical centre, ring widths/offsets, exact transitions/tangencies and complete outer-band AFFL hierarchy remain open.",
+    "Separate 2610 vaulted condition remains source-preserved but semantically unassigned if later build scope requires it."
+  ],
+  "source_watch": "Verified Outlook and Library: no newer Archilab inbound or authoritative file beyond the 2026-09-10 Model PDF.",
+  "chief_of_staff_action": "Keep Level 02 priority five closed. Do not close L01 D11/W06/W08 missing masonry fields from schedule or neighbouring dimensions. Await explicit Archilab/site-approved dimensions if these become build-critical.",
+  "geometry_action": "NONE"
+}
